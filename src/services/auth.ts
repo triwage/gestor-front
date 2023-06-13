@@ -8,9 +8,11 @@ export interface AuthProps {
 
 export async function Auth({ login, senha }: AuthProps) {
   try {
-    const res = await api.post('/pwa/customers/login', {
-      login,
-      senha,
+    const res = await api.get('/ManagerUsers/login', {
+      params: {
+        nomeDeUsuario: login,
+        senha,
+      },
     })
 
     const { success, data, error, message } = res.data
