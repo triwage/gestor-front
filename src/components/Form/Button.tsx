@@ -20,15 +20,14 @@ export function Button({
     <button
       className={clsx(
         'flex items-center gap-2',
-        'justify-center space-x-2 px-1 py-3',
+        'h-10 justify-center space-x-2 px-2 py-3',
         'w-full rounded-md border-none text-sm font-semibold',
         'transition-all hover:opacity-90',
         'active:translate-y-0.5 active:opacity-90',
         {
-          'pointer-events-none h-12 text-white opacity-50': disable,
-          'h-9 bg-primary text-white': variant === 'primary',
-          'h-9 w-[96px] px-1 py-4 font-medium text-white':
-            variant === 'secondary',
+          'pointer-events-none text-white opacity-50': disable,
+          'bg-primary text-white': variant === 'primary',
+          'w-[96px] px-1 py-4 font-medium text-white': variant === 'secondary',
         },
         className,
       )}

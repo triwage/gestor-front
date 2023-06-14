@@ -1,23 +1,30 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router'
 
-import { PencilSimple, Plus, User, UserMinus } from '@phosphor-icons/react'
+import { Plus, Sliders, User, UserMinus } from '@phosphor-icons/react'
 
-import { Button } from '../components/Form/Button'
-import { Input } from '../components/Form/Input'
-import { Dropdown } from '../components/System/Dropdown'
-import { TextAction } from '../components/Texts/TextAction'
-import { TextBody } from '../components/Texts/TextBody'
-import { TextHeading } from '../components/Texts/TextHeading'
-import { Container } from '../template/Container'
+import { Button } from '../../components/Form/Button'
+import { Input } from '../../components/Form/Input'
+import { Dialog } from '../../components/System/Dialog'
+import { Dropdown } from '../../components/System/Dropdown'
+import { Icon } from '../../components/System/Icon'
+import { Loader } from '../../components/System/Loader'
+import { TextAction } from '../../components/Texts/TextAction'
+import { TextBody } from '../../components/Texts/TextBody'
+import { TextHeading } from '../../components/Texts/TextHeading'
+import { deleteUser } from '../../services/users'
+import { Container } from '../../template/Container'
 
 interface Inputs {
   users: string
 }
 
 export default function Users() {
-  const formUsers = useForm<Inputs>()
+  const [isOpenModal, setIsOpenModal] = useState(false)
 
+  const router = useNavigate()
+  const formUsers = useForm<Inputs>()
   const { watch } = formUsers
 
   const usuarios = [
@@ -53,6 +60,10 @@ export default function Users() {
     { id: 2, name: 'Funcionário', value: 0 },
   ]
 
+  async function handleDeleteUser(id: number) {
+    await deleteUser(id)
+  }
+
   const usuariosFilter = useMemo(() => {
     if (watch('users') && watch('users') !== 'undefined') {
       const lowerSearch = watch('users').toLowerCase()
@@ -63,8 +74,6 @@ export default function Users() {
     return usuarios
   }, [watch('users')])
 
-  console.log(usuariosFilter)
-
   return (
     <Container>
       <div className="flex w-full flex-col">
@@ -72,8 +81,8 @@ export default function Users() {
           <TextHeading>Usuários</TextHeading>
 
           <div className="flex items-center">
-            <Button>
-              <Plus size={20} /> Add usuário
+            <Button onClick={() => router('/users/newUser')}>
+              <Plus size={18} /> Add usuário
             </Button>
           </div>
         </div>
@@ -120,13 +129,21 @@ export default function Users() {
                   onChange={(item) => console.log(item)}
                   name={item.cargo}
                 />
-                <UserMinus size={20} />
-                {/* <PencilSimple size={20} /> */}
+                <Icon onClick={() => handleDeleteUser(5)}>
+                  <UserMinus size={20} />
+                </Icon>
+                <Icon onClick={() => setIsOpenModal(true)}>
+                  <Sliders size={20} />
+                </Icon>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      <Dialog open={isOpenModal} closeDialog={() => setIsOpenModal(false)}>
+        <div className="flex w-full">sdasda</div>
+      </Dialog>
     </Container>
   )
 }

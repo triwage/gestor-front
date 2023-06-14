@@ -31,21 +31,18 @@ export function Input({
     <div className="flex w-full flex-col items-start justify-start gap-0.5">
       <label
         htmlFor={name}
-        className="md-max:uppercase -mb-0.5 w-full text-base font-medium text-black dark:text-white"
+        className="md-max:uppercase -mb-0.5 w-full text-sm font-medium text-black dark:text-white"
       >
         {label}
       </label>
       <div
-        className={clsx(
-          'flex w-full select-none items-center space-x-3 rounded-md border border-gray-400 bg-transparent transition-all duration-75',
-          'h-9 focus-within:border-primary',
-          'focus-within:border-2',
-          className,
-        )}
+        className="flex h-10 w-full select-none items-center gap-3 rounded-md border-gray-300/30 bg-gray/20 transition-all
+          duration-75 focus-within:border-2 focus-within:border-primary"
       >
         <input
           className={clsx(
-            'flex h-full w-full flex-1 appearance-none rounded-md border-none bg-transparent px-2 py-1 text-sm font-semibold leading-4 text-black text-black-700 outline-none placeholder:font-normal dark:text-white',
+            'h-full w-full appearance-none rounded-md border-none bg-transparent px-3',
+            'py-2 text-sm font-medium leading-4 text-black outline-none placeholder:font-normal dark:text-white',
             className,
           )}
           id={name}
@@ -54,7 +51,7 @@ export function Input({
         />
       </div>
       {fieldError && (
-        <TextAction size="sm" className="font-semibold text-red">
+        <TextAction size="xs" className="font-semibold text-red">
           {fieldError.message?.toString()}
         </TextAction>
       )}

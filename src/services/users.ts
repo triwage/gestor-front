@@ -3,6 +3,7 @@ import { AxiosError } from 'axios'
 
 import { alerta } from '../components/System/Alert'
 import { api } from '../libs/api'
+import { InputsAddNewUser } from '../pages/users/newUser'
 
 export function useUsers() {
   return useQuery({
@@ -23,15 +24,20 @@ export function useUsers() {
   })
 }
 
-export async function addNewUser() {
+export async function addNewUser({
+  nomeCompleto,
+  nomeDeUsuario,
+  email,
+  senha,
+}: InputsAddNewUser) {
   try {
     const payload = {
-      nomeCompleto: 'Teste de Oliveira',
-      nomeDeUsuario: 'testeoliv',
-      email: 'teste12@gmail.com',
-
-      senha: '1234567',
+      nomeCompleto,
+      nomeDeUsuario,
+      email,
+      senha,
     }
+
     const res = await api.post('/ManagerUsers', payload)
 
     console.log(res)

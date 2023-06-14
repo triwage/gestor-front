@@ -77,7 +77,8 @@ export default {
         100: '#cce6ff',
         50: '#EAF2FF',
       },
-      opacity: 'rgb(0, 0, 0, 0.4)',
+      border: 'rgb(122,122,122, 0.3)',
+      opacity: 'rgb(0, 0, 0, 0.45)',
       transparent: 'transparent',
     },
     extend: {
