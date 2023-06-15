@@ -1,10 +1,6 @@
 import { InputHTMLAttributes } from 'react'
 import { Controller, FieldValues, RegisterOptions } from 'react-hook-form'
 
-import { parseISO } from 'date-fns'
-
-import { useCurrentPanelInfoStore } from '~/store/useCurrentPanelInfoStore'
-
 import { TextAction } from '../../Texts/TextAction'
 import { InputCalendar } from './Calendar'
 
@@ -28,7 +24,6 @@ export function DateInput({
   schema,
   ...props
 }: DateInputProps) {
-  const { currentDate } = useCurrentPanelInfoStore()
   return (
     <Controller
       control={control}
@@ -41,7 +36,7 @@ export function DateInput({
       }) => (
         <div className="flex w-full flex-col items-start justify-start gap-1">
           <InputCalendar
-            value={setDefaultValue ? parseISO(String(currentDate)) : value}
+            value={value}
             onChange={onChange}
             onBlur={onBlur}
             name={name}

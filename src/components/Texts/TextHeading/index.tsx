@@ -16,7 +16,7 @@ export function TextHeading({
   return (
     <h2
       className={clsx(
-        'md-max:uppercase select-none',
+        ' select-none',
         {
           'font-black text-black dark:text-white': !className,
           'text-sm': size === 'xs',

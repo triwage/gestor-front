@@ -31,7 +31,7 @@ export function Input({
     <div className="flex w-full flex-col items-start justify-start gap-0.5">
       <label
         htmlFor={name}
-        className="md-max:uppercase -mb-0.5 w-full text-sm font-medium text-black dark:text-white"
+        className="-mb-0.5 w-full text-sm font-medium text-black dark:text-white"
       >
         {label}
       </label>

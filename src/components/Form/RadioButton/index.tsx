@@ -37,7 +37,7 @@ export function RadioButton({
           {...register(name, schema)}
           {...props}
         />
-        <TextBody className="ml-1  select-none text-base font-medium text-black md-max:uppercase">
+        <TextBody className="ml-1  select-none text-base font-medium text-black ">
           {label}
         </TextBody>
       </label>

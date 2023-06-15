@@ -60,7 +60,7 @@ export function SelectGeneric({
     <>
       <label
         htmlFor={String(label)}
-        className="md-max:uppercase -mb-0.5 w-full text-base font-medium text-black"
+        className=" -mb-0.5 w-full text-base font-medium text-black"
       >
         {label}
       </label>
@@ -68,7 +68,7 @@ export function SelectGeneric({
       <Select
         instanceId={Math.floor(Math.random() * 9999)}
         className={clsx(
-          'md-max:uppercase w-full',
+          ' w-full',
           {
             'text-base font-medium': !className,
           },

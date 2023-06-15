@@ -2,14 +2,13 @@ import { useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
-import { Plus, Sliders, User, UserMinus } from '@phosphor-icons/react'
+import { PlusCircle, Sliders, User, UserMinus } from '@phosphor-icons/react'
 
 import { Button } from '../../components/Form/Button'
 import { Input } from '../../components/Form/Input'
 import { Dialog } from '../../components/System/Dialog'
 import { Dropdown } from '../../components/System/Dropdown'
 import { Icon } from '../../components/System/Icon'
-import { Loader } from '../../components/System/Loader'
 import { TextAction } from '../../components/Texts/TextAction'
 import { TextBody } from '../../components/Texts/TextBody'
 import { TextHeading } from '../../components/Texts/TextHeading'
@@ -82,7 +81,7 @@ export default function Users() {
 
           <div className="flex items-center">
             <Button onClick={() => router('/users/newUser')}>
-              <Plus size={18} /> Add usuário
+              <PlusCircle size={18} /> Add usuário
             </Button>
           </div>
         </div>

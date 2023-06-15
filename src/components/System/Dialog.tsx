@@ -2,14 +2,16 @@ import { ReactNode } from 'react'
 
 import { Transition } from '@headlessui/react'
 import { X } from '@phosphor-icons/react'
+import clsx from 'clsx'
 
 interface DialogProps {
   open: boolean
   closeDialog: () => void
   children: ReactNode
+  size?: 'lg'
 }
 
-export function Dialog({ open, closeDialog, children }: DialogProps) {
+export function Dialog({ open, closeDialog, children, size }: DialogProps) {
   return (
     <Transition
       className="fixed left-0 top-0 flex h-full w-full items-center justify-center"
@@ -32,7 +34,15 @@ export function Dialog({ open, closeDialog, children }: DialogProps) {
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       />
-      <div className="z-50 flex min-h-[75%] min-w-[75%] flex-col items-center gap-1 rounded-md bg-white p-1 shadow-sm shadow-white">
+
+      <div
+        className={clsx(
+          'z-50 flex flex-col items-center gap-1 rounded-md bg-white p-1 shadow-sm shadow-white',
+          {
+            'min-h-[75%] min-w-[75%]': size === 'lg',
+          },
+        )}
+      >
         <div className="flex w-full justify-end">
           <X
             size={22}

@@ -12,7 +12,7 @@ export function TextBody({ children, size = 'md', className }: TextBodyProps) {
   return (
     <span
       className={clsx(
-        'md-max:uppercase',
+        '',
         {
           'font-normal text-black dark:text-white': !className,
           'text-xs': size === 'xs',

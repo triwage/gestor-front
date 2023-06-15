@@ -7,6 +7,10 @@ html, body {
   font-family: 'Inter', sans-serif;
 }
 
+.onPress {
+  @apply active:translate-y-0.5 cursor-pointer
+}
+
 .loaderRectangle {
  display: flex;
  justify-content: center;

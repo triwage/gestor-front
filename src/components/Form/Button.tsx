@@ -6,7 +6,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string
   disable?: boolean
   asChild?: boolean
-  variant?: 'primary' | 'secondary' | 'confirm' | 'comprovant' | 'outline'
+  variant?: 'primary' | 'structure'
 }
 
 export function Button({
@@ -27,7 +27,7 @@ export function Button({
         {
           'pointer-events-none text-white opacity-50': disable,
           'bg-primary text-white': variant === 'primary',
-          'w-[96px] px-1 py-4 font-medium text-white': variant === 'secondary',
+          '': variant === 'structure',
         },
         className,
       )}

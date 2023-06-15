@@ -70,17 +70,20 @@ export function InputCalendar({
   }, [value])
 
   return (
-    <div className="w-full space-y-1">
-      <label htmlFor="small" className="text-base font-medium text-black">
+    <div className="flex w-full flex-col items-start justify-start gap-0.5">
+      <label
+        htmlFor="small"
+        className="text-sm font-medium text-black dark:text-white"
+      >
         {label}
       </label>
       <div
-        className="flex h-9 w-full select-none items-center gap-2 rounded-md border border-border-form bg-white p-2
+        className="gap-q flex h-9 w-full select-none items-center rounded-md border border-gray-300/30 bg-gray/20 p-2
           transition-all focus-within:border-2 focus-within:border-primary"
       >
         <CalendarBlank
           size={24}
-          className={disabled ? 'text-black-200' : 'text-primary'}
+          className="text-primary dark:text-white"
           weight="fill"
           onClick={() => {
             !disabled && setOpen(true)
@@ -88,7 +91,7 @@ export function InputCalendar({
         />
         <input
           type="text"
-          className="flex h-full w-full appearance-none border-none bg-transparent text-base font-medium leading-4 text-black outline-none placeholder:font-normal"
+          className="flex h-max w-full appearance-none rounded-md border-none bg-transparent p-2 text-sm font-medium leading-4 text-black outline-none placeholder:font-normal dark:text-white"
           defaultValue={format(new Date(valueCalendar), 'dd/MM/yyyy')}
           disabled={disabled}
           onChange={handleInputDate}
@@ -97,13 +100,13 @@ export function InputCalendar({
       </div>
 
       {open && (
-        <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-loading">
+        <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-opacity">
           <div className="flex flex-col items-end justify-center gap-0.5">
             <div
               onClick={() => {
                 setOpen(false)
               }}
-              className="flex items-center justify-center rounded-full bg-white p-1"
+              className="flex items-center justify-center rounded-full p-1"
             >
               <X
                 size={24}

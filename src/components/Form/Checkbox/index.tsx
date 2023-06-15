@@ -36,7 +36,7 @@ export function Checkbox({
           {...props}
         />
         {label && (
-          <TextBody className="ml-2 select-none font-medium text-black md-max:uppercase">
+          <TextBody className="ml-2 select-none font-medium text-black ">
             {label}
           </TextBody>
         )}

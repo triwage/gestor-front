@@ -16,7 +16,7 @@ export function TextAction({
   return (
     <span
       className={clsx(
-        'md-max:uppercase select-none',
+        ' select-none',
         {
           'font-semibold text-black dark:text-white': !className,
           'text-xs': size === 'xs',

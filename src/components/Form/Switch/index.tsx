@@ -28,8 +28,8 @@ export function Switch({ name, label, schema, ...props }: SwitchProps) {
           {...register(name, schema)}
           {...props}
         />
-        <div className="after:duration-250 peer h-5 w-9 rounded-full bg-primary-200 after:absolute after:left-[2px] after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-transparent"></div>
-        <TextBody className="md-max:uppercase ml-2 select-none font-medium text-black">
+        <div className="after:duration-250 peer h-5 w-9 rounded-full bg-primary-50 after:absolute after:left-[2px] after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-transparent"></div>
+        <TextBody className=" ml-2 select-none text-sm font-medium text-black dark:text-white">
           {label}
         </TextBody>
       </label>

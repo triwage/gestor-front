@@ -27,7 +27,7 @@ export function RadioGroup({
   return (
     <div className="flex w-full flex-col items-start justify-start gap-0.5">
       <div className="col w-full gap-0.5">
-        <label className="select-none text-base font-medium text-black md-max:uppercase">
+        <label className="select-none text-base font-medium text-black ">
           {label}
         </label>
         <div className="flex flex-wrap items-center justify-start gap-1">

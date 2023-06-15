@@ -31,7 +31,7 @@ export function InputCurrency({
     <div className="flex w-full flex-col items-start justify-start gap-0.5">
       <label
         htmlFor={name}
-        className="-mb-0.5 w-full text-base font-medium text-black md-max:uppercase"
+        className="-mb-0.5 w-full text-base font-medium text-black "
       >
         {label}
       </label>
@@ -40,7 +40,7 @@ export function InputCurrency({
           R$
         </span>
         <input
-          className="block w-full min-w-0 flex-1 rounded-none rounded-r-lg bg-transparent p-2 text-base font-medium outline-none md-max:uppercase"
+          className="block w-full min-w-0 flex-1 rounded-none rounded-r-lg bg-transparent p-2 text-base font-medium outline-none "
           id={name}
           {...register(name, {
             onChange: (event) => {
