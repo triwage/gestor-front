@@ -143,7 +143,13 @@ export default function Banners() {
               >
                 <ImagesSquare size={20} />
               </Icon>
-              <Icon>
+              <Icon
+                onClick={() =>
+                  router('/banners/addBanner', {
+                    state: item,
+                  })
+                }
+              >
                 <PencilSimple size={20} />
               </Icon>
             </div>

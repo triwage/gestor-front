@@ -12,9 +12,3 @@ export function getParseMessageError(obj: any, path: any) {
 
   return result
 }
-
-export function haveData(value: any) {
-  return (
-    value !== undefined && value != null && value !== '' && value.length !== 0
-  )
-}

@@ -42,7 +42,7 @@ app.render(
         toastClassName={({ type }: any) =>
           // @ts-expect-error
           contextClass[type || 'default'] +
-          'relative flex mt-2 mx-2 p-1.5 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer'
+          'relative flex mt-1 mx-1 p-1.5 min-h-10 rounded-lg justify-between overflow-hidden cursor-pointer'
         }
         autoClose={2500}
       />

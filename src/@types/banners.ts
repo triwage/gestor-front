@@ -1,5 +1,12 @@
 export type BannersProps = {
-  title: string
-  subtitle: string
-  img: string
+  gebaTitulo: string
+  gebaSubtitulo: string
+  gebaBotaoTexto: string
+  gebaBotaoAcao: string
+  gebaImagem?: string
+  gebaImagemAltura?: number
+  gebaImagemLargura?: number
+  gebaStatus?: boolean
+  gebaDtaValidade?: string
+  id?: number
 }

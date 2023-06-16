@@ -36,8 +36,8 @@ export function Input({
         {label}
       </label>
       <div
-        className="flex h-10 w-full select-none items-center gap-3 rounded-md border-gray-300/30 bg-gray/20 transition-all
-          duration-75 focus-within:border-2 focus-within:border-primary"
+        className="flex h-10 w-full select-none items-center gap-3 rounded-md border border-gray-300/30 bg-gray/20 transition-all
+          duration-75 focus-within:border focus-within:border-gray"
       >
         <input
           className={clsx(

@@ -14,7 +14,7 @@ interface DialogProps {
 export function Dialog({ open, closeDialog, children, size }: DialogProps) {
   return (
     <Transition
-      className="fixed left-0 top-0 flex h-full w-full items-center justify-center"
+      className="fixed left-0 top-0 flex h-full w-full flex-col items-center justify-center"
       show={open}
       enter="transform transition duration-150"
       enterFrom="opacity-0 scale-50"
@@ -34,7 +34,12 @@ export function Dialog({ open, closeDialog, children, size }: DialogProps) {
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       />
-
+      <div
+        onClick={closeDialog}
+        className="fixed -left-2 top-3 z-50 flex w-full justify-end"
+      >
+        <X size={28} className="cursor-pointer text-white" weight="bold" />
+      </div>
       <div
         className={clsx(
           'z-50 flex flex-col items-center gap-1 rounded-md bg-white p-1 shadow-sm shadow-white',
@@ -43,14 +48,7 @@ export function Dialog({ open, closeDialog, children, size }: DialogProps) {
           },
         )}
       >
-        <div className="flex w-full justify-end">
-          <X
-            size={22}
-            className="cursor-pointer text-primary"
-            onClick={closeDialog}
-          />
-        </div>
-        <div className="mt-2 h-full w-full">{children}</div>
+        <div className="h-full w-full">{children}</div>
       </div>
     </Transition>
   )

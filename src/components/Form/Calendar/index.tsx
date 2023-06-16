@@ -7,7 +7,6 @@ import { InputCalendar } from './Calendar'
 interface DateInputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string
   control: any
-  setDefaultValue?: boolean
   minDate?: any
   maxDate?: any
   label?: string
@@ -20,7 +19,6 @@ export function DateInput({
   minDate,
   maxDate,
   label,
-  setDefaultValue,
   schema,
   ...props
 }: DateInputProps) {

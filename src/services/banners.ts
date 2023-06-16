@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 
+import { BannersProps } from '../@types/banners'
 import { alerta } from '../components/System/Alert'
 import { api } from '../libs/api'
-import { InputsAddBanner } from '../pages/banners/addBanner'
 
 export function useBanners() {
   return useQuery({
@@ -32,7 +32,7 @@ export async function addNewBanner({
   gebaImagem,
   gebaStatus,
   gebaDtaValidade,
-}: InputsAddBanner) {
+}: BannersProps) {
   try {
     const payload = {
       gebaTitulo,
@@ -43,10 +43,10 @@ export async function addNewBanner({
       gebaStatus,
       gebaDtaValidade,
     }
+    console.log(payload)
+    // const res = await api.post('/banners', payload)
 
-    const res = await api.post('/banners', payload)
-
-    console.log(res)
+    // console.log(res)
   } catch (error) {
     if (error instanceof AxiosError) {
       alerta(error.response?.data.message)
@@ -65,7 +65,7 @@ export async function updateUser({
   gebaStatus,
   gebaDtaValidade,
   id,
-}: InputsAddBanner) {
+}: BannersProps) {
   try {
     const payload = {
       gebaTitulo,

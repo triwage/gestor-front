@@ -16,6 +16,22 @@ export function Sidebar() {
     router(value)
   }
 
+  // function subMenus(menu, itensExpandir) {
+  //   if (menu?.ITENS.length > 0) {
+  //     return (
+  //       <Menus
+  //         menu={menu}
+  //         show={itensExpandir}
+  //         onClick={(value) => {
+  //           setHoverMenu(true)
+  //           handleExpandir(value)
+  //           handleClickMenuPai(value)
+  //         }}
+  //       />
+  //     )
+  //   }
+  // }
+
   function toggleTheme() {
     setTheme(theme === 'dark' ? 'light' : 'dark')
     localStorage.setItem('theme', theme === 'dark' ? 'light' : 'dark')

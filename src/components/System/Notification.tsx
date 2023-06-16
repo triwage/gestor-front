@@ -9,12 +9,12 @@ export function Notification({ description }: NotificationProps) {
       Object.keys(description).length > 1 &&
       typeof description !== 'string' ? (
         description.map((item: any) => (
-          <span className="w-full text-base font-semibold" key={item}>
+          <span className="w-full text-sm font-medium" key={item}>
             {item.charAt(0).toUpperCase() + item.slice(1)}
           </span>
         ))
       ) : (
-        <span className="w-full text-base font-semibold">{description}</span>
+        <span className="w-full text-sm font-medium">{description}</span>
       )}
     </div>
   )

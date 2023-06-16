@@ -79,7 +79,7 @@ export default {
         50: '#EAF2FF',
       },
       border: 'rgb(122,122,122, 0.3)',
-      opacity: 'rgb(0, 0, 0, 0.45)',
+      opacity: 'rgb(0, 0, 0, 0.5)',
       transparent: 'transparent',
     },
     extend: {

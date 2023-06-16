@@ -1,11 +1,12 @@
-import { ChangeEvent, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import Calendar from 'react-calendar'
 
 import { CalendarBlank, X } from '@phosphor-icons/react'
 import { format, parse } from 'date-fns'
 import 'react-calendar/dist/Calendar.css'
+import { mask, unMask } from 'remask'
 
-interface InputCalendarProps {
+interface DateProps {
   name: string
   label?: string
   value: Date
@@ -23,8 +24,8 @@ export function InputCalendar({
   maxDate,
   disabled,
   ...props
-}: InputCalendarProps) {
-  const [valueCalendar, setValueCalendar] = useState(new Date())
+}: DateProps) {
+  const [valueCalendar, setValueCalendar] = useState<Date>(new Date())
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
@@ -34,11 +35,11 @@ export function InputCalendar({
     setValueCalendar(date)
     const dateFormat = format(date, 'dd/MM/yyyy')
     if (inputRef !== null) {
-      ;(inputRef.current as unknown as HTMLInputElement).value = dateFormat
+      ;(inputRef.current as HTMLInputElement).value = dateFormat
     }
   }
 
-  function handleInputDate(e: ChangeEvent<HTMLInputElement>) {
+  function handleInputDate(e: any) {
     const date = parse(e.target.value, 'dd/MM/yyyy', new Date())
     if (e.target.value.length === 10) {
       if (date instanceof Date && !isNaN(date.valueOf())) {
@@ -46,12 +47,8 @@ export function InputCalendar({
         onChange(date)
       }
     }
-    e.currentTarget.maxLength = 8
-    let result = e.currentTarget.value
-    const tst = result.replace(/\D/g, '')
-    result = tst.replace(/^(\d{2})(\d{2})(\d{4})/, '$1/$2/$3')
-
-    e.currentTarget.value = result
+    const result = mask(unMask(e.target.value), ['99/99/9999'])
+    e.target.value = result
   }
 
   useMemo(() => {
@@ -65,7 +62,6 @@ export function InputCalendar({
       if (inputRef?.current !== null) {
         ;(inputRef?.current).value = dateFormat
       }
-      onChange(dateFormat)
     }
   }, [value])
 
@@ -78,11 +74,11 @@ export function InputCalendar({
         {label}
       </label>
       <div
-        className="gap-q flex h-9 w-full select-none items-center rounded-md border border-gray-300/30 bg-gray/20 p-2
-          transition-all focus-within:border-2 focus-within:border-primary"
+        className="border-border-form flex h-10 w-full select-none items-center rounded-md border border-gray-300/30 bg-gray/20 pl-2
+          transition-all focus-within:border focus-within:border-gray"
       >
         <CalendarBlank
-          size={24}
+          size={20}
           className="text-primary dark:text-white"
           weight="fill"
           onClick={() => {
@@ -91,7 +87,7 @@ export function InputCalendar({
         />
         <input
           type="text"
-          className="flex h-max w-full appearance-none rounded-md border-none bg-transparent p-2 text-sm font-medium leading-4 text-black outline-none placeholder:font-normal dark:text-white"
+          className="flex h-10 w-full flex-1 appearance-none rounded-md border-none bg-transparent px-2 text-sm font-medium text-black outline-none placeholder:font-normal dark:text-white"
           defaultValue={format(new Date(valueCalendar), 'dd/MM/yyyy')}
           disabled={disabled}
           onChange={handleInputDate}
@@ -100,18 +96,16 @@ export function InputCalendar({
       </div>
 
       {open && (
-        <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-opacity">
-          <div className="flex flex-col items-end justify-center gap-0.5">
-            <div
-              onClick={() => {
-                setOpen(false)
-              }}
-              className="flex items-center justify-center rounded-full p-1"
-            >
+        <div className="fixed left-0 top-0 z-[999] flex h-screen w-screen flex-col items-center justify-center bg-opacity">
+          <div className="flex flex-col items-end justify-center space-y-0.5">
+            <div className="z-50 flex items-center justify-center rounded-full p-1">
               <X
-                size={24}
+                size={28}
                 weight="bold"
-                className="cursor-pointer text-primary"
+                className="cursor-pointer text-white"
+                onClick={() => {
+                  setOpen(false)
+                }}
               />
             </div>
             <Calendar
