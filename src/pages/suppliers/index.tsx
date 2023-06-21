@@ -2,31 +2,30 @@ import { useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
-import { PlusCircle, Sliders, User, UserMinus } from '@phosphor-icons/react'
+import { PencilSimpleLine, PlusCircle, User } from '@phosphor-icons/react'
 
 import { Button } from '../../components/Form/Button'
 import { Input } from '../../components/Form/Input'
 import { Dialog } from '../../components/System/Dialog'
-import { Dropdown } from '../../components/System/Dropdown'
 import { Icon } from '../../components/System/Icon'
 import { TextAction } from '../../components/Texts/TextAction'
 import { TextBody } from '../../components/Texts/TextBody'
 import { TextHeading } from '../../components/Texts/TextHeading'
-import { deleteUser } from '../../services/users'
+// import { deleteUser } from '../../services/users'
 import { Container } from '../../template/Container'
 
 interface Inputs {
-  users: string
+  suppliers: string
 }
 
-export default function Users() {
+export default function Suppliers() {
   const [isOpenModal, setIsOpenModal] = useState(false)
 
   const router = useNavigate()
-  const formUsers = useForm<Inputs>()
-  const { watch } = formUsers
+  const formSuppliers = useForm<Inputs>()
+  const { watch } = formSuppliers
 
-  const usuarios = [
+  const suppliers = [
     {
       nome: 'fulano de tal',
       cargo: 'Admin',
@@ -54,47 +53,42 @@ export default function Users() {
     },
   ]
 
-  const optionsDropdown = [
-    { id: 1, name: 'Admin', value: 0 },
-    { id: 2, name: 'Funcionário', value: 0 },
-  ]
+  // async function handleDeleteProduct(id: number) {
+  //   await deleteUser(id)
+  // }
 
-  async function handleDeleteUser(id: number) {
-    await deleteUser(id)
-  }
-
-  const usuariosFilter = useMemo(() => {
-    if (watch('users') && watch('users') !== 'undefined') {
-      const lowerSearch = watch('users').toLowerCase()
-      return usuarios?.filter((customer) =>
-        customer.nome.toLowerCase().includes(lowerSearch),
+  const suppliersFilter = useMemo(() => {
+    if (watch('suppliers') && watch('suppliers') !== 'undefined') {
+      const lowerSearch = watch('suppliers').toLowerCase()
+      return suppliers?.filter((p) =>
+        p.nome.toLowerCase().includes(lowerSearch),
       )
     }
-    return usuarios
-  }, [watch('users')])
+    return suppliers
+  }, [watch('suppliers')])
 
   return (
     <Container>
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
-          <TextHeading>Usuários</TextHeading>
+          <TextHeading>Fornecedores</TextHeading>
 
           <div className="flex items-center">
             <Button onClick={() => router('/users/newUser')}>
-              <PlusCircle size={18} /> Adicionar usuário
+              <PlusCircle size={18} /> Adicionar fornecedor
             </Button>
           </div>
         </div>
 
-        <FormProvider {...formUsers}>
+        <FormProvider {...formSuppliers}>
           <form className="my-2">
-            <Input name="users" label="Pesquisar usuário" />
+            <Input name="suppliers" label="Pesquisar usuário" />
           </form>
         </FormProvider>
 
         <div className="mt-1 flex w-full flex-col gap-1 divide-y divide-gray-300 dark:divide-gray-300/20">
-          {!usuariosFilter ||
-            (usuariosFilter.length === 0 && (
+          {!suppliersFilter ||
+            (suppliersFilter.length === 0 && (
               <TextBody
                 size="sm"
                 className="text-center font-semibold text-black dark:text-white"
@@ -102,7 +96,7 @@ export default function Users() {
                 Nenhum usuário encontrado!
               </TextBody>
             ))}
-          {usuariosFilter.map((item, index) => (
+          {suppliersFilter.map((item, index) => (
             <div
               key={index}
               className="flex w-full items-center justify-between rounded-md py-1"
@@ -123,16 +117,8 @@ export default function Users() {
                 </TextAction>
               </div>
               <div className="flex items-center gap-3">
-                <Dropdown
-                  items={optionsDropdown}
-                  onChange={(item) => console.log(item)}
-                  name={item.cargo}
-                />
-                <Icon onClick={() => handleDeleteUser(5)}>
-                  <UserMinus size={20} />
-                </Icon>
                 <Icon onClick={() => setIsOpenModal(true)}>
-                  <Sliders size={20} />
+                  <PencilSimpleLine size={20} />
                 </Icon>
               </div>
             </div>

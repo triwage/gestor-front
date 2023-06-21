@@ -5,12 +5,17 @@ import Logo from '@/assets/logo.png'
 import { HouseSimple, Sun, Moon, SignOut, Package } from '@phosphor-icons/react'
 import clsx from 'clsx'
 
+import { MenusProps } from '../@types/menus'
+import { useMenus } from '../services/menus'
 import { Menu } from './Menu'
+import { Loader } from './System/Loader'
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const [theme, setTheme] = useState<null | string>(null)
   const router = useNavigate()
+
+  const { data, isLoading, isFetching } = useMenus()
 
   function navigateToPageMenu(value: string) {
     router(value)
@@ -53,6 +58,31 @@ export function Sidebar() {
       document.documentElement.classList.add('dark')
     }
   }, [theme])
+
+  useEffect(() => {
+    if (data) {
+      const res = [] as MenusProps[]
+      data?.forEach((item: MenusProps) => {
+        if (!item.gemeGemeId) {
+          item.ITENS = []
+          res.push(item)
+        }
+      })
+
+      for (let indexDad = 0; indexDad < res.length; indexDad++) {
+        for (let element = 0; element < data.length; element++) {
+          if (data[element].gemeGemeId === res[indexDad].gemeId) {
+            res[indexDad].ITENS.push(data[element])
+          }
+        }
+      }
+      console.log('RESPOSTA,', res)
+    }
+  }, [data, isLoading, isFetching])
+
+  if (isLoading || isFetching) {
+    return <Loader />
+  }
 
   return (
     <>

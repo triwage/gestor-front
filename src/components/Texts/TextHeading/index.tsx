@@ -18,7 +18,7 @@ export function TextHeading({
       className={clsx(
         ' select-none',
         {
-          'font-black text-black dark:text-white': !className,
+          'font-extrabold text-black dark:text-white': !className,
           'text-sm': size === 'xs',
           'text-base': size === 'sm',
           'text-lg': size === 'md',

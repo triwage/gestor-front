@@ -29,6 +29,7 @@ export async function addNewUser({
   nomeDeUsuario,
   email,
   senha,
+  geusAdmin,
 }: InputsAddNewUser) {
   try {
     const payload = {
@@ -36,6 +37,7 @@ export async function addNewUser({
       nomeDeUsuario,
       email,
       senha,
+      geusAdmin,
     }
 
     const res = await api.post('/ManagerUsers', payload)

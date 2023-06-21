@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import { alerta } from '../components/System/Alert'
 import { EnviromentVars } from '../config/env'
 
 const token = localStorage.getItem('token')
@@ -22,8 +23,8 @@ api.interceptors.response.use(
   },
   function (error) {
     if (error.response !== undefined && error.response.status === 401) {
-      alert('Sessão expirada!')
-      window.location.href = '/expired'
+      alerta('Sessão expirada!')
+      window.location.href = '/login'
     } else {
       return Promise.reject(error)
     }

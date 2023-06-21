@@ -8,9 +8,9 @@ export interface AuthProps {
 
 export async function Auth({ login, senha }: AuthProps) {
   try {
-    const res = await api.get('/ManagerUsers/login', {
+    const res = await api.get('/users/login', {
       params: {
-        nomeDeUsuario: login,
+        usuario: login,
         senha,
       },
     })

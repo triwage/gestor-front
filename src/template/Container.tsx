@@ -12,15 +12,15 @@ export function Container({ children }: ContainerProps) {
   const router = useNavigate()
 
   useEffect(() => {
-    // const loader = async () => {
-    //   const user = localStorage.getItem('token')
-    //   if (!user) {
-    //     alerta('Usuário sem permissão')
-    //     return router('/login')
-    //   }
-    //   return null
-    // }
-    // loader()
+    const loader = async () => {
+      const user = localStorage.getItem('token')
+      if (!user) {
+        alerta('Usuário sem permissão')
+        return router('/login')
+      }
+      return null
+    }
+    loader()
   }, [])
 
   return (

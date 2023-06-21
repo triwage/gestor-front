@@ -5,6 +5,7 @@ import { FloppyDiskBack } from '@phosphor-icons/react'
 import * as yup from 'yup'
 
 import { Button } from '../../components/Form/Button'
+import { Checkbox } from '../../components/Form/Checkbox'
 import { Input } from '../../components/Form/Input'
 import { TextHeading } from '../../components/Texts/TextHeading'
 import { addNewUser } from '../../services/users'
@@ -15,6 +16,7 @@ export interface InputsAddNewUser {
   nomeDeUsuario: string
   email: string
   senha: string
+  geusAdmin: boolean
 }
 
 const schemaUsers = yup
@@ -27,6 +29,7 @@ const schemaUsers = yup
       .max(255)
       .required('Informe o e-mail'),
     senha: yup.string().required('Crie uma senha'),
+    geusAdmin: yup.boolean().required(),
   })
   .required()
 
@@ -41,15 +44,16 @@ export default function NewUser() {
     nomeDeUsuario,
     email,
     senha,
+    geusAdmin,
   }: InputsAddNewUser) {
-    await addNewUser({ nomeCompleto, nomeDeUsuario, email, senha })
+    await addNewUser({ nomeCompleto, nomeDeUsuario, email, senha, geusAdmin })
   }
 
   return (
     <Container>
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
-          <TextHeading>Adicionar novo usuário</TextHeading>
+          <TextHeading>Usuários / Adicionar usuário</TextHeading>
         </div>
 
         <FormProvider {...formUsers}>
@@ -58,13 +62,16 @@ export default function NewUser() {
             onSubmit={handleSubmit(handleAddNewUser)}
           >
             <div className="flex gap-2">
-              <Input name="nomeCompleto" type="text" label="Nome" />
-              <Input name="nomeDeUsuario" type="text" label="Nome de usuário" />
+              <Input name="nomeCompleto" label="Nome" />
+              <Input name="nomeDeUsuario" label="Nome de usuário" />
             </div>
 
             <div className="flex gap-2">
-              <Input name="email" type="email" label="E-mail" />
+              <Input name="email" label="E-mail" />
               <Input name="senha" type="password" label="Senha" />
+            </div>
+            <div className="flex gap-2">
+              <Checkbox name="geusAdmin" label="Admin" />
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button onClick={() => handleSubmit(handleAddNewUser)}>
