@@ -1,51 +1,62 @@
 import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 
+import { UsersConfigProps } from '../@types/users'
 import { alerta } from '../components/System/Alert'
+import { haveData } from '../functions/general'
+import { clearCharacters } from '../functions/stringsAndObjects'
 import { api } from '../libs/api'
-import { InputsAddNewUser } from '../pages/users/newUser'
+import { InputsAddNewUser } from '../pages/config/users/newUser'
 
 export function useUsers() {
   return useQuery({
     queryKey: ['listUsers'],
-    queryFn: async () => {
+    queryFn: async (): Promise<UsersConfigProps[] | null> => {
       try {
-        const res = await api.get('/ManagerUsers')
+        const res = await api.get('/users')
 
-        console.log(res)
+        const { data } = res.data
+
+        return haveData(data)
       } catch (error) {
         if (error instanceof AxiosError) {
           alerta(error.response?.data.message)
         } else {
           console.error(error)
         }
+        return null
       }
     },
   })
 }
 
 export async function addNewUser({
-  nomeCompleto,
-  nomeDeUsuario,
-  email,
-  senha,
+  geusNome,
+  geusNomeUsuario,
+  geusEmail,
+  geusSenha,
   geusAdmin,
 }: InputsAddNewUser) {
   try {
     const payload = {
-      nomeCompleto,
-      nomeDeUsuario,
-      email,
-      senha,
+      geusNome,
+      geusNomeUsuario,
+      geusEmail,
+      geusSenha,
       geusAdmin,
     }
 
-    const res = await api.post('/ManagerUsers', payload)
+    const res = await api.post('/users', payload)
 
-    console.log(res)
+    const { success, message } = res.data
+
+    if (success) {
+      alerta(message, 1)
+      window.location.href = '/config/users'
+    }
   } catch (error) {
     if (error instanceof AxiosError) {
-      alerta(error.response?.data.message)
+      alerta(clearCharacters(error.response?.data?.error))
     } else {
       console.error(error)
     }

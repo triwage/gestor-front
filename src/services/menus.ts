@@ -3,10 +3,6 @@ import { AxiosError } from 'axios'
 
 import { alerta } from '../components/System/Alert'
 import { haveData } from '../functions/general'
-import {
-  getMenuToStorage,
-  saveMenuToStorage,
-} from '../functions/stringsAndObjects'
 import { api } from '../libs/api'
 
 export function useMenus() {
@@ -15,14 +11,15 @@ export function useMenus() {
     queryFn: async () => {
       try {
         if (localStorage.getItem('menus')) {
-          return getMenuToStorage()
+          const menusLocal = localStorage.getItem('menus')
+          return JSON.parse(menusLocal)
         }
         const res = await api.get('/menus')
 
         const { success, data } = res.data
 
         if (success && haveData(data)) {
-          saveMenuToStorage(data)
+          localStorage.setItem('menus', JSON.stringify(data))
           return haveData(data)
         }
         return null

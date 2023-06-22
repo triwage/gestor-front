@@ -30,13 +30,13 @@ export function Checkbox({
     <div className="flex w-max flex-col items-start justify-start gap-0.5">
       <label className="relative inline-flex cursor-pointer items-center">
         <input
-          className="form-checkbox h-5 w-5 cursor-pointer rounded-md text-primary focus:ring-transparent"
+          className="form-checkbox h-5 w-5 cursor-pointer rounded-md text-primary focus:ring-white dark:focus:ring-black"
           type="checkbox"
           {...register(name, schema)}
           {...props}
         />
         {label && (
-          <TextBody className="ml-2 select-none text-sm font-medium text-black">
+          <TextBody className="ml-2 select-none text-sm font-medium text-black dark:text-white">
             {label}
           </TextBody>
         )}

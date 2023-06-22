@@ -39,10 +39,10 @@ async function getBase64(blob: any) {
 
 export function haveData(value: any) {
   if (Array.isArray(value) && value.length === 0) {
-    return false
+    return null
   }
   if (value === undefined || value === null || value === '') {
-    return false
+    return null
   }
   return value
 }

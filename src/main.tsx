@@ -7,6 +7,9 @@ import './index.css'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-alpine.css'
+
 import { X } from '@phosphor-icons/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 

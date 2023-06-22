@@ -1,41 +1,57 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import Logo from '@/assets/logo.png'
-import { HouseSimple, Sun, Moon, SignOut, Package } from '@phosphor-icons/react'
+import {
+  Sun,
+  Moon,
+  SignOut,
+  HouseSimple,
+  CaretDown,
+} from '@phosphor-icons/react'
 import clsx from 'clsx'
 
 import { MenusProps } from '../@types/menus'
 import { useMenus } from '../services/menus'
 import { Menu } from './Menu'
+import { Icon } from './System/Icon'
 import { Loader } from './System/Loader'
 
 export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState<number | boolean>(false)
+  const [menus, setMenus] = useState<MenusProps[] | null>(null)
   const [theme, setTheme] = useState<null | string>(null)
   const router = useNavigate()
 
   const { data, isLoading, isFetching } = useMenus()
 
-  function navigateToPageMenu(value: string) {
-    router(value)
+  function handleExpandir(menu: MenusProps) {
+    const itensExpandirAux = isOpen !== menu.gemeId ? menu.gemeId : -1
+
+    setIsOpen(itensExpandirAux)
   }
 
-  // function subMenus(menu, itensExpandir) {
-  //   if (menu?.ITENS.length > 0) {
-  //     return (
-  //       <Menus
-  //         menu={menu}
-  //         show={itensExpandir}
-  //         onClick={(value) => {
-  //           setHoverMenu(true)
-  //           handleExpandir(value)
-  //           handleClickMenuPai(value)
-  //         }}
-  //       />
-  //     )
-  //   }
-  // }
+  function handleClickMenuPai(menu: MenusProps) {
+    if (menu.gemeUrl && menu.gemeUrl !== '#') {
+      router(menu.gemeUrl)
+    }
+  }
+
+  function subMenus(menu: MenusProps, itensExpandir: boolean | number) {
+    if (menu?.ITENS.length > 0) {
+      return (
+        <Menu
+          menu={menu}
+          show={itensExpandir}
+          onClick={(value) => {
+            setIsOpen(true)
+            handleExpandir(value)
+            handleClickMenuPai(value)
+          }}
+        />
+      )
+    }
+  }
 
   function toggleTheme() {
     setTheme(theme === 'dark' ? 'light' : 'dark')
@@ -76,7 +92,7 @@ export function Sidebar() {
           }
         }
       }
-      console.log('RESPOSTA,', res)
+      setMenus(res)
     }
   }, [data, isLoading, isFetching])
 
@@ -115,73 +131,177 @@ export function Sidebar() {
             />
 
             <div className="flex w-full flex-col items-start justify-start gap-2">
-              <Menu
-                onClick={() => navigateToPageMenu('/')}
-                route="/"
-                isOpen={isOpen}
-                icon={
-                  <HouseSimple
-                    size={22}
-                    className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
-                  />
-                }
-                name="Página inicial"
-              />
-
-              <Menu
-                onClick={() => navigateToPageMenu('/products')}
-                route="/products"
-                isOpen={isOpen}
-                icon={
-                  <Package
-                    size={22}
-                    className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
-                  />
-                }
-                name="Produtos"
-              />
+              {menus?.map((element) => (
+                <Fragment key={element.gemeDescricao}>
+                  <div
+                    onClick={() => {
+                      setIsOpen(true)
+                      handleExpandir(element)
+                      handleClickMenuPai(element)
+                    }}
+                    className={clsx(
+                      'group flex w-full cursor-pointer items-center gap-2 rounded-md p-2 transition-all hover:bg-primary/20 dark:hover:bg-black/40',
+                      {
+                        'border-b border-white-200/70':
+                          isOpen === element.gemeId && element.ITENS.length > 0,
+                        'justify-start': isOpen,
+                        'justify-center': !isOpen,
+                        ' bg-primary/20 dark:bg-black/40':
+                          location.pathname === element.gemeUrl,
+                      },
+                    )}
+                  >
+                    <div
+                      className={clsx('flex w-full items-center  text-center', {
+                        'justify-between': isOpen,
+                        'justify-center': !isOpen,
+                      })}
+                    >
+                      <div className="flex items-center gap-2 text-center">
+                        <Icon>
+                          <HouseSimple
+                            size={20}
+                            className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
+                          />
+                        </Icon>
+                        <span
+                          className={clsx(
+                            'select-none text-sm font-medium text-primary/90 transition-all group-hover:text-primary dark:text-white/90 dark:group-hover:text-white',
+                            {
+                              'invisible hidden': !isOpen,
+                            },
+                          )}
+                        >
+                          {element.gemeDescricao}
+                        </span>
+                      </div>
+                      {isOpen && element.ITENS.length > 0 && (
+                        <Icon>
+                          <CaretDown size={20} className="text-white" />
+                        </Icon>
+                      )}
+                    </div>
+                  </div>
+                  {subMenus(element, Number(isOpen))}
+                </Fragment>
+              ))}
             </div>
           </div>
 
           <div className="flex w-full flex-col items-start justify-start gap-2">
             {theme === 'dark' && (
-              <Menu
+              <div
                 onClick={toggleTheme}
-                isOpen={isOpen}
-                icon={
-                  <Sun
-                    size={22}
-                    className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
-                  />
-                }
-                name="Light"
-              />
+                className={clsx(
+                  'group flex w-full cursor-pointer items-center gap-2 rounded-md p-2 transition-all hover:bg-primary/20 dark:hover:bg-black/40',
+                  {
+                    'justify-start': isOpen,
+                    'justify-center': !isOpen,
+                  },
+                )}
+              >
+                <div
+                  className={clsx('flex w-full items-center  text-center', {
+                    'justify-between': isOpen,
+                    'justify-center': !isOpen,
+                  })}
+                >
+                  <div className="flex items-center gap-2 text-center">
+                    <Icon>
+                      <Moon
+                        size={20}
+                        className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
+                        weight="fill"
+                      />
+                    </Icon>
+                    <span
+                      className={clsx(
+                        'select-none text-sm font-medium text-primary/90 transition-all group-hover:text-primary dark:text-white/90 dark:group-hover:text-white',
+                        {
+                          'invisible hidden': !isOpen,
+                        },
+                      )}
+                    >
+                      Dark
+                    </span>
+                  </div>
+                </div>
+              </div>
             )}
             {theme === 'light' && (
-              <Menu
+              <div
                 onClick={toggleTheme}
-                isOpen={isOpen}
-                icon={
-                  <Moon
-                    size={22}
-                    className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
-                    weight="fill"
-                  />
-                }
-                name="Dark"
-              />
+                className={clsx(
+                  'group flex w-full cursor-pointer items-center gap-2 rounded-md p-2 transition-all hover:bg-primary/20 dark:hover:bg-black/40',
+                  {
+                    'justify-start': isOpen,
+                    'justify-center': !isOpen,
+                  },
+                )}
+              >
+                <div
+                  className={clsx('flex w-full items-center  text-center', {
+                    'justify-between': isOpen,
+                    'justify-center': !isOpen,
+                  })}
+                >
+                  <div className="flex items-center gap-2 text-center">
+                    <Icon>
+                      <Sun
+                        size={20}
+                        className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
+                      />
+                    </Icon>
+                    <span
+                      className={clsx(
+                        'select-none text-sm font-medium text-primary/90 transition-all group-hover:text-primary dark:text-white/90 dark:group-hover:text-white',
+                        {
+                          'invisible hidden': !isOpen,
+                        },
+                      )}
+                    >
+                      Light
+                    </span>
+                  </div>
+                </div>
+              </div>
             )}
-            <Menu
+            <div
               onClick={() => console.log('888')}
-              isOpen={isOpen}
-              icon={
-                <SignOut
-                  size={22}
-                  className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
-                />
-              }
-              name="Sair"
-            />
+              className={clsx(
+                'group flex w-full cursor-pointer items-center gap-2 rounded-md p-2 transition-all hover:bg-primary/20 dark:hover:bg-black/40',
+                {
+                  'justify-start': isOpen,
+                  'justify-center': !isOpen,
+                },
+              )}
+            >
+              <div
+                className={clsx('flex w-full items-center  text-center', {
+                  'justify-between': isOpen,
+                  'justify-center': !isOpen,
+                })}
+              >
+                <div className="flex items-center gap-2 text-center">
+                  <Icon>
+                    <SignOut
+                      size={20}
+                      className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
+                    />
+                  </Icon>
+                  <span
+                    className={clsx(
+                      'select-none text-sm font-medium text-primary/90 transition-all group-hover:text-primary dark:text-white/90 dark:group-hover:text-white',
+                      {
+                        'invisible hidden': !isOpen,
+                      },
+                    )}
+                  >
+                    Sair
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -2,31 +2,30 @@ import { useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
-import { PlusCircle, Sliders, User, UserMinus } from '@phosphor-icons/react'
+import { PencilSimpleLine, PlusCircle, User } from '@phosphor-icons/react'
 
-import { Button } from '../../components/Form/Button'
-import { Input } from '../../components/Form/Input'
-import { Dialog } from '../../components/System/Dialog'
-import { Dropdown } from '../../components/System/Dropdown'
-import { Icon } from '../../components/System/Icon'
-import { TextAction } from '../../components/Texts/TextAction'
-import { TextBody } from '../../components/Texts/TextBody'
-import { TextHeading } from '../../components/Texts/TextHeading'
-import { deleteUser } from '../../services/users'
-import { Container } from '../../template/Container'
+import { Button } from '../../../components/Form/Button'
+import { Input } from '../../../components/Form/Input'
+import { Dialog } from '../../../components/System/Dialog'
+import { Icon } from '../../../components/System/Icon'
+import { TextAction } from '../../../components/Texts/TextAction'
+import { TextBody } from '../../../components/Texts/TextBody'
+import { TextHeading } from '../../../components/Texts/TextHeading'
+// import { deleteUser } from '../../services/users'
+import { Container } from '../../../template/Container'
 
 interface Inputs {
-  users: string
+  products: string
 }
 
-export default function Users() {
+export default function Products() {
   const [isOpenModal, setIsOpenModal] = useState(false)
 
   const router = useNavigate()
-  const formUsers = useForm<Inputs>()
-  const { watch } = formUsers
+  const formProducts = useForm<Inputs>()
+  const { watch } = formProducts
 
-  const usuarios = [
+  const products = [
     {
       nome: 'fulano de tal',
       cargo: 'Admin',
@@ -54,47 +53,40 @@ export default function Users() {
     },
   ]
 
-  const optionsDropdown = [
-    { id: 1, name: 'Admin', value: 0 },
-    { id: 2, name: 'Funcionário', value: 0 },
-  ]
+  // async function handleDeleteProduct(id: number) {
+  //   await deleteUser(id)
+  // }
 
-  async function handleDeleteUser(id: number) {
-    await deleteUser(id)
-  }
-
-  const usuariosFilter = useMemo(() => {
-    if (watch('users') && watch('users') !== 'undefined') {
-      const lowerSearch = watch('users').toLowerCase()
-      return usuarios?.filter((customer) =>
-        customer.nome.toLowerCase().includes(lowerSearch),
-      )
+  const productsFilter = useMemo(() => {
+    if (watch('products') && watch('products') !== 'undefined') {
+      const lowerSearch = watch('products').toLowerCase()
+      return products?.filter((p) => p.nome.toLowerCase().includes(lowerSearch))
     }
-    return usuarios
-  }, [watch('users')])
+    return products
+  }, [watch('products')])
 
   return (
     <Container>
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
-          <TextHeading>Usuários</TextHeading>
+          <TextHeading>Produtos</TextHeading>
 
           <div className="flex items-center">
             <Button onClick={() => router('/users/newUser')}>
-              <PlusCircle size={18} /> Adicionar usuário
+              <PlusCircle size={18} /> Adicionar produto
             </Button>
           </div>
         </div>
 
-        <FormProvider {...formUsers}>
+        <FormProvider {...formProducts}>
           <form className="my-2">
-            <Input name="users" label="Pesquisar usuário" />
+            <Input name="products" label="Pesquisar usuário" />
           </form>
         </FormProvider>
 
         <div className="mt-1 flex w-full flex-col gap-1 divide-y divide-gray-300 dark:divide-gray-300/20">
-          {!usuariosFilter ||
-            (usuariosFilter.length === 0 && (
+          {!productsFilter ||
+            (productsFilter.length === 0 && (
               <TextBody
                 size="sm"
                 className="text-center font-semibold text-black dark:text-white"
@@ -102,7 +94,7 @@ export default function Users() {
                 Nenhum usuário encontrado!
               </TextBody>
             ))}
-          {usuariosFilter.map((item, index) => (
+          {productsFilter.map((item, index) => (
             <div
               key={index}
               className="flex w-full items-center justify-between rounded-md py-1"
@@ -123,16 +115,8 @@ export default function Users() {
                 </TextAction>
               </div>
               <div className="flex items-center gap-3">
-                <Dropdown
-                  items={optionsDropdown}
-                  onChange={(item) => console.log(item)}
-                  name={item.cargo}
-                />
-                <Icon onClick={() => handleDeleteUser(5)}>
-                  <UserMinus size={20} />
-                </Icon>
                 <Icon onClick={() => setIsOpenModal(true)}>
-                  <Sliders size={20} />
+                  <PencilSimpleLine size={20} />
                 </Icon>
               </div>
             </div>
