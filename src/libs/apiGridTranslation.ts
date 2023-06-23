@@ -1,19 +1,19 @@
 export const AgGridTranslation = {
   // for filter panel
-  page: 'daPage',
-  more: 'daMore',
-  to: 'daTo',
-  of: 'daOf',
-  next: 'daNexten',
-  last: 'daLasten',
-  first: 'daFirsten',
-  previous: 'daPreviousen',
-  loadingOoo: 'daLoading...',
+  page: 'Page',
+  more: 'More',
+  to: 'To',
+  of: 'Of',
+  next: 'Nexten',
+  last: 'Lasten',
+  first: 'Firsten',
+  previous: 'Previousen',
+  loadingOoo: 'Carregando...',
 
   // for set filter
-  selectAll: 'daSelect Allen',
-  searchOoo: 'daSearch...',
-  blanks: 'daBlanc',
+  selectAll: 'Select Allen',
+  searchOoo: 'Search...',
+  blanks: 'Blanc',
 
   // for number filter and text filter
   filterOoo: 'Filtrar...',

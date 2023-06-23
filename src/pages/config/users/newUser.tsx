@@ -1,5 +1,6 @@
+import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 
 import { yupResolver } from '@hookform/resolvers/yup'
 import { CaretLeft, FloppyDiskBack } from '@phosphor-icons/react'
@@ -10,10 +11,11 @@ import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
-import { addNewUser } from '../../../services/users'
+import { addNewUser, updateUser } from '../../../services/users'
 import { Container } from '../../../template/Container'
 
 export interface InputsAddNewUser {
+  geusId?: number
   geusNome: string
   geusNomeUsuario: string
   geusEmail: string
@@ -39,25 +41,49 @@ export default function NewUser() {
   const formUsers = useForm<InputsAddNewUser>({
     resolver: yupResolver(schemaUsers),
   })
-  const { handleSubmit } = formUsers
+  const { handleSubmit, setValue } = formUsers
 
   const router = useNavigate()
+  const location = useLocation()
 
   async function handleAddNewUser({
+    geusId,
     geusNome,
     geusNomeUsuario,
     geusEmail,
     geusSenha,
     geusAdmin,
   }: InputsAddNewUser) {
-    await addNewUser({
-      geusNome,
-      geusNomeUsuario,
-      geusEmail,
-      geusSenha,
-      geusAdmin,
-    })
+    if (location.state) {
+      await updateUser({
+        geusId,
+        geusNome,
+        geusNomeUsuario,
+        geusEmail,
+        geusSenha,
+        geusAdmin,
+      })
+    } else {
+      await addNewUser({
+        geusNome,
+        geusNomeUsuario,
+        geusEmail,
+        geusSenha,
+        geusAdmin,
+      })
+    }
   }
+
+  useEffect(() => {
+    if (location.state) {
+      const userEdit = Object.keys(location.state)
+
+      userEdit?.forEach((user) => {
+        // @ts-expect-error
+        setValue(String(user), location.state[user])
+      })
+    }
+  }, [location])
 
   return (
     <Container>
@@ -95,7 +121,8 @@ export default function NewUser() {
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button onClick={() => handleSubmit(handleAddNewUser)}>
-                <FloppyDiskBack size={18} weight="fill" /> Adicionar usuário
+                <FloppyDiskBack size={18} weight="fill" />
+                {location.state ? 'Atualizar usuário' : 'Adicionar usuário'}
               </Button>
             </div>
           </form>

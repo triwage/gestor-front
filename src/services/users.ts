@@ -52,7 +52,7 @@ export async function addNewUser({
 
     if (success) {
       alerta(message, 1)
-      window.location.href = '/config/users'
+      location.href = '/config/users'
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -63,11 +63,31 @@ export async function addNewUser({
   }
 }
 
-export async function updateUser(id: number) {
+export async function updateUser({
+  geusId,
+  geusNome,
+  geusNomeUsuario,
+  geusEmail,
+  geusSenha,
+  geusAdmin,
+}: InputsAddNewUser) {
   try {
-    const res = await api.put(`/ManagerUsers/${id}`)
+    const payload = {
+      geusId,
+      geusNome,
+      geusNomeUsuario,
+      geusEmail,
+      geusSenha,
+      geusAdmin,
+    }
+    const res = await api.put(`/users/${geusId}`, payload)
 
-    console.log(res)
+    const { success, message } = res.data
+
+    if (success) {
+      alerta(message, 1)
+      location.href = '/config/users'
+    }
   } catch (error) {
     if (error instanceof AxiosError) {
       alerta(error.response?.data.message)
@@ -79,14 +99,20 @@ export async function updateUser(id: number) {
 
 export async function deleteUser(id: number) {
   try {
-    const res = await api.delete(`/ManagerUsers/${id}`)
+    const res = await api.delete(`/users/${id}`)
 
-    console.log(res)
+    const { success, message } = res.data
+    if (success) {
+      alerta(message, 1)
+      return true
+    }
+    return false
   } catch (error) {
     if (error instanceof AxiosError) {
       alerta(error.response?.data.message)
     } else {
       console.error(error)
     }
+    return false
   }
 }

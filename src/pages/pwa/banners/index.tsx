@@ -3,19 +3,21 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
 import { ImagesSquare, PencilSimple, PlusCircle } from '@phosphor-icons/react'
+import { AgGridReact } from 'ag-grid-react'
 import clsx from 'clsx'
 
-import Banner1 from '../../assets/banner1.png'
-import Banner2 from '../../assets/banner2.png'
-import { Button } from '../../components/Form/Button'
-import { Input } from '../../components/Form/Input'
-import { PreviewBanner } from '../../components/Pages/Banners/PreviewBanner'
-import { Dialog } from '../../components/System/Dialog'
-import { Icon } from '../../components/System/Icon'
-import { TextAction } from '../../components/Texts/TextAction'
-import { TextBody } from '../../components/Texts/TextBody'
-import { TextHeading } from '../../components/Texts/TextHeading'
-import { Container } from '../../template/Container'
+import Banner1 from '../../../assets/banner1.png'
+import Banner2 from '../../../assets/banner2.png'
+import { Button } from '../../../components/Form/Button'
+import { Input } from '../../../components/Form/Input'
+import { PreviewBanner } from '../../../components/Pages/Banners/PreviewBanner'
+import { Dialog } from '../../../components/System/Dialog'
+import { Icon } from '../../../components/System/Icon'
+import { TextAction } from '../../../components/Texts/TextAction'
+import { TextBody } from '../../../components/Texts/TextBody'
+import { TextHeading } from '../../../components/Texts/TextHeading'
+import { AgGridTranslation } from '../../../libs/apiGridTranslation'
+import { Container } from '../../../template/Container'
 
 interface Inputs {
   banners: string
@@ -25,38 +27,75 @@ export default function Banners() {
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [bannerPreview, setBannerPreview] = useState(null)
 
-  const banners = [
+  const [columnDefs] = useState<ColDef[]>([
     {
-      img: Banner1,
-      title: 'DASDASDASDADASDASDASDADASDA',
-      subtitle: 'Testando o subtítulo',
-      status: 'Ativo',
+      field: '',
+      maxWidth: 60,
+      lockVisible: true,
+      cellStyle: {
+        textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      cellRenderer: (params: { data: UsersConfigProps }) => {
+        return (
+          <div className="flex h-full w-full items-center justify-center gap-1">
+            <Icon
+              onClick={() => {
+                router('newUser', {
+                  state: params.data,
+                })
+              }}
+              className="h-full w-full"
+            >
+              <PencilSimple size={20} weight="fill" className="text-primary" />
+            </Icon>
+            <Icon
+              onClick={() => handleDeleteUser(params.data.geusId)}
+              className="w-ful h-full"
+            >
+              <TrashSimple size={20} weight="fill" className="text-primary" />
+            </Icon>
+          </div>
+        )
+      },
     },
     {
-      img: Banner2,
-      title: 'Indique e ganhe',
-      subtitle: 'Testando o subtítulo',
-      status: 'Ativo',
+      field: 'geusId',
+      headerName: 'ID',
+      maxWidth: 70,
     },
     {
-      img: Banner1,
-      title: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      subtitle: 'Testando o subtítulo',
-      status: 'Inativo',
+      field: 'geusNome',
+      headerName: 'Nome',
+      flex: 1,
+      sortable: true,
+      filter: true,
     },
+    { field: 'geusNomeUsuario', headerName: 'Username', flex: 1 },
+    { field: 'geusEmail', headerName: 'Email', flex: 1, sortable: true },
     {
-      img: Banner2,
-      title: 'DASDASDASDADASDASDASDADASDA',
-      subtitle: 'Testando o subtítulo',
-      status: 'Inativo',
+      field: 'geusAdmin',
+      headerName: 'Admin',
+      maxWidth: 90,
+      sortable: true,
+      cellStyle: (params) => {
+        if (params.value) {
+          return { color: '#fff', backgroundColor: '#15803d' }
+        } else {
+          return { color: '#fff', backgroundColor: '#ed3241' }
+        }
+      },
+      cellRenderer: (params: { value: boolean }) => {
+        if (params.value) {
+          return 'Sim'
+        } else {
+          return 'Não'
+        }
+      },
     },
-    {
-      img: Banner2,
-      title: 'Lorem ipsum dolor sit amet,',
-      subtitle: 'Testando o subtítulo',
-      status: 'Inativo',
-    },
-  ]
+  ])
 
   const router = useNavigate()
   const formUsers = useForm<Inputs>()
@@ -90,71 +129,14 @@ export default function Banners() {
         </form>
       </FormProvider>
 
-      <div className="mt-1 flex w-full flex-col gap-1 divide-y divide-gray-300 dark:divide-gray-300/20">
-        {!bannersFilter ||
-          (bannersFilter.length === 0 && (
-            <TextBody
-              size="sm"
-              className="text-center font-semibold text-black dark:text-white"
-            >
-              Nenhum usuário encontrado!
-            </TextBody>
-          ))}
-        {bannersFilter.map((item, index) => (
-          <div
-            key={index}
-            className="flex w-full items-center justify-between rounded-md py-1"
-          >
-            <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center rounded-lg bg-gray-300 p-1 text-black">
-                <img alt="teste" src={item.img} className="h-5 w-5" />
-              </div>
-
-              <TextAction
-                size="sm"
-                className="font-medium text-black dark:text-white"
-              >
-                {item.title}
-              </TextAction>
-              <TextAction size="xs" className="font-normal text-gray-500">
-                {item.subtitle}
-              </TextAction>
-            </div>
-            <div className="flex items-center gap-3">
-              <div
-                className={clsx(
-                  'flex items-center gap-1 rounded-md  px-2 py-1',
-                  {
-                    'bg-green': item.status === 'Ativo',
-                    'bg-red': item.status === 'Inativo',
-                  },
-                )}
-              >
-                <TextAction size="xs" className="font-medium text-white">
-                  {item.status}
-                </TextAction>
-              </div>
-              <Icon
-                click
-                onClick={() => {
-                  setBannerPreview(item)
-                  setIsOpenModal(true)
-                }}
-              >
-                <ImagesSquare size={20} />
-              </Icon>
-              <Icon
-                onClick={() =>
-                  router('/banners/addBanner', {
-                    state: item,
-                  })
-                }
-              >
-                <PencilSimple size={20} />
-              </Icon>
-            </div>
-          </div>
-        ))}
+      <div className="ag-theme-alpine h-full w-full">
+        <AgGridReact
+          rowData={bannersFilter}
+          columnDefs={columnDefs}
+          domLayout={'autoHeight'}
+          animateRows={true}
+          gridOptions={{ localeText: AgGridTranslation }}
+        />
       </div>
       <Dialog open={isOpenModal} closeDialog={() => setIsOpenModal(false)}>
         <div className="flex h-full w-full items-center justify-center">

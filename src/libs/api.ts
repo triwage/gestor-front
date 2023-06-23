@@ -24,7 +24,8 @@ api.interceptors.response.use(
   function (error) {
     if (error.response !== undefined && error.response.status === 401) {
       alerta('Sessão expirada!')
-      window.location.href = '/login'
+      localStorage.removeItem('token')
+      location.href = '/login'
     } else {
       return Promise.reject(error)
     }

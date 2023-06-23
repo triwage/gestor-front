@@ -16,6 +16,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import routes from '~react-pages'
 
 import { Loader } from './components/System/Loader'
+import { LoadingProvider } from './contexts/LoadingContext'
 import { queryClient } from './libs/queryClient'
 
 const contextClass = {
@@ -41,19 +42,21 @@ const app = createRoot(document.getElementById('root')!)
 app.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <ToastContainer
-          closeButton={CloseButton}
-          hideProgressBar
-          toastClassName={({ type }: any) =>
-            // @ts-expect-error
-            contextClass[type || 'default'] +
-            'relative flex mt-1 mx-1 p-1.5 min-h-10 rounded-lg justify-between overflow-hidden cursor-pointer'
-          }
-          autoClose={2500}
-        />
-        <App />
-      </Router>
+      <LoadingProvider>
+        <Router>
+          <ToastContainer
+            closeButton={CloseButton}
+            hideProgressBar
+            toastClassName={({ type }: any) =>
+              // @ts-expect-error
+              contextClass[type || 'default'] +
+              'relative flex mt-1 mx-1 p-1.5 min-h-10 rounded-lg justify-between overflow-hidden cursor-pointer'
+            }
+            autoClose={2500}
+          />
+          <App />
+        </Router>
+      </LoadingProvider>
     </QueryClientProvider>
   </StrictMode>,
 )
