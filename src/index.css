@@ -166,7 +166,7 @@ input:-webkit-autofill {
   --ag-foreground-color: #000 !important;
   --ag-background-color: #fff !important;
   --ag-header-foreground-color: #fff !important;
-  --ag-secondary-foreground-color: #fff !important;
+  --ag-secondary-foreground-color: #000 !important;
   --ag-border-color: rgb(122, 122, 122, 0.3) !important;
   --ag-cell-horizontal-border: 3px solid rgb(122, 122, 122, 0.2) !important;
   --ag-header-background-color: #0f48a3 !important;
@@ -181,18 +181,50 @@ input:-webkit-autofill {
   --ag-header-column-separator-display: block !important;
   --ag-header-column-separator-color: #fff !important;
   --ag-icon-size: 20px !important;
-  --ag-header-height: 40px !important;
-  --ag-row-height: 40px !important;
+  --ag-header-height: 34px !important;
+  --ag-row-height: 34px !important;
   --ag-cell-horizontal-padding: 8px !important;
   --ag-borders-input: solid 2px !important;
   --ag-input-border-color: #0f48a3 !important;
+}
+
+.dark .ag-theme-alpine {
+  --ag-foreground-color: #fff !important;
+  --ag-background-color: #1f2024 !important;
+  --ag-header-foreground-color: #fff !important;
+  --ag-secondary-foreground-color: #fff !important;
+  --ag-border-color: rgb(122,122,122, 0.3) !important;
+  --ag-row-border-color: rgb(122,122,122, 0.3) !important;
+  --ag-cell-horizontal-border: 3px solid rgb(122,122,122, 0.3) !important;  
+  --ag-header-background-color: #0f48a3 !important;
+  --ag-odd-row-background-color: #1a1a1a !important;
+  --ag-header-column-resize-handle-color: rgb(122,122,122, 0.3) !important;
+
+  --ag-header-cell-hover-background-color: #0f48a3 !important;
+  --ag-header-cell-moving-background-color: rgb(122,122,122, 0.3) !important;
+  --ag-row-hover-color: rgb(122,122,122, 0.1) !important;
+
+  --ag-font-size: 14px !important;
+  --ag-header-column-separator-display: block !important;
+  --ag-header-column-separator-color: rgb(122,122,122, 0.3) !important;
+  --ag-icon-size: 20px !important;
+  --ag-header-height: 34px !important;
+  --ag-row-height: 34px !important;
+  --ag-cell-horizontal-padding: 8px !important;
+  --ag-borders-input: solid 2px !important;
+  --ag-input-border-color: #0f48a3 !important;
+}
+
+
+.ag-cell-label-container .ag-icon {
+  color: #fff;
 }
 
 .ag-root-wrapper {
   border-radius: 6px;
   font-weight: 500 !important;
   height: calc(100vh - 10rem);
-  box-shadow: 0px 5px 3px -2px rgb(122, 122, 122, 0.4);
+  box-shadow: 0px 5px 3px -2px rgb(122,122,122, 0.1);
 }
 
 .ag-center-cols-clipper {

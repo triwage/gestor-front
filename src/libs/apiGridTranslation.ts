@@ -1,13 +1,13 @@
 export const AgGridTranslation = {
   // for filter panel
-  page: 'Page',
+  page: 'Página',
   more: 'More',
-  to: 'To',
-  of: 'Of',
-  next: 'Nexten',
+  to: 'até',
+  of: 'de',
+  next: 'Próximo',
   last: 'Lasten',
-  first: 'Firsten',
-  previous: 'Previousen',
+  first: 'Primeiro',
+  previous: 'Anterior',
   loadingOoo: 'Carregando...',
 
   // for set filter

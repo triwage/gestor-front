@@ -7,7 +7,7 @@ import { TextAction } from '../../Texts/TextAction'
 import { SelectGeneric } from './SelectGeneric'
 
 export interface OptionsSelectProps {
-  value: number | string
+  value: number | string | boolean
   label: string
 }
 

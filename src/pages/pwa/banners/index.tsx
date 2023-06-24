@@ -6,8 +6,6 @@ import { ImagesSquare, PencilSimple, PlusCircle } from '@phosphor-icons/react'
 import { AgGridReact } from 'ag-grid-react'
 import clsx from 'clsx'
 
-import Banner1 from '../../../assets/banner1.png'
-import Banner2 from '../../../assets/banner2.png'
 import { Button } from '../../../components/Form/Button'
 import { Input } from '../../../components/Form/Input'
 import { PreviewBanner } from '../../../components/Pages/Banners/PreviewBanner'
@@ -101,15 +99,15 @@ export default function Banners() {
   const formUsers = useForm<Inputs>()
   const { watch } = formUsers
 
-  const bannersFilter = useMemo(() => {
-    if (watch('banners') && watch('banners') !== 'undefined') {
-      const lowerSearch = watch('banners').toLowerCase()
-      return banners?.filter((customer) =>
-        customer.title.toLowerCase().includes(lowerSearch),
-      )
-    }
-    return banners
-  }, [watch('banners')])
+  // const bannersFilter = useMemo(() => {
+  //   if (watch('banners') && watch('banners') !== 'undefined') {
+  //     const lowerSearch = watch('banners').toLowerCase()
+  //     return banners?.filter((customer) =>
+  //       customer.title.toLowerCase().includes(lowerSearch),
+  //     )
+  //   }
+  //   return banners
+  // }, [watch('banners')])
 
   return (
     <Container>
@@ -117,7 +115,7 @@ export default function Banners() {
         <TextHeading>Banners</TextHeading>
 
         <div className="flex items-center">
-          <Button onClick={() => router('/banners/addBanner')}>
+          <Button onClick={() => router('addBanner')}>
             <PlusCircle size={18} /> Add banner
           </Button>
         </div>
@@ -129,16 +127,16 @@ export default function Banners() {
         </form>
       </FormProvider>
 
-      <div className="ag-theme-alpine h-full w-full">
+      <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
         <AgGridReact
-          rowData={bannersFilter}
+          rowData={[]}
           columnDefs={columnDefs}
           domLayout={'autoHeight'}
           animateRows={true}
           gridOptions={{ localeText: AgGridTranslation }}
         />
       </div>
-      <Dialog open={isOpenModal} closeDialog={() => setIsOpenModal(false)}>
+      {/* <Dialog open={isOpenModal} closeDialog={() => setIsOpenModal(false)}>
         <div className="flex h-full w-full items-center justify-center">
           <PreviewBanner
             img={bannerPreview?.img}
@@ -146,7 +144,7 @@ export default function Banners() {
             title={bannerPreview?.title}
           />
         </div>
-      </Dialog>
+      </Dialog> */}
     </Container>
   )
 }

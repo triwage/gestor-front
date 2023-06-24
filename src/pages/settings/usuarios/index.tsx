@@ -54,13 +54,21 @@ export default function Users() {
               }}
               className="h-full w-full"
             >
-              <PencilSimple size={20} weight="fill" className="text-primary" />
+              <PencilSimple
+                size={20}
+                weight="fill"
+                className="text-primary dark:text-white"
+              />
             </Icon>
             <Icon
               onClick={() => handleDeleteUser(params.data.geusId)}
               className="w-ful h-full"
             >
-              <TrashSimple size={20} weight="fill" className="text-primary" />
+              <TrashSimple
+                size={20}
+                weight="fill"
+                className="text-primary dark:text-white"
+              />
             </Icon>
           </div>
         )

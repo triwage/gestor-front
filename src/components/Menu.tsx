@@ -2,7 +2,6 @@ import { ReactNode, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import { Transition } from '@headlessui/react'
-import { Package } from '@phosphor-icons/react'
 import clsx from 'clsx'
 
 import { MenusProps } from '../@types/menus'
@@ -64,11 +63,8 @@ export function Menu({ name, menu, show, icon, onClick }: MenuProps) {
           >
             <div className="flex items-center justify-center text-center">
               {icon && icon}
-              {!icon && (
-                <Package
-                  size={22}
-                  className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
-                />
+              {!icon && element.gemeIcone && (
+                <img src={element.gemeIcone} className="h-5 w-5" />
               )}
             </div>
             <span

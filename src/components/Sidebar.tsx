@@ -2,13 +2,7 @@ import { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import Logo from '@/assets/logo.png'
-import {
-  Sun,
-  Moon,
-  SignOut,
-  HouseSimple,
-  CaretDown,
-} from '@phosphor-icons/react'
+import { Sun, Moon, SignOut, CaretDown } from '@phosphor-icons/react'
 import clsx from 'clsx'
 
 import { MenusProps } from '../@types/menus'
@@ -33,7 +27,7 @@ export function Sidebar() {
 
   function handleClickMenuPai(menu: MenusProps) {
     if (menu.gemeUrl && menu.gemeUrl !== '#') {
-      router(menu.gemeUrl)
+      router(`/${menu.gemeUrl}`)
     }
   }
 
@@ -158,12 +152,11 @@ export function Sidebar() {
                       })}
                     >
                       <div className="flex items-center gap-2 text-center">
-                        <Icon>
-                          <HouseSimple
-                            size={20}
-                            className="text-primary/80 group-hover:text-primary dark:text-white/80 dark:group-hover:text-white"
-                          />
-                        </Icon>
+                        <img
+                          src={element.gemeIcone}
+                          className="h-5 w-5"
+                          alt={element.gemeDescricao}
+                        />
                         <span
                           className={clsx(
                             'select-none text-sm font-medium text-primary/90 transition-all group-hover:text-primary dark:text-white/90 dark:group-hover:text-white',

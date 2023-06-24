@@ -6,7 +6,7 @@ import { alerta } from '../components/System/Alert'
 import { haveData } from '../functions/general'
 import { clearCharacters } from '../functions/stringsAndObjects'
 import { api } from '../libs/api'
-import { InputsAddNewUser } from '../pages/config/users/newUser'
+import { InputsAddNewUser } from '../pages/settings/usuarios/newUser'
 
 export function useUsers() {
   return useQuery({
@@ -52,7 +52,7 @@ export async function addNewUser({
 
     if (success) {
       alerta(message, 1)
-      location.href = '/config/users'
+      location.href = '/settings/usuarios'
     }
   } catch (error) {
     if (error instanceof AxiosError) {

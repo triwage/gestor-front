@@ -7,6 +7,7 @@ export function FormataValorMonetario(valor: any, usarCifrao = true) {
   if (!usarCifrao) {
     valorFormatado = valorFormatado.replace('R$', '').trimStart()
   }
+
   return valorFormatado
 }
 

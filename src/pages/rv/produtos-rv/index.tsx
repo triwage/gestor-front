@@ -1,21 +1,20 @@
 import { useCallback, useMemo, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
-import { PencilSimple, PlusCircle } from '@phosphor-icons/react'
-import { ColDef, CellValueChangedEvent } from 'ag-grid-community'
+import { PencilSimple } from '@phosphor-icons/react'
+import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
-import { Button } from '../../components/Form/Button'
-import { Input } from '../../components/Form/Input'
-import { Dialog } from '../../components/System/Dialog'
-import { Icon } from '../../components/System/Icon'
-import { TextHeading } from '../../components/Texts/TextHeading'
-import useLoading from '../../contexts/LoadingContext'
-import { FormataValorMonetario } from '../../functions/currency'
-import { AgGridTranslation } from '../../libs/apiGridTranslation'
-import { useRVProducts } from '../../services/rv/products'
-import { Container } from '../../template/Container'
+import { FieldOnGrid } from '../../../components/FieldOnGrid'
+import { Dialog } from '../../../components/System/Dialog'
+import { Icon } from '../../../components/System/Icon'
+import { TextHeading } from '../../../components/Texts/TextHeading'
+import useLoading from '../../../contexts/LoadingContext'
+import { FormataValorMonetario } from '../../../functions/currency'
+import { AgGridTranslation } from '../../../libs/apiGridTranslation'
+import { useRVProducts } from '../../../services/rv/products'
+import { Container } from '../../../template/Container'
 
 interface Inputs {
   products: string
@@ -46,11 +45,11 @@ export default function RVProducts() {
         return (
           <div className="flex h-full w-full items-center justify-center gap-1">
             <Icon
-              // onClick={() => {
-              //   router('newUser', {
-              //     state: params.data,
-              //   })
-              // }}
+              onClick={() => {
+                router('newProduct', {
+                  state: params.data,
+                })
+              }}
               className="h-full w-full"
             >
               <PencilSimple size={20} weight="fill" className="text-primary" />
@@ -77,7 +76,6 @@ export default function RVProducts() {
       headerName: 'Fornecedor',
       flex: 1,
       filter: true,
-      editable: true,
       valueSetter: (params) => {
         const newVal = params.newValue
         const valueChanged = params.data.forv_provider !== newVal
@@ -126,6 +124,10 @@ export default function RVProducts() {
       headerName: 'Ativo',
       maxWidth: 80,
       sortable: true,
+      editable: true,
+      cellEditor: FieldOnGrid,
+      cellEditorPopup: true,
+      cellEditorPopupPosition: 'under',
       cellStyle: (params) => {
         if (params.value) {
           return { color: '#fff', backgroundColor: '#15803d' }
@@ -143,9 +145,9 @@ export default function RVProducts() {
     },
   ])
 
-  const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
-    console.log('Data after change is', event.data)
-  }, [])
+  // const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
+  //   console.log('Data after change is', event.data)
+  // }, [])
 
   const productsFilter = useMemo(() => {
     if (watch('products') && watch('products') !== 'undefined') {
@@ -169,12 +171,13 @@ export default function RVProducts() {
             <Input name="products" label="Pesquisar produto" />
           </form>
         </FormProvider> */}
-        <div className="ag-theme-alpine h-full">
+        <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
             rowData={productsFilter}
             columnDefs={columnDefs}
             animateRows={true}
-            onCellValueChanged={onCellValueChanged}
+            pagination={true}
+            paginationPageSize={17}
             gridOptions={{ localeText: AgGridTranslation }}
           />
         </div>
