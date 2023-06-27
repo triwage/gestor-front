@@ -1,29 +1,57 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
-import { CaretLeft, FloppyDiskBack } from '@phosphor-icons/react'
-
-import { RVProductsProps } from '../../../@types/rv/products'
 import { Button } from '../../../components/Form/Button'
 import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { InputCurrency } from '../../../components/Form/InputCurrency'
+import { Select } from '../../../components/Form/Select'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
+
+import { useRVCategories } from '../../../services/rv/categories'
+import { updateRVProduct } from '../../../services/rv/products'
+
+import { RVProductsProps } from '../../../@types/rv/products'
+
+import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { Container } from '../../../template/Container'
+import { CaretLeft, FloppyDiskBack } from '@phosphor-icons/react'
 
-export default function NewProduct() {
+export default function UpdateProduct() {
   const formProduct = useForm<RVProductsProps>()
-  const { handleSubmit, setValue } = formProduct
+  const { handleSubmit, setValue, control } = formProduct
+
+  const { setLoading } = useLoading()
+
+  const { data: RVcategories } = useRVCategories()
 
   const router = useNavigate()
   const location = useLocation()
 
-  function handleUpdateProduct(data) {
-    console.log(data)
+  async function handleUpdateProduct(data: RVProductsProps) {
+    // @ts-expect-error
+    data.prrv_pcrv_id = data.pcrv_id.value
+
+    setLoading(true)
+    await updateRVProduct(data)
+    setLoading(false)
   }
+
+  const optionsCategories = useMemo(() => {
+    let res = [] as Array<{ value: number; label: string }>
+    if (RVcategories) {
+      res = RVcategories?.map((item) => {
+        return {
+          value: item.pcrv_id,
+          label: item.pcrv_kind,
+        }
+      })
+    }
+    return res
+  }, [RVcategories])
 
   useEffect(() => {
     const checkTypeof = {
@@ -34,6 +62,15 @@ export default function NewProduct() {
     if (location.state) {
       const userEdit = Object.keys(location.state)
 
+      if (optionsCategories) {
+        setValue(
+          // @ts-expect-error
+          'pcrv_id',
+          optionsCategories?.find(
+            (e) => e.value === location.state.prrv_pcrv_id,
+          ),
+        )
+      }
       userEdit?.forEach((user) => {
         // @ts-expect-error
         if (checkTypeof[String(user)]) {
@@ -48,7 +85,7 @@ export default function NewProduct() {
         }
       })
     }
-  }, [location])
+  }, [location, optionsCategories])
 
   return (
     <Container>
@@ -77,8 +114,14 @@ export default function NewProduct() {
               <InputCurrency name="prrv_valor_minimo" label="Valor mínimo" />
               <InputCurrency name="prrv_valor_maximo" label="Valor máximo" />
             </div>
-            <div className="flex gap-2">
-              <Checkbox name="prrv_ativo" label="Ativo" />
+            <div className="grid grid-cols-2 items-center gap-2">
+              <Select
+                control={control}
+                label="Categoria"
+                name="pcrv_id"
+                options={optionsCategories}
+              />
+              <Checkbox name="prrv_ativo" label="Produto ativo" />
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button onClick={() => handleSubmit(handleUpdateProduct)}>

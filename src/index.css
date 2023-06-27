@@ -160,6 +160,13 @@ input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0 1000px white inset !important;
 }
 
+.css-1dimb5e-singleValue {
+  color: #000 !important;
+}
+.dark .css-1dimb5e-singleValue {
+  color: #fff !important;
+}
+
 /* Configuração do ag-grid-react */
 
 .ag-theme-alpine {

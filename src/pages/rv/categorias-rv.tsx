@@ -1,85 +1,51 @@
-import { useMemo, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { useCallback, useState } from 'react'
 
-import { PencilSimple } from '@phosphor-icons/react'
-import { ColDef } from 'ag-grid-community'
-import { AgGridReact } from 'ag-grid-react'
-
-import { Button } from '../../components/Form/Button'
-import { Input } from '../../components/Form/Input'
 import { Dialog } from '../../components/System/Dialog'
-import { Icon } from '../../components/System/Icon'
 import { TextHeading } from '../../components/Texts/TextHeading'
+import useLoading from '../../contexts/LoadingContext'
 import { AgGridTranslation } from '../../libs/apiGridTranslation'
-import { useRVCategories } from '../../services/rv/categories'
+import {
+  updateRVCategories,
+  useRVCategories,
+} from '../../services/rv/categories'
 import { Container } from '../../template/Container'
-
-interface Inputs {
-  categories: string
-}
+import { CellValueChangedEvent, ColDef } from 'ag-grid-community'
+import { AgGridReact } from 'ag-grid-react'
 
 export default function RVCategories() {
   const [isOpenModal, setIsOpenModal] = useState(false)
 
   const { data } = useRVCategories()
 
-  const router = useNavigate()
-  const formProducts = useForm<Inputs>()
-  const { watch } = formProducts
+  const { setLoading } = useLoading()
 
   const [columnDefs] = useState<ColDef[]>([
     {
-      field: '',
-      maxWidth: 40,
-      lockVisible: true,
-      cellStyle: {
-        textAlign: 'center',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      cellRenderer: (params) => {
-        return (
-          <div className="flex h-full w-full items-center justify-center gap-1">
-            <Icon
-              // onClick={() => {
-              //   router('newUser', {
-              //     state: params.data,
-              //   })
-              // }}
-              className="h-full w-full"
-            >
-              <PencilSimple size={20} weight="fill" className="text-primary" />
-            </Icon>
-          </div>
-        )
-      },
-    },
-    {
       field: 'pcrv_id',
       headerName: 'ID',
-      maxWidth: 60,
+      minWidth: 80,
+      maxWidth: 120,
+      sort: 'asc',
     },
     {
       field: 'pcrv_kind',
-      headerName: 'Tipo',
+      headerName: 'Nome',
       flex: 1,
       width: 120,
       sortable: true,
       filter: true,
+      editable: true,
     },
   ])
 
-  const categoriesFilter = useMemo(() => {
-    if (watch('categories') && watch('categories') !== 'undefined') {
-      const lowerSearch = watch('categories').toLowerCase()
-      return data?.filter((p) =>
-        p.prrv_nome.toLowerCase().includes(lowerSearch),
-      )
-    }
-    return data
-  }, [watch('categories'), data])
+  const onCellValueChanged = useCallback(
+    async (event: CellValueChangedEvent) => {
+      setLoading(true)
+      await updateRVCategories(event.data)
+      setLoading(false)
+    },
+    [],
+  )
 
   return (
     <Container>
@@ -88,16 +54,12 @@ export default function RVCategories() {
           <TextHeading>Categorias RV</TextHeading>
         </div>
 
-        {/* <FormProvider {...formProducts}>
-          <form className="my-1">
-            <Input name="products" label="Pesquisar produto" />
-          </form>
-        </FormProvider> */}
         <div className="ag-theme-alpine h-full">
           <AgGridReact
-            rowData={categoriesFilter}
+            rowData={data}
             columnDefs={columnDefs}
             animateRows={true}
+            onCellValueChanged={onCellValueChanged}
             gridOptions={{ localeText: AgGridTranslation }}
           />
         </div>

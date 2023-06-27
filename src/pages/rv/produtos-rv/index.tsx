@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
@@ -46,13 +46,17 @@ export default function RVProducts() {
           <div className="flex h-full w-full items-center justify-center gap-1">
             <Icon
               onClick={() => {
-                router('newProduct', {
+                router('updateProduct', {
                   state: params.data,
                 })
               }}
               className="h-full w-full"
             >
-              <PencilSimple size={20} weight="fill" className="text-primary" />
+              <PencilSimple
+                size={20}
+                weight="fill"
+                className="text-primary dark:text-white"
+              />
             </Icon>
           </div>
         )
@@ -61,6 +65,7 @@ export default function RVProducts() {
     {
       field: 'prrv_id',
       headerName: 'ID',
+      sort: 'asc',
       maxWidth: 60,
     },
     {

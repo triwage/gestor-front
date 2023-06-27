@@ -1,10 +1,9 @@
 import { InputHTMLAttributes, ReactNode } from 'react'
 import { Controller, FieldValues, RegisterOptions } from 'react-hook-form'
 
-import PropTypes from 'prop-types'
-
 import { TextAction } from '../../Texts/TextAction'
 import { SelectGeneric } from './SelectGeneric'
+import PropTypes from 'prop-types'
 
 export interface OptionsSelectProps {
   value: number | string | boolean

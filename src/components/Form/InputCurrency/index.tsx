@@ -3,7 +3,7 @@ import { FieldValues, RegisterOptions, useFormContext } from 'react-hook-form'
 
 import clsx from 'clsx'
 
-import { FormataValorMonetario } from '../../../functions/currency'
+import { formatarMoeda } from '../../../functions/currency'
 import { getParseMessageError } from '../../../functions/stringsAndObjects'
 import { TextAction } from '../../Texts/TextAction'
 
@@ -56,10 +56,7 @@ export function InputCurrency({
           id={name}
           {...register(name, {
             onChange: (event) => {
-              event.target.value = FormataValorMonetario(
-                event.target.value,
-                false,
-              )
+              event.target.value = formatarMoeda(event.target.value)
             },
           })}
           {...props}

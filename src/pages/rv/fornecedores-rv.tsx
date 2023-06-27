@@ -1,14 +1,15 @@
 import { useCallback, useState } from 'react'
 
+import { Icon } from '../../components/System/Icon'
+import { TextHeading } from '../../components/Texts/TextHeading'
+
+import { useRVProviders } from '../../services/rv/providers'
+
+import { AgGridTranslation } from '../../libs/apiGridTranslation'
+import { Container } from '../../template/Container'
 import { PencilSimple } from '@phosphor-icons/react'
 import { ColDef, CellValueChangedEvent } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-
-import { Icon } from '../../components/System/Icon'
-import { TextHeading } from '../../components/Texts/TextHeading'
-import { AgGridTranslation } from '../../libs/apiGridTranslation'
-import { useRVProviders } from '../../services/rv/providers'
-import { Container } from '../../template/Container'
 
 export default function RVProviders() {
   const { data } = useRVProviders()
@@ -49,6 +50,7 @@ export default function RVProviders() {
       field: 'forv_id',
       headerName: 'ID',
       maxWidth: 60,
+      sort: 'asc',
     },
     {
       field: 'forv_provider',

@@ -6,15 +6,17 @@ import clsx from 'clsx'
 const colourStyles = {
   control: (styles: any) => ({
     ...styles,
-    backgroundColor: 'white',
+    backgroundColor: 'rgb(122 122 122 / 0.2)',
+    color: '#fff',
     height: '2.75rem',
+    border: '1px solid rgb(214 215 219 / 0.3)',
   }),
   option: (
     styles: Record<string, any>,
     { isDisabled, isFocused, isSelected }: any,
   ) => {
-    const color = '#a2c2f6'
-    const selected = '#73a4f2'
+    const color = '#fff'
+    const selected = '#145dd2'
     return {
       ...styles,
       backgroundColor: isDisabled
@@ -24,11 +26,12 @@ const colourStyles = {
         : isFocused
         ? color
         : undefined,
-      color: isDisabled ? '#000' : isSelected,
+      color: isSelected ? '#fff' : isDisabled ? '#000' : isSelected,
       cursor: isDisabled ? 'not-allowed' : 'default',
       zIndex: '999',
       ':active': {
         ...styles[':active'],
+        color: '#fff',
         backgroundColor: !isDisabled
           ? isSelected
             ? selected
@@ -57,10 +60,10 @@ export function SelectGeneric({
   ...props
 }: SelectGenericProps) {
   return (
-    <>
+    <div className="flex w-full flex-col items-start justify-start gap-0.5">
       <label
         htmlFor={String(label)}
-        className=" -mb-0.5 w-full text-base font-medium text-black"
+        className="-mb-0.5 w-full text-sm font-medium text-black dark:text-white"
       >
         {label}
       </label>
@@ -70,7 +73,7 @@ export function SelectGeneric({
         className={clsx(
           ' w-full',
           {
-            'text-base font-medium': !className,
+            'text-base font-medium text-black': !className,
           },
           className,
         )}
@@ -88,6 +91,6 @@ export function SelectGeneric({
           },
         })}
       />
-    </>
+    </div>
   )
 }

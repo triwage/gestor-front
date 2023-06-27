@@ -3,6 +3,7 @@ import { AxiosError } from 'axios'
 
 import { RVProductsProps } from '../../@types/rv/products'
 import { alerta } from '../../components/System/Alert'
+import { formataMoedaPFloat } from '../../functions/currency'
 import { haveData } from '../../functions/general'
 import { clearCharacters } from '../../functions/stringsAndObjects'
 import { api } from '../../libs/api'
@@ -37,19 +38,19 @@ export async function updateRVProduct(data: RVProductsProps) {
       prrv_pcrv_id: data.prrv_pcrv_id,
       prrv_forv_id: data.prrv_forv_id,
       prrv_nome: data.prrv_nome,
-      prrv_valor: data.prrv_valor,
-      prrv_valor_minimo: data.prrv_valor_minimo,
-      prrv_valor_maximo: data.prrv_valor_maximo,
+      prrv_valor: formataMoedaPFloat(data.prrv_valor),
+      prrv_valor_minimo: formataMoedaPFloat(data.prrv_valor_minimo),
+      prrv_valor_maximo: formataMoedaPFloat(data.prrv_valor_maximo),
       prrv_area_codes: data.prrv_area_codes,
       prrv_ativo: data.prrv_ativo,
     }
 
     const res = await api.put('/rv/products', payload)
 
-    const { success, message } = res.data
+    const { success } = res.data
 
     if (success) {
-      alerta(message, 1)
+      alerta('Produto alterado com sucesso', 1)
     }
   } catch (error) {
     if (error instanceof AxiosError) {
