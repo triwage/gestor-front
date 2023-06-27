@@ -8,7 +8,7 @@ const colourStyles = {
     ...styles,
     backgroundColor: 'rgb(122 122 122 / 0.2)',
     color: '#fff',
-    height: '2.75rem',
+    height: '2.5rem',
     border: '1px solid rgb(214 215 219 / 0.3)',
   }),
   option: (
@@ -73,7 +73,7 @@ export function SelectGeneric({
         className={clsx(
           ' w-full',
           {
-            'text-base font-medium text-black': !className,
+            'text-sm font-medium text-black': !className,
           },
           className,
         )}

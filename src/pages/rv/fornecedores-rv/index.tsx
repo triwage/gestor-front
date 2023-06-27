@@ -1,17 +1,19 @@
 import { useCallback, useState } from 'react'
+import { useNavigate } from 'react-router'
 
-import { Icon } from '../../components/System/Icon'
-import { TextHeading } from '../../components/Texts/TextHeading'
+import { Icon } from '../../../components/System/Icon'
+import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { useRVProviders } from '../../services/rv/providers'
+import { useRVProviders } from '../../../services/rv/providers'
 
-import { AgGridTranslation } from '../../libs/apiGridTranslation'
-import { Container } from '../../template/Container'
+import { AgGridTranslation } from '../../../libs/apiGridTranslation'
+import { Container } from '../../../template/Container'
 import { PencilSimple } from '@phosphor-icons/react'
 import { ColDef, CellValueChangedEvent } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function RVProviders() {
+  const router = useNavigate()
   const { data } = useRVProviders()
 
   const [columnDefs] = useState<ColDef[]>([
@@ -29,11 +31,11 @@ export default function RVProviders() {
         return (
           <div className="flex h-full w-full items-center justify-center gap-1">
             <Icon
-              // onClick={() => {
-              //   router('newUser', {
-              //     state: params.data,
-              //   })
-              // }}
+              onClick={() => {
+                router('updateSupplier', {
+                  state: params.data,
+                })
+              }}
               className="h-full w-full"
             >
               <PencilSimple

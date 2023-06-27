@@ -21,13 +21,15 @@ export async function handleUploadImage(event: ChangeEvent<HTMLInputElement>) {
     const shortImage =
       compressedFile.size > imagem.size ? imagem : compressedFile
 
-    const resData = (await getBase64(shortImage)) as string
+    const imageResult = new File([shortImage], shortImage.name, {
+      type: shortImage.type,
+    })
 
-    return resData ?? null
+    return imageResult ?? null
   }
 }
 
-async function getBase64(blob: any) {
+export async function getBase64(blob: any) {
   return await new Promise((resolve) => {
     const reader = new FileReader()
     reader.onloadend = () => {

@@ -2,17 +2,17 @@ import { useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
-import { PencilSimpleLine, PlusCircle, User } from '@phosphor-icons/react'
+import { Button } from '../../../components/Form/Button'
+import { Input } from '../../../components/Form/Input'
+import { Dialog } from '../../../components/System/Dialog'
+import { Icon } from '../../../components/System/Icon'
+import { TextAction } from '../../../components/Texts/TextAction'
+import { TextBody } from '../../../components/Texts/TextBody'
+import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { Button } from '../../components/Form/Button'
-import { Input } from '../../components/Form/Input'
-import { Dialog } from '../../components/System/Dialog'
-import { Icon } from '../../components/System/Icon'
-import { TextAction } from '../../components/Texts/TextAction'
-import { TextBody } from '../../components/Texts/TextBody'
-import { TextHeading } from '../../components/Texts/TextHeading'
-// import { deleteUser } from '../../services/users'
-import { Container } from '../../template/Container'
+// import { deleteUser } from '../../../services/users'
+import { Container } from '../../../template/Container'
+import { PencilSimpleLine, PlusCircle, User } from '@phosphor-icons/react'
 
 interface Inputs {
   suppliers: string

@@ -1,5 +1,8 @@
 import { alerta } from '../components/System/Alert'
+
+import { clearCharacters } from '../functions/stringsAndObjects'
 import { api } from '../libs/api'
+import { AxiosError } from 'axios'
 
 export interface AuthProps {
   login: string
@@ -26,7 +29,11 @@ export async function Auth({ login, senha }: AuthProps) {
     alerta(error)
     return false
   } catch (error) {
-    console.error(error)
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
     return false
   }
 }

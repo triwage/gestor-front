@@ -1,10 +1,9 @@
 import { InputHTMLAttributes, ReactNode } from 'react'
 import { FieldValues, RegisterOptions, useFormContext } from 'react-hook-form'
 
-import clsx from 'clsx'
-
 import { getParseMessageError } from '../../../functions/stringsAndObjects'
 import { TextAction } from '../../Texts/TextAction'
+import clsx from 'clsx'
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string

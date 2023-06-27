@@ -1,15 +1,16 @@
 import { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import Logo from '@/assets/logo.png'
-import { Sun, Moon, SignOut, CaretDown } from '@phosphor-icons/react'
-import clsx from 'clsx'
+import { useMenus } from '../services/menus'
 
 import { MenusProps } from '../@types/menus'
-import { useMenus } from '../services/menus'
+
 import { Menu } from './Menu'
 import { Icon } from './System/Icon'
 import { Loader } from './System/Loader'
+import Logo from '@/assets/logo.png'
+import { Sun, Moon, SignOut, CaretDown } from '@phosphor-icons/react'
+import clsx from 'clsx'
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState<number | boolean>(false)
@@ -26,7 +27,9 @@ export function Sidebar() {
   }
 
   function handleClickMenuPai(menu: MenusProps) {
-    if (menu.gemeUrl && menu.gemeUrl !== '#') {
+    if (menu.gemeUrl === '/home') {
+      router(`/home`)
+    } else if (menu.gemeUrl && menu.gemeUrl !== '#') {
       router(`/${menu.gemeUrl}`)
     }
   }
@@ -129,7 +132,6 @@ export function Sidebar() {
                 <Fragment key={element.gemeDescricao}>
                   <div
                     onClick={() => {
-                      setIsOpen(true)
                       handleExpandir(element)
                       handleClickMenuPai(element)
                     }}
@@ -170,7 +172,16 @@ export function Sidebar() {
                       </div>
                       {isOpen && element.ITENS.length > 0 && (
                         <Icon>
-                          <CaretDown size={20} className="text-white" />
+                          <CaretDown
+                            size={20}
+                            className={clsx(
+                              'text-primary transition-transform dark:text-white',
+                              {
+                                'rotate-180': isOpen === element.gemeId,
+                                'rotate-0': isOpen !== element.gemeId,
+                              },
+                            )}
+                          />
                         </Icon>
                       )}
                     </div>
@@ -215,7 +226,7 @@ export function Sidebar() {
                         },
                       )}
                     >
-                      Dark
+                      Escuro
                     </span>
                   </div>
                 </div>
@@ -253,7 +264,7 @@ export function Sidebar() {
                         },
                       )}
                     >
-                      Light
+                      Claro
                     </span>
                   </div>
                 </div>

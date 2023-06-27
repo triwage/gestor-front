@@ -62,15 +62,6 @@ export default function UpdateProduct() {
     if (location.state) {
       const userEdit = Object.keys(location.state)
 
-      if (optionsCategories) {
-        setValue(
-          // @ts-expect-error
-          'pcrv_id',
-          optionsCategories?.find(
-            (e) => e.value === location.state.prrv_pcrv_id,
-          ),
-        )
-      }
       userEdit?.forEach((user) => {
         // @ts-expect-error
         if (checkTypeof[String(user)]) {
@@ -84,6 +75,15 @@ export default function UpdateProduct() {
           setValue(String(user), location.state[user])
         }
       })
+      if (optionsCategories) {
+        setValue(
+          // @ts-expect-error
+          'pcrv_id',
+          optionsCategories?.find(
+            (e) => e.value === location.state.prrv_pcrv_id,
+          ),
+        )
+      }
     }
   }, [location, optionsCategories])
 

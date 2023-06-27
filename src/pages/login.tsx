@@ -2,19 +2,26 @@ import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
-import Logo from '../assets/logo.png'
 import { Button } from '../components/Form/Button'
 import { Input } from '../components/Form/Input'
+
 import { Auth, AuthProps } from '../services/auth'
 
+import Logo from '../assets/logo.png'
+import useLoading from '../contexts/LoadingContext'
+
 export default function Login() {
+  const { setLoading } = useLoading()
+
   const router = useNavigate()
   const formLogin = useForm<AuthProps>()
 
   const { handleSubmit } = formLogin
 
   async function onSubmit({ login, senha }: AuthProps) {
+    setLoading(true)
     const res = await Auth({ login, senha })
+    setLoading(false)
     if (res) {
       router('/')
     }
