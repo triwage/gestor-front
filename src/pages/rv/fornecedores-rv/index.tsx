@@ -6,6 +6,8 @@ import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { useRVProviders } from '../../../services/rv/providers'
 
+import { RVProvidersProps } from '../../../@types/rv/providers'
+
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
 import { PencilSimple } from '@phosphor-icons/react'
@@ -27,7 +29,7 @@ export default function RVProviders() {
         alignItems: 'center',
         justifyContent: 'center',
       },
-      cellRenderer: (params) => {
+      cellRenderer: (params: { data: RVProvidersProps }) => {
         return (
           <div className="flex h-full w-full items-center justify-center gap-1">
             <Icon
@@ -71,7 +73,7 @@ export default function RVProviders() {
         alignItems: 'center',
         justifyContent: 'center',
       },
-      cellRenderer: (params) => {
+      cellRenderer: (params: { value: string | undefined }) => {
         if (params.value) {
           return <img src={params.value} alt="Logo" width={24} height={24} />
         }

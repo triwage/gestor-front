@@ -7,9 +7,8 @@ import {
 } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { ICellEditorParams } from 'ag-grid-community'
-
 import { Select } from './Form/Select'
+import { ICellEditorParams } from 'ag-grid-community'
 
 // eslint-disable-next-line react/display-name
 const FieldOnGrid = forwardRef((props: ICellEditorParams, ref) => {

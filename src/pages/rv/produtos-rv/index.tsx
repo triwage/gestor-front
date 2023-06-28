@@ -1,34 +1,34 @@
-import { useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
+import { FieldOnGrid } from '../../../components/FieldOnGrid'
+import { Icon } from '../../../components/System/Icon'
+import { TextHeading } from '../../../components/Texts/TextHeading'
+
+import { updateRVProduct, useRVProducts } from '../../../services/rv/products'
+
+import { RVProductsProps } from '../../../@types/rv/products'
+
+import useLoading from '../../../contexts/LoadingContext'
+import { FormataValorMonetario } from '../../../functions/currency'
+import { AgGridTranslation } from '../../../libs/apiGridTranslation'
+import { Container } from '../../../template/Container'
 import { PencilSimple } from '@phosphor-icons/react'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
-import { FieldOnGrid } from '../../../components/FieldOnGrid'
-import { Dialog } from '../../../components/System/Dialog'
-import { Icon } from '../../../components/System/Icon'
-import { TextHeading } from '../../../components/Texts/TextHeading'
-import useLoading from '../../../contexts/LoadingContext'
-import { FormataValorMonetario } from '../../../functions/currency'
-import { AgGridTranslation } from '../../../libs/apiGridTranslation'
-import { useRVProducts } from '../../../services/rv/products'
-import { Container } from '../../../template/Container'
-
-interface Inputs {
-  products: string
-}
-
 export default function RVProducts() {
-  const [isOpenModal, setIsOpenModal] = useState(false)
-
   const { data } = useRVProducts()
 
-  const router = useNavigate()
   const { setLoading } = useLoading()
-  const formProducts = useForm<Inputs>()
-  const { watch } = formProducts
+
+  const router = useNavigate()
+
+  async function handleUploadProduct(data: RVProductsProps) {
+    setLoading(true)
+    await updateRVProduct(data)
+    setLoading(false)
+  }
 
   const [columnDefs] = useState<ColDef[]>([
     {
@@ -41,7 +41,7 @@ export default function RVProducts() {
         alignItems: 'center',
         justifyContent: 'center',
       },
-      cellRenderer: (params) => {
+      cellRenderer: (params: { data: RVProductsProps }) => {
         return (
           <div className="flex h-full w-full items-center justify-center gap-1">
             <Icon
@@ -133,6 +133,12 @@ export default function RVProducts() {
       cellEditor: FieldOnGrid,
       cellEditorPopup: true,
       cellEditorPopupPosition: 'under',
+      valueSetter: (params) => {
+        const newVal = params.newValue
+        params.data.prrv_ativo = newVal
+        handleUploadProduct(params.data)
+        return newVal
+      },
       cellStyle: (params) => {
         if (params.value) {
           return { color: '#fff', backgroundColor: '#15803d' }
@@ -154,16 +160,6 @@ export default function RVProducts() {
   //   console.log('Data after change is', event.data)
   // }, [])
 
-  const productsFilter = useMemo(() => {
-    if (watch('products') && watch('products') !== 'undefined') {
-      const lowerSearch = watch('products').toLowerCase()
-      return data?.filter((p) =>
-        p.prrv_nome.toLowerCase().includes(lowerSearch),
-      )
-    }
-    return data
-  }, [watch('products'), data])
-
   return (
     <Container>
       <div className="flex h-full w-full flex-col">
@@ -171,14 +167,9 @@ export default function RVProducts() {
           <TextHeading>Produtos RV</TextHeading>
         </div>
 
-        {/* <FormProvider {...formProducts}>
-          <form className="my-1">
-            <Input name="products" label="Pesquisar produto" />
-          </form>
-        </FormProvider> */}
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
-            rowData={productsFilter}
+            rowData={data}
             columnDefs={columnDefs}
             animateRows={true}
             pagination={true}
@@ -187,10 +178,6 @@ export default function RVProducts() {
           />
         </div>
       </div>
-
-      <Dialog open={isOpenModal} closeDialog={() => setIsOpenModal(false)}>
-        <div className="flex w-full">sdasda</div>
-      </Dialog>
     </Container>
   )
 }

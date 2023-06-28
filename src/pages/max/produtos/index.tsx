@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
-import { FieldOnGrid } from '../../components/FieldOnGrid'
-import { Dialog } from '../../components/System/Dialog'
-import { Icon } from '../../components/System/Icon'
-import { TextHeading } from '../../components/Texts/TextHeading'
+import { Dialog } from '../../../components/System/Dialog'
+import { Icon } from '../../../components/System/Icon'
+import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { useMaxProducts } from '../../services/max/products'
+import { useMaxProducts } from '../../../services/max/products'
 
-import useLoading from '../../contexts/LoadingContext'
-import { FormataValorMonetario } from '../../functions/currency'
-import { AgGridTranslation } from '../../libs/apiGridTranslation'
-import { Container } from '../../template/Container'
+import { MaxProductsProps } from '../../../@types/max/products'
+
+import { FormataValorMonetario } from '../../../functions/currency'
+import { AgGridTranslation } from '../../../libs/apiGridTranslation'
+import { Container } from '../../../template/Container'
 import { PencilSimple } from '@phosphor-icons/react'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
@@ -22,7 +22,6 @@ export default function MaxProducts() {
   const { data } = useMaxProducts()
 
   const router = useNavigate()
-  const { setLoading } = useLoading()
 
   const [columnDefs] = useState<ColDef[]>([
     {
@@ -35,7 +34,7 @@ export default function MaxProducts() {
         alignItems: 'center',
         justifyContent: 'center',
       },
-      cellRenderer: (params) => {
+      cellRenderer: (params: { data: MaxProductsProps }) => {
         return (
           <div className="flex h-full w-full items-center justify-center gap-1">
             <Icon
@@ -94,7 +93,7 @@ export default function MaxProducts() {
         alignItems: 'center',
         justifyContent: 'center',
       },
-      cellRenderer: (params) => {
+      cellRenderer: (params: { value: string | undefined }) => {
         if (params.value) {
           return <img src={params.value} alt="Imagem" width={24} height={24} />
         }
@@ -107,14 +106,14 @@ export default function MaxProducts() {
       maxWidth: 80,
       sortable: true,
       cellStyle: (params) => {
-        if (params.value) {
+        if (params.value === '1') {
           return { color: '#fff', backgroundColor: '#15803d' }
         } else {
           return { color: '#fff', backgroundColor: '#ed3241' }
         }
       },
-      cellRenderer: (params: { value: boolean }) => {
-        if (params.value) {
+      cellRenderer: (params: { value: string }) => {
+        if (params.value === '1') {
           return 'Ativo'
         } else {
           return 'Inativo'
@@ -134,11 +133,6 @@ export default function MaxProducts() {
           <TextHeading>Produtos Max Nível</TextHeading>
         </div>
 
-        {/* <FormProvider {...formProducts}>
-          <form className="my-1">
-            <Input name="products" label="Pesquisar produto" />
-          </form>
-        </FormProvider> */}
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
             rowData={data}

@@ -1,46 +1,38 @@
-import { ChangeEvent, useEffect, useMemo } from 'react'
+import { ChangeEvent, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
+import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
-import { Select } from '../../../components/Form/Select'
+import { InputCurrency } from '../../../components/Form/InputCurrency'
 import { Textarea } from '../../../components/Form/Textarea'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
-import { useRVCategories } from '../../../services/rv/categories'
-import { updateRVSupplier } from '../../../services/rv/providers'
+import { updateMaxProduct } from '../../../services/max/products'
 
-import { RVProvidersProps } from '../../../@types/rv/providers'
+import { MaxProductsProps } from '../../../@types/max/products'
 
 import useLoading from '../../../contexts/LoadingContext'
+import { FormataValorMonetario } from '../../../functions/currency'
 import { handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import { CaretLeft, FloppyDiskBack, Images } from '@phosphor-icons/react'
 
-export default function UpdateSupplier() {
-  const formProduct = useForm<RVProvidersProps>()
-  const { handleSubmit, setValue, control, watch } = formProduct
+export default function UpdateMaxProduct() {
+  const formProduct = useForm<MaxProductsProps>()
+  const { handleSubmit, setValue, watch } = formProduct
 
   const { setLoading } = useLoading()
-
-  const { data: RVcategories } = useRVCategories()
 
   const router = useNavigate()
   const location = useLocation()
 
-  async function handleUpdateSupplier(data: RVProvidersProps) {
-    // @ts-expect-error
-    data.forv_pcrv_id = data.forv_kind.value
-    // @ts-expect-error
-    data.pcrv_kind = data.forv_kind.label
-    // @ts-expect-error
-    data.forv_kind = data.forv_kind.label
-
+  async function handleUpdateProductMax(data: MaxProductsProps) {
     setLoading(true)
-    await updateRVSupplier(data)
+    await updateMaxProduct(data)
     setLoading(false)
   }
 
@@ -48,7 +40,7 @@ export default function UpdateSupplier() {
     const res = await handleUploadImage(event)
     if (res) {
       const imageCloud = await uploadImages(res)
-      setValue('forv_logo', imageCloud)
+      setValue('imagem_padrao_url', imageCloud)
     }
     const inputElem = document.getElementById('newFile') as HTMLInputElement
     if (inputElem) {
@@ -56,38 +48,28 @@ export default function UpdateSupplier() {
     }
   }
 
-  const optionsCategories = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (RVcategories) {
-      res = RVcategories?.map((item) => {
-        return {
-          value: item.pcrv_id,
-          label: item.pcrv_kind,
+  useEffect(() => {
+    const checkTypeof = {
+      preco: true,
+    }
+    if (location.state) {
+      const productEdit = Object.keys(location.state)
+
+      productEdit?.forEach((user) => {
+        // @ts-expect-error
+        if (checkTypeof[String(user)]) {
+          setValue(
+            // @ts-expect-error
+            String(user),
+            FormataValorMonetario(location.state[user], false),
+          )
+        } else {
+          // @ts-expect-error
+          setValue(String(user), location.state[user])
         }
       })
     }
-    return res
-  }, [RVcategories])
-
-  useEffect(() => {
-    if (location.state) {
-      const supplierEdit = Object.keys(location.state)
-
-      supplierEdit?.forEach((supplier) => {
-        // @ts-expect-error
-        setValue(String(supplier), location.state[supplier])
-      })
-      if (optionsCategories) {
-        setValue(
-          // @ts-expect-error
-          'forv_kind',
-          optionsCategories?.find(
-            (e) => e.value === location.state.forv_pcrv_id,
-          ),
-        )
-      }
-    }
-  }, [location, optionsCategories])
+  }, [location])
 
   return (
     <Container>
@@ -97,39 +79,27 @@ export default function UpdateSupplier() {
             <Icon onClick={() => router(-1)}>
               <CaretLeft size={22} className="text-black dark:text-white" />
             </Icon>
-            <TextHeading>Fornecedores / Editar fornecedor</TextHeading>
+            <TextHeading>Produtos Max Nível / Editar produto</TextHeading>
           </div>
         </div>
 
         <FormProvider {...formProduct}>
           <form
             className="my-2 space-y-2"
-            onSubmit={handleSubmit(handleUpdateSupplier)}
+            onSubmit={handleSubmit(handleUpdateProductMax)}
           >
             <div className="flex gap-2">
-              <Input name="forv_provider" label="Nome" />
-              <Select
-                control={control}
-                label="Categoria"
-                name="forv_kind"
-                options={optionsCategories}
-              />
+              <Input name="nome" label="Nome" />
+              <InputCurrency name="preco" label="Preço" />
             </div>
 
             <div className="flex gap-2">
-              <Textarea name="forv_descricao" label="Descrição" rows={8} />
-              <Textarea
-                name="forv_termos_condicoes"
-                label="Termos e condições"
-                rows={8}
-              />
+              <Textarea name="descricao" label="Descrição" rows={8} />
             </div>
-            <div className="grid grid-cols-2 items-center gap-2">
-              <Textarea name="forv_instrucoes" label="Instruções" rows={8} />
-
+            <div className="grid grid-cols-2 items-start gap-2">
               <div className="flex items-end gap-4">
                 <img
-                  src={watch('forv_logo')}
+                  src={watch('imagem_padrao_url')}
                   alt="Logo"
                   className="h-full max-h-48"
                 />
@@ -140,7 +110,7 @@ export default function UpdateSupplier() {
                   >
                     <div className="flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                       <Images size={20} weight="fill" />
-                      Alterar logo
+                      Alterar imagem
                     </div>
                   </label>
                   <input
@@ -152,11 +122,12 @@ export default function UpdateSupplier() {
                   />
                 </div>
               </div>
+              <Checkbox name="status" label="Produto ativo" />
             </div>
             <div className="w-full border-t border-border pt-1">
-              <Button onClick={() => handleSubmit(handleUpdateSupplier)}>
+              <Button onClick={() => handleSubmit(handleUpdateProductMax)}>
                 <FloppyDiskBack size={18} weight="fill" />
-                Atualizar fornecedor
+                Atualizar produto
               </Button>
             </div>
           </form>

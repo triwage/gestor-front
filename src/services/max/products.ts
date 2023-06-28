@@ -29,3 +29,30 @@ export function useMaxProducts() {
     },
   })
 }
+
+export async function updateMaxProduct(data: MaxProductsProps) {
+  try {
+    const payload = {
+      id: data.id,
+      nome: data.nome,
+      descricao: data.descricao,
+      imagem_padrao_url: data.imagem_padrao_url,
+      preco: data.preco,
+      status: data.status,
+    }
+
+    const res = await api.put(`/maxnivel/products/${data.id}`, payload)
+
+    const { success } = res.data
+
+    if (success) {
+      alerta('Produto alterado com sucesso', 1)
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+  }
+}

@@ -1,9 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
+import { alerta } from '../components/System/Alert'
 
 import { BannersProps } from '../@types/banners'
-import { alerta } from '../components/System/Alert'
+
 import { api } from '../libs/api'
+import { useQuery } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
 
 export function useBanners() {
   return useQuery({
