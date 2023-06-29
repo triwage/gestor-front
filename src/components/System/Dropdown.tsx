@@ -24,8 +24,8 @@ export function Dropdown({ items, onChange, className, name }: DropdownProps) {
     <div>
       <Menu as="div" className="relative inline-block text-left">
         <div>
-          <Menu.Button className="flex h-9 w-full items-center justify-center gap-1 rounded-md bg-primary px-4 py-2.5 text-xs font-normal text-white">
-            <span className="xs-max:hidden truncate text-xs">
+          <Menu.Button className="flex h-9 w-full items-center justify-center gap-1 rounded-md bg-primary px-2 py-2.5 text-xs font-normal text-white">
+            <span className="xs-max:hidden truncate text-xs font-medium">
               {nameDropdown}
             </span>
             <CaretDown size={16} className="xs-max:hidden" />
@@ -46,7 +46,7 @@ export function Dropdown({ items, onChange, className, name }: DropdownProps) {
               className,
             )}
           >
-            <div className="divide-border w-full divide-y px-1 py-1">
+            <div className="w-full divide-y divide-border px-1 py-1">
               {items?.map((item) => (
                 <Menu.Item key={item.id} as={Fragment}>
                   {({ active }) => (

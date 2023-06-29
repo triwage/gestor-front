@@ -1,26 +1,22 @@
-import { useMemo, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
-import { PencilSimple, PlusCircle, TrashSimple } from '@phosphor-icons/react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { ColDef } from 'ag-grid-community'
-import { AgGridReact } from 'ag-grid-react'
-
-import { UsersConfigProps } from '../../../@types/users'
 import { Button } from '../../../components/Form/Button'
-import { Input } from '../../../components/Form/Input'
 import { Dialog } from '../../../components/System/Dialog'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
-import { AgGridTranslation } from '../../../libs/apiGridTranslation'
-import { deleteUser, useUsers } from '../../../services/users'
-import { Container } from '../../../template/Container'
 
-interface Inputs {
-  users: string
-}
+import { deleteUser, useUsers } from '../../../services/users'
+
+import { UsersConfigProps } from '../../../@types/users'
+
+import { AgGridTranslation } from '../../../libs/apiGridTranslation'
+import { Container } from '../../../template/Container'
+import { PencilSimple, PlusCircle, TrashSimple } from '@phosphor-icons/react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { ColDef } from 'ag-grid-community'
+import { AgGridReact } from 'ag-grid-react'
 
 export default function Users() {
   const queryClient = useQueryClient()
@@ -29,8 +25,6 @@ export default function Users() {
   const { data, isLoading, isFetching } = useUsers()
 
   const router = useNavigate()
-  const formUsers = useForm<Inputs>()
-  const { watch } = formUsers
 
   const [columnDefs] = useState<ColDef[]>([
     {
@@ -61,7 +55,7 @@ export default function Users() {
               />
             </Icon>
             <Icon
-              onClick={() => handleDeleteUser(params.data.geusId)}
+              onClick={() => handleDeleteUser(params.data.geus_id)}
               className="w-ful h-full"
             >
               <TrashSimple
@@ -75,21 +69,21 @@ export default function Users() {
       },
     },
     {
-      field: 'geusId',
+      field: 'geus_id',
       headerName: 'ID',
       maxWidth: 70,
     },
     {
-      field: 'geusNome',
+      field: 'geus_nome',
       headerName: 'Nome',
       flex: 1,
       sortable: true,
       filter: true,
     },
-    { field: 'geusNomeUsuario', headerName: 'Username', flex: 1 },
-    { field: 'geusEmail', headerName: 'Email', flex: 1, sortable: true },
+    { field: 'geus_nome_usuario', headerName: 'Username', flex: 1 },
+    { field: 'geus_email', headerName: 'Email', flex: 1, sortable: true },
     {
-      field: 'geusAdmin',
+      field: 'geus_admin',
       headerName: 'Admin',
       maxWidth: 90,
       sortable: true,
@@ -115,21 +109,11 @@ export default function Users() {
       const res = await deleteUser(userId)
 
       if (res) {
-        const updateData = usuariosFilter?.filter((e) => e.geusId !== userId)
+        const updateData = data?.filter((e) => e.geus_id !== userId)
         queryClient.setQueryData(['listUsers'], updateData)
       }
     },
   )
-
-  const usuariosFilter = useMemo(() => {
-    if (watch('users') && watch('users') !== 'undefined') {
-      const lowerSearch = watch('users').toLowerCase()
-      return data?.filter((customer) =>
-        customer.geusNome.toLowerCase().includes(lowerSearch),
-      )
-    }
-    return data
-  }, [data, watch('users')])
 
   if (isLoading || isFetching) {
     return <Loader />
@@ -137,28 +121,21 @@ export default function Users() {
 
   return (
     <Container>
-      <div className="flex w-full flex-col">
-        <div className="flex h-full w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
+      <div className="flex h-full w-full flex-col">
+        <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Usuários</TextHeading>
 
           <div className="flex items-center">
-            <Button onClick={() => router('/config/users/newUser')}>
+            <Button onClick={() => router('newUser')}>
               <PlusCircle size={18} /> Adicionar usuário
             </Button>
           </div>
         </div>
 
-        <FormProvider {...formUsers}>
-          <form className="my-2">
-            <Input name="users" label="Pesquisar usuário" />
-          </form>
-        </FormProvider>
-
-        <div className="ag-theme-alpine h-full w-full">
+        <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
-            rowData={usuariosFilter}
+            rowData={data}
             columnDefs={columnDefs}
-            domLayout={'autoHeight'}
             animateRows={true}
             gridOptions={{ localeText: AgGridTranslation }}
           />

@@ -2,38 +2,38 @@ import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
-import { yupResolver } from '@hookform/resolvers/yup'
-import { CaretLeft, FloppyDiskBack } from '@phosphor-icons/react'
-import * as yup from 'yup'
-
 import { Button } from '../../../components/Form/Button'
 import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
+
 import { addNewUser, updateUser } from '../../../services/users'
+
 import { Container } from '../../../template/Container'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { CaretLeft, FloppyDiskBack } from '@phosphor-icons/react'
+import * as yup from 'yup'
 
 export interface InputsAddNewUser {
-  geusId?: number
-  geusNome: string
-  geusNomeUsuario: string
-  geusEmail: string
-  geusSenha: string
-  geusAdmin: boolean
+  geus_id?: number
+  geus_nome: string
+  geus_nome_usuario: string
+  geus_email: string
+  geus_senha?: string
+  geus_admin: boolean
 }
 
 const schemaUsers = yup
   .object({
-    geusNome: yup.string().required('Informe o nome'),
-    geusNomeUsuario: yup.string().required('Crie um nome de usuário'),
-    geusEmail: yup
+    geus_nome: yup.string().required('Informe o nome'),
+    geus_nome_usuario: yup.string().required('Crie um nome de usuário'),
+    geus_email: yup
       .string()
       .email('E-mail inválido')
       .max(255)
       .required('Informe o e-mail'),
-    geusSenha: yup.string().required('Crie uma senha'),
-    geusAdmin: yup.boolean().required(),
+    geus_admin: yup.boolean().required(),
   })
   .required()
 
@@ -47,29 +47,29 @@ export default function NewUser() {
   const location = useLocation()
 
   async function handleAddNewUser({
-    geusId,
-    geusNome,
-    geusNomeUsuario,
-    geusEmail,
-    geusSenha,
-    geusAdmin,
+    geus_admin,
+    geus_email,
+    geus_nome,
+    geus_nome_usuario,
+    geus_senha,
+    geus_id,
   }: InputsAddNewUser) {
     if (location.state) {
       await updateUser({
-        geusId,
-        geusNome,
-        geusNomeUsuario,
-        geusEmail,
-        geusSenha,
-        geusAdmin,
+        geus_admin,
+        geus_email,
+        geus_nome,
+        geus_nome_usuario,
+        geus_senha,
+        geus_id,
       })
     } else {
       await addNewUser({
-        geusNome,
-        geusNomeUsuario,
-        geusEmail,
-        geusSenha,
-        geusAdmin,
+        geus_admin,
+        geus_email,
+        geus_nome,
+        geus_nome_usuario,
+        geus_senha,
       })
     }
   }
@@ -103,21 +103,25 @@ export default function NewUser() {
             onSubmit={handleSubmit(handleAddNewUser)}
           >
             <div className="flex gap-2">
-              <Input name="geusNome" label="Nome" />
-              <Input name="geusNomeUsuario" label="Nome de usuário" />
+              <Input name="geus_nome" label="Nome" />
+              <Input name="geus_nome_usuario" label="Nome de usuário" />
             </div>
 
             <div className="flex gap-2">
-              <Input name="geusEmail" label="E-mail" autoComplete="new-email" />
               <Input
-                name="geusSenha"
+                name="geus_email"
+                label="E-mail"
+                autoComplete="new-email"
+              />
+              <Input
                 type="password"
+                name="geus_senha"
                 label="Senha"
                 autoComplete="new-password"
               />
             </div>
             <div className="flex gap-2">
-              <Checkbox name="geusAdmin" label="Admin" />
+              <Checkbox name="geus_admin" label="Admin" />
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button onClick={() => handleSubmit(handleAddNewUser)}>

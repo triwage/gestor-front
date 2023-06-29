@@ -2,11 +2,6 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
-import { yupResolver } from '@hookform/resolvers/yup'
-import { CaretLeft, FileImage, FloppyDiskBack } from '@phosphor-icons/react'
-import * as yup from 'yup'
-
-import { BannersProps } from '../../../@types/banners'
 import { Button } from '../../../components/Form/Button'
 import { DateInput } from '../../../components/Form/Calendar'
 import { Input } from '../../../components/Form/Input'
@@ -15,10 +10,17 @@ import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
-import { handleUploadImage } from '../../../functions/general'
-import { addYearsDate } from '../../../functions/timesAndDates'
+
 import { addNewBanner } from '../../../services/banners'
+
+import { BannersProps } from '../../../@types/banners'
+
+import { getBase64, handleUploadImage } from '../../../functions/general'
+import { addYearsDate } from '../../../functions/timesAndDates'
 import { Container } from '../../../template/Container'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { CaretLeft, FileImage, FloppyDiskBack } from '@phosphor-icons/react'
+import * as yup from 'yup'
 
 const schemaBanners = yup
   .object({
@@ -40,7 +42,10 @@ export default function AddBanner() {
 
   async function getImage(event: ChangeEvent<HTMLInputElement>) {
     const res = await handleUploadImage(event)
-    setFilesAnexed(res || null)
+    if (res) {
+      const imageFinal = (await getBase64(res)) as string
+      setFilesAnexed(imageFinal)
+    }
     const inputElem = document.getElementById('newFile') as HTMLInputElement
     if (inputElem) {
       inputElem.value = ''
@@ -103,7 +108,12 @@ export default function AddBanner() {
               <div className="flex w-full flex-col gap-2 p-1">
                 {filesAnexed && (
                   <div className="h-max w-max">
-                    <img src={filesAnexed} alt="Banner" />
+                    <img
+                      src={filesAnexed}
+                      alt="Banner"
+                      width={335}
+                      height={151}
+                    />
                   </div>
                 )}
 

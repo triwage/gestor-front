@@ -1,12 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
+import { alerta } from '../components/System/Alert'
 
 import { UsersConfigProps } from '../@types/users'
-import { alerta } from '../components/System/Alert'
+
 import { haveData } from '../functions/general'
 import { clearCharacters } from '../functions/stringsAndObjects'
 import { api } from '../libs/api'
 import { InputsAddNewUser } from '../pages/settings/usuarios/newUser'
+import { useQuery } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
 
 export function useUsers() {
   return useQuery({
@@ -31,19 +32,19 @@ export function useUsers() {
 }
 
 export async function addNewUser({
-  geusNome,
-  geusNomeUsuario,
-  geusEmail,
-  geusSenha,
-  geusAdmin,
+  geus_admin,
+  geus_email,
+  geus_nome,
+  geus_nome_usuario,
+  geus_senha,
 }: InputsAddNewUser) {
   try {
     const payload = {
-      geusNome,
-      geusNomeUsuario,
-      geusEmail,
-      geusSenha,
-      geusAdmin,
+      geus_admin,
+      geus_email,
+      geus_nome,
+      geus_nome_usuario,
+      geus_senha,
     }
 
     const res = await api.post('/users', payload)
@@ -64,23 +65,23 @@ export async function addNewUser({
 }
 
 export async function updateUser({
-  geusId,
-  geusNome,
-  geusNomeUsuario,
-  geusEmail,
-  geusSenha,
-  geusAdmin,
+  geus_admin,
+  geus_email,
+  geus_nome,
+  geus_nome_usuario,
+  geus_senha,
+  geus_id,
 }: InputsAddNewUser) {
   try {
     const payload = {
-      geusId,
-      geusNome,
-      geusNomeUsuario,
-      geusEmail,
-      geusSenha,
-      geusAdmin,
+      geus_admin,
+      geus_email,
+      geus_nome,
+      geus_nome_usuario,
+      geus_senha,
+      geus_id,
     }
-    const res = await api.put(`/users/${geusId}`, payload)
+    const res = await api.put(`/users/${geus_id}`, payload)
 
     const { success, message } = res.data
 

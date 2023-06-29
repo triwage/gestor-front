@@ -1,5 +1,6 @@
 import { alerta } from '../components/System/Alert'
 
+import { haveData } from '../functions/general'
 import { clearCharacters } from '../functions/stringsAndObjects'
 import { api } from '../libs/api'
 import { AxiosError } from 'axios'
@@ -20,7 +21,7 @@ export async function Auth({ login, senha }: AuthProps) {
 
     const { success, data, error, message } = res.data
 
-    if (success) {
+    if (success && haveData(data)) {
       localStorage.setItem('token', data.token)
       api.defaults.headers.common.Authorization = `Bearer ${data.token}`
       alerta(message, 1)

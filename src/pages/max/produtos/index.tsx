@@ -1,27 +1,38 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
+import { Button } from '../../../components/Form/Button'
 import { Dialog } from '../../../components/System/Dialog'
+import { Dropdown } from '../../../components/System/Dropdown'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { useMaxProducts } from '../../../services/max/products'
+
+import { useMaxProductsStore } from '../../../store/useMaxProductsStore'
 
 import { MaxProductsProps } from '../../../@types/max/products'
 
 import { FormataValorMonetario } from '../../../functions/currency'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { PencilSimple } from '@phosphor-icons/react'
+import { PencilSimple, PlusCircle } from '@phosphor-icons/react'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function MaxProducts() {
+  const { setCurrentStatus } = useMaxProductsStore()
   const [isOpenModal, setIsOpenModal] = useState(false)
 
   const { data } = useMaxProducts()
 
   const router = useNavigate()
+
+  const optionsFilter = [
+    { id: 0, name: 'Todos', value: -1 },
+    { id: 1, name: 'Ativos', value: 1 },
+    { id: 2, name: 'Inativos', value: 0 },
+  ]
 
   const [columnDefs] = useState<ColDef[]>([
     {
@@ -131,6 +142,20 @@ export default function MaxProducts() {
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Produtos Max Nível</TextHeading>
+
+          <div className="flex items-center">
+            <Button onClick={() => router('updateProduct')}>
+              <PlusCircle size={18} /> Adicionar produto
+            </Button>
+          </div>
+        </div>
+
+        <div className="my-1 flex w-full justify-end">
+          <Dropdown
+            items={optionsFilter}
+            name="Filtrar"
+            onChange={(res) => setCurrentStatus(res.value)}
+          />
         </div>
 
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">

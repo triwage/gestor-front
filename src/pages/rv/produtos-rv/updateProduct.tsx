@@ -12,6 +12,7 @@ import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { useRVCategories } from '../../../services/rv/categories'
 import { updateRVProduct } from '../../../services/rv/products'
+import { useRVProviders } from '../../../services/rv/providers'
 
 import { RVProductsProps } from '../../../@types/rv/products'
 
@@ -27,6 +28,7 @@ export default function UpdateProduct() {
   const { setLoading } = useLoading()
 
   const { data: RVcategories } = useRVCategories()
+  const { data: RVProviders } = useRVProviders()
 
   const router = useNavigate()
   const location = useLocation()
@@ -53,12 +55,26 @@ export default function UpdateProduct() {
     return res
   }, [RVcategories])
 
+  const optionsProviders = useMemo(() => {
+    let res = [] as Array<{ value: number; label: string }>
+    if (RVProviders) {
+      res = RVProviders?.map((item) => {
+        return {
+          value: item.forv_id,
+          label: item.forv_provider,
+        }
+      })
+    }
+    return res
+  }, [RVProviders])
+
   useEffect(() => {
     const checkTypeof = {
       prrv_valor: true,
       prrv_valor_minimo: true,
       prrv_valor_maximo: true,
     }
+
     if (location.state) {
       const userEdit = Object.keys(location.state)
 
@@ -84,8 +100,17 @@ export default function UpdateProduct() {
           ),
         )
       }
+      if (optionsProviders) {
+        setValue(
+          'prrv_forv_id',
+          // @ts-expect-error
+          optionsProviders?.find(
+            (e) => e.value === location.state.prrv_forv_id,
+          ),
+        )
+      }
     }
-  }, [location, optionsCategories])
+  }, [location, optionsCategories, optionsProviders])
 
   return (
     <Container>
@@ -106,14 +131,14 @@ export default function UpdateProduct() {
           >
             <div className="flex gap-2">
               <Input name="prrv_nome" label="Nome" />
-              <Input name="forv_provider" label="Fornecedor" disabled />
+              <InputCurrency name="prrv_valor" label="Valor" />
             </div>
 
             <div className="flex gap-2">
-              <InputCurrency name="prrv_valor" label="Valor" />
               <InputCurrency name="prrv_valor_minimo" label="Valor mínimo" />
               <InputCurrency name="prrv_valor_maximo" label="Valor máximo" />
             </div>
+
             <div className="grid grid-cols-2 items-center gap-2">
               <Select
                 control={control}
@@ -121,6 +146,14 @@ export default function UpdateProduct() {
                 name="pcrv_id"
                 options={optionsCategories}
               />
+              <Select
+                control={control}
+                label="Fornecedor"
+                name="prrv_forv_id"
+                options={optionsProviders}
+              />
+            </div>
+            <div className="flex gap-2">
               <Checkbox name="prrv_ativo" label="Produto ativo" />
             </div>
             <div className="w-full border-t border-border pt-1">

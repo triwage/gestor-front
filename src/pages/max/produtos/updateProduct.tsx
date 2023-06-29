@@ -11,7 +11,7 @@ import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
-import { updateMaxProduct } from '../../../services/max/products'
+import { addMaxProduct, updateMaxProduct } from '../../../services/max/products'
 
 import { MaxProductsProps } from '../../../@types/max/products'
 
@@ -19,7 +19,12 @@ import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
-import { CaretLeft, FloppyDiskBack, Images } from '@phosphor-icons/react'
+import {
+  CaretLeft,
+  FloppyDiskBack,
+  Images,
+  UserSquare,
+} from '@phosphor-icons/react'
 
 export default function UpdateMaxProduct() {
   const formProduct = useForm<MaxProductsProps>()
@@ -32,7 +37,11 @@ export default function UpdateMaxProduct() {
 
   async function handleUpdateProductMax(data: MaxProductsProps) {
     setLoading(true)
-    await updateMaxProduct(data)
+    if (location.state) {
+      await updateMaxProduct(data)
+    } else {
+      await addMaxProduct(data)
+    }
     setLoading(false)
   }
 
@@ -79,7 +88,11 @@ export default function UpdateMaxProduct() {
             <Icon onClick={() => router(-1)}>
               <CaretLeft size={22} className="text-black dark:text-white" />
             </Icon>
-            <TextHeading>Produtos Max Nível / Editar produto</TextHeading>
+            <TextHeading>
+              {location.state
+                ? 'Produtos Max Nível / Editar produto'
+                : 'Produtos Max Nível / Adicionar produto'}
+            </TextHeading>
           </div>
         </div>
 
@@ -98,11 +111,19 @@ export default function UpdateMaxProduct() {
             </div>
             <div className="grid grid-cols-2 items-start gap-2">
               <div className="flex items-end gap-4">
-                <img
-                  src={watch('imagem_padrao_url')}
-                  alt="Logo"
-                  className="h-full max-h-48"
-                />
+                {!watch('imagem_padrao_url') && (
+                  <Icon>
+                    <UserSquare size={96} weight="fill" />
+                  </Icon>
+                )}
+
+                {watch('imagem_padrao_url') && (
+                  <img
+                    src={watch('imagem_padrao_url')}
+                    alt="Logo"
+                    className="h-full max-h-48"
+                  />
+                )}
                 <div>
                   <label
                     htmlFor="newFile"
@@ -110,7 +131,9 @@ export default function UpdateMaxProduct() {
                   >
                     <div className="flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                       <Images size={20} weight="fill" />
-                      Alterar imagem
+                      {!watch('imagem_padrao_url')
+                        ? 'Adicionar imagem'
+                        : 'Alterar imagem'}
                     </div>
                   </label>
                   <input

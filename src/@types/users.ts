@@ -1,8 +1,8 @@
 export type UsersConfigProps = {
-  geusId: number
-  geusNomeUsuario: string
-  geusNome: string
-  geusEmail: string
-  geusAdmin: boolean
-  geusSenha: string
+  geus_id: number
+  geus_nome_usuario: string
+  geus_nome: string
+  geus_email: string
+  geus_admin: boolean
+  geus_senha: string
 }
