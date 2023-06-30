@@ -38,3 +38,9 @@ export async function Auth({ login, senha }: AuthProps) {
     return false
   }
 }
+
+export function Logout() {
+  localStorage.removeItem('menus')
+  localStorage.removeItem('token')
+  location.href = '/login'
+}

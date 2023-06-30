@@ -62,18 +62,18 @@ export function FormSendEmail({ onResponse }: FormSendEmailProps) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="flex w-11/12 flex-col gap-3">
+    <div className="flex w-full flex-col items-center justify-center">
+      <div className="flex w-full flex-col gap-3">
         <div className="flex flex-col">
           <TextAction
             size="base"
-            className="self-start text-left font-bold text-black"
+            className="self-start text-left font-bold text-black dark:text-white"
           >
             Esqueceu sua senha?
           </TextAction>
           <TextAction
             size="sm"
-            className="-mt-1 self-start text-left font-normal text-black"
+            className="-mt-1 self-start text-left font-normal text-black dark:text-white"
           >
             Digite o seu e-mail para redefinir sua senha
           </TextAction>
@@ -84,7 +84,11 @@ export function FormSendEmail({ onResponse }: FormSendEmailProps) {
             className="flex flex-col items-center justify-center gap-2"
           >
             <Input name="login" placeholder="E-mail" />
-            <Button onClick={handleSubmit(onSubmit)}>
+            <Button
+              variant="structure"
+              className="bg-primary text-white dark:bg-white dark:text-black"
+              onClick={handleSubmit(onSubmit)}
+            >
               Enviar código
               <PaperPlaneTilt size={18} weight="fill" />
             </Button>

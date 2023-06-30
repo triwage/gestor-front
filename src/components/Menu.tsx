@@ -1,10 +1,10 @@
 import { ReactNode, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
+import { MenusProps } from '../@types/menus'
+
 import { Transition } from '@headlessui/react'
 import clsx from 'clsx'
-
-import { MenusProps } from '../@types/menus'
 
 interface MenuProps {
   show: boolean | number
@@ -27,7 +27,7 @@ export function Menu({ name, menu, show, icon, onClick }: MenuProps) {
   }
 
   function handleExpandir(menu: MenusProps) {
-    const itensExpandirAux = itensExpandir !== menu.gemeId ? menu.gemeId : -1
+    const itensExpandirAux = itensExpandir !== menu.geme_id ? menu.geme_id : -1
 
     setItensExpandir(itensExpandirAux)
   }
@@ -35,7 +35,7 @@ export function Menu({ name, menu, show, icon, onClick }: MenuProps) {
   return (
     <Transition
       className="flex w-full items-center pl-3"
-      show={show === menu?.gemeId || !!name}
+      show={show === menu?.geme_id || !!name}
       enter="transition-all ease-in-out duration-75 delay-75"
       enterFrom="opacity-0 translate-y-6"
       enterTo="opacity-100 translate-y-0"
@@ -46,7 +46,7 @@ export function Menu({ name, menu, show, icon, onClick }: MenuProps) {
       <div className="col w-full space-y-1">
         {menu?.ITENS?.map((element) => (
           <div
-            key={element.gemeId}
+            key={element.geme_id}
             onClick={() => {
               handleExpandir(element)
               onClick(element)
@@ -57,14 +57,18 @@ export function Menu({ name, menu, show, icon, onClick }: MenuProps) {
                 'justify-start': show,
                 'justify-center': !show,
                 ' bg-primary/20 dark:bg-black/40':
-                  location.pathname === element.gemeUrl,
+                  location.pathname === element.geme_url,
               },
             )}
           >
             <div className="flex items-center justify-center text-center">
               {icon && icon}
-              {!icon && element.gemeIcone && (
-                <img src={element.gemeIcone} className="h-5 w-5" />
+              {!icon && element.geme_icone && (
+                <img
+                  src={element.geme_icone}
+                  alt={element.geme_descricao}
+                  className="h-5 w-5"
+                />
               )}
             </div>
             <span
@@ -76,7 +80,7 @@ export function Menu({ name, menu, show, icon, onClick }: MenuProps) {
               )}
             >
               {name && name}
-              {!name && element.gemeDescricao}
+              {!name && element.geme_descricao}
             </span>
             {subMenus(element, Number(itensExpandir))}
           </div>

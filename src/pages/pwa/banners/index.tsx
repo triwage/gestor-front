@@ -2,15 +2,15 @@ import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
-import { PencilSimple, PlusCircle } from '@phosphor-icons/react'
-import { AgGridReact } from 'ag-grid-react'
-
 import { Button } from '../../../components/Form/Button'
 import { Input } from '../../../components/Form/Input'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
+
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
+import { NotePencil, PlusCircle } from '@phosphor-icons/react'
+import { AgGridReact } from 'ag-grid-react'
 
 interface Inputs {
   banners: string
@@ -42,7 +42,7 @@ export default function Banners() {
               }}
               className="h-full w-full"
             >
-              <PencilSimple size={20} weight="fill" className="text-primary" />
+              <NotePencil size={20} weight="fill" className="text-primary" />
             </Icon>
             <Icon
               onClick={() => handleDeleteUser(params.data.geusId)}

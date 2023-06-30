@@ -13,7 +13,7 @@ import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { PencilSimple } from '@phosphor-icons/react'
+import { NotePencil } from '@phosphor-icons/react'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
@@ -52,7 +52,7 @@ export default function RVProducts() {
               }}
               className="h-full w-full"
             >
-              <PencilSimple
+              <NotePencil
                 size={20}
                 weight="fill"
                 className="text-primary dark:text-white"

@@ -2,8 +2,6 @@ import { useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 
-import { PencilSimpleLine, PlusCircle, User } from '@phosphor-icons/react'
-
 import { Button } from '../../../components/Form/Button'
 import { Input } from '../../../components/Form/Input'
 import { Dialog } from '../../../components/System/Dialog'
@@ -11,8 +9,10 @@ import { Icon } from '../../../components/System/Icon'
 import { TextAction } from '../../../components/Texts/TextAction'
 import { TextBody } from '../../../components/Texts/TextBody'
 import { TextHeading } from '../../../components/Texts/TextHeading'
+
 // import { deleteUser } from '../../../services/users'
 import { Container } from '../../../template/Container'
+import { NotePencil, PlusCircle, User } from '@phosphor-icons/react'
 
 interface Inputs {
   categories: string
@@ -118,7 +118,7 @@ export default function Categories() {
               </div>
               <div className="flex items-center gap-3">
                 <Icon onClick={() => setIsOpenModal(true)}>
-                  <PencilSimpleLine size={20} />
+                  <NotePencil size={20} />
                 </Icon>
               </div>
             </div>

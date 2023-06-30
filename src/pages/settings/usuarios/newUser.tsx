@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
 import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
+import { ResetPassword } from '../../../components/ResetPassowrd'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
@@ -38,6 +39,7 @@ const schemaUsers = yup
   .required()
 
 export default function NewUser() {
+  const [modalResetPassword, setModalResetPassword] = useState(false)
   const formUsers = useForm<InputsAddNewUser>({
     resolver: yupResolver(schemaUsers),
   })
@@ -107,18 +109,30 @@ export default function NewUser() {
               <Input name="geus_nome_usuario" label="Nome de usuário" />
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <Input
                 name="geus_email"
                 label="E-mail"
                 autoComplete="new-email"
               />
-              <Input
-                type="password"
-                name="geus_senha"
-                label="Senha"
-                autoComplete="new-password"
-              />
+              {!location.state && (
+                <Input
+                  type="password"
+                  name="geus_senha"
+                  label="Senha"
+                  autoComplete="new-password"
+                />
+              )}
+              {location.state && (
+                <Button
+                  type="button"
+                  onClick={() => setModalResetPassword(true)}
+                  variant="structure"
+                  className="mt-5 bg-primary text-white dark:bg-white dark:text-black"
+                >
+                  Resetar senha
+                </Button>
+              )}
             </div>
             <div className="flex gap-2">
               <Checkbox name="geus_admin" label="Admin" />
@@ -132,6 +146,11 @@ export default function NewUser() {
           </form>
         </FormProvider>
       </div>
+
+      <ResetPassword
+        isOpen={modalResetPassword}
+        onPress={() => setModalResetPassword(false)}
+      />
     </Container>
   )
 }

@@ -86,7 +86,7 @@ export function FormResetPassword({
           <InputPassword.Icon>
             <Eye
               size={20}
-              className="text-black"
+              className="text-black dark:text-white"
               onClick={() => {
                 setPasswordView(!passwordView)
               }}
@@ -105,7 +105,7 @@ export function FormResetPassword({
           <InputPassword.Icon>
             <EyeSlash
               size={20}
-              className="text-black"
+              className="text-black dark:text-white"
               onClick={() => {
                 setPasswordView(!passwordView)
               }}
@@ -128,7 +128,7 @@ export function FormResetPassword({
           <InputPassword.Icon>
             <Eye
               size={20}
-              className="text-black"
+              className="text-black dark:text-white"
               onClick={() => {
                 setConfirmPasswordView(!confirmPasswordView)
               }}
@@ -147,7 +147,7 @@ export function FormResetPassword({
           <InputPassword.Icon>
             <EyeSlash
               size={20}
-              className="text-black"
+              className="text-black dark:text-white"
               onClick={() => {
                 setConfirmPasswordView(!confirmPasswordView)
               }}
@@ -159,11 +159,11 @@ export function FormResetPassword({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="flex w-11/12 flex-col gap-3">
+    <div className="flex w-full flex-col items-center justify-center">
+      <div className="flex w-full flex-col gap-3">
         <TextAction
           size="base"
-          className="self-start text-left font-semibold text-black"
+          className="self-start text-left font-semibold text-black dark:text-white"
         >
           Crie e confirme uma senha nova
         </TextAction>
@@ -174,7 +174,11 @@ export function FormResetPassword({
           >
             {Password()}
             {ConfirmPassword()}
-            <Button onClick={handleSubmit(onSubmit)}>
+            <Button
+              variant="structure"
+              className="bg-primary text-white dark:bg-white dark:text-black"
+              onClick={handleSubmit(onSubmit)}
+            >
               Alterar senha
               <FloppyDiskBack size={18} weight="fill" />
             </Button>

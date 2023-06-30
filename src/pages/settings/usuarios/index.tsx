@@ -13,7 +13,7 @@ import { UsersConfigProps } from '../../../@types/users'
 
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { PencilSimple, PlusCircle, TrashSimple } from '@phosphor-icons/react'
+import { NotePencil, PlusCircle, TrashSimple } from '@phosphor-icons/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
@@ -48,7 +48,7 @@ export default function Users() {
               }}
               className="h-full w-full"
             >
-              <PencilSimple
+              <NotePencil
                 size={20}
                 weight="fill"
                 className="text-primary dark:text-white"

@@ -12,7 +12,7 @@ import { TextHeading } from '../../../components/Texts/TextHeading'
 
 // import { deleteUser } from '../../../services/users'
 import { Container } from '../../../template/Container'
-import { PencilSimpleLine, PlusCircle, User } from '@phosphor-icons/react'
+import { NotePencil, PlusCircle, User } from '@phosphor-icons/react'
 
 interface Inputs {
   suppliers: string
@@ -118,7 +118,7 @@ export default function Suppliers() {
               </div>
               <div className="flex items-center gap-3">
                 <Icon onClick={() => setIsOpenModal(true)}>
-                  <PencilSimpleLine size={20} />
+                  <NotePencil size={20} />
                 </Icon>
               </div>
             </div>

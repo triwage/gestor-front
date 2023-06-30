@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
-
 import { alerta } from '../components/System/Alert'
+
 import { haveData } from '../functions/general'
 import { api } from '../libs/api'
+import { useQuery } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
 
 export function useMenus() {
   return useQuery({
@@ -12,6 +12,7 @@ export function useMenus() {
       try {
         if (localStorage.getItem('menus')) {
           const menusLocal = localStorage.getItem('menus')
+          // @ts-expect-error
           return JSON.parse(menusLocal)
         }
         const res = await api.get('/menus')

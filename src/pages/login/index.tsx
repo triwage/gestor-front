@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '../../components/Form/Button'
 import { Input } from '../../components/Form/Input'
 import { LeftBar } from '../../components/Pages/Login/LeftBar'
+import { ResetPassword } from '../../components/ResetPassowrd'
 import { TextAction } from '../../components/Texts/TextAction'
 
 import { Auth, AuthProps } from '../../services/auth'
@@ -13,6 +14,8 @@ import useLoading from '../../contexts/LoadingContext'
 import { LockSimpleOpen } from '@phosphor-icons/react'
 
 export default function Login() {
+  const [modalResetPassword, setModalResetPassword] = useState(false)
+
   const { setLoading } = useLoading()
 
   const router = useNavigate()
@@ -72,7 +75,7 @@ export default function Login() {
                 <Input name="senha" type="password" placeholder="Senha" />
 
                 <div
-                  onClick={() => router('reset-password')}
+                  onClick={() => setModalResetPassword(true)}
                   className="onPress self-end "
                 >
                   <TextAction
@@ -91,6 +94,11 @@ export default function Login() {
           </div>
         </div>
       </div>
+
+      <ResetPassword
+        isOpen={modalResetPassword}
+        onPress={() => setModalResetPassword(false)}
+      />
     </div>
   )
 }

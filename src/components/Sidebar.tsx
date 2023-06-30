@@ -1,7 +1,10 @@
 import { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { Logout } from '../services/auth'
 import { useMenus } from '../services/menus'
+
+import { useMaxProductsStore } from '../store/useMaxProductsStore'
 
 import { MenusProps } from '../@types/menus'
 
@@ -13,6 +16,7 @@ import { Sun, Moon, SignOut, CaretDown } from '@phosphor-icons/react'
 import clsx from 'clsx'
 
 export function Sidebar() {
+  const { setCurrentStatus } = useMaxProductsStore()
   const [isOpen, setIsOpen] = useState<number | boolean>(false)
   const [menus, setMenus] = useState<MenusProps[] | null>(null)
   const [theme, setTheme] = useState<null | string>(null)
@@ -21,16 +25,16 @@ export function Sidebar() {
   const { data, isLoading, isFetching } = useMenus()
 
   function handleExpandir(menu: MenusProps) {
-    const itensExpandirAux = isOpen !== menu.gemeId ? menu.gemeId : -1
+    const itensExpandirAux = isOpen !== menu.geme_id ? menu.geme_id : -1
 
     setIsOpen(itensExpandirAux)
   }
 
   function handleClickMenuPai(menu: MenusProps) {
-    if (menu.gemeUrl === '/home') {
+    if (menu.geme_url === '/home') {
       router(`/home`)
-    } else if (menu.gemeUrl && menu.gemeUrl !== '#') {
-      router(`/${menu.gemeUrl}`)
+    } else if (menu.geme_url && menu.geme_url !== '#') {
+      router(`/${menu.geme_url}`)
     }
   }
 
@@ -76,7 +80,7 @@ export function Sidebar() {
     if (data) {
       const res = [] as MenusProps[]
       data?.forEach((item: MenusProps) => {
-        if (!item.gemeGemeId) {
+        if (!item.geme_geme_id) {
           item.ITENS = []
           res.push(item)
         }
@@ -84,7 +88,7 @@ export function Sidebar() {
 
       for (let indexDad = 0; indexDad < res.length; indexDad++) {
         for (let element = 0; element < data.length; element++) {
-          if (data[element].gemeGemeId === res[indexDad].gemeId) {
+          if (data[element].geme_geme_id === res[indexDad].geme_id) {
             res[indexDad].ITENS.push(data[element])
           }
         }
@@ -129,7 +133,7 @@ export function Sidebar() {
 
             <div className="flex w-full flex-col items-start justify-start gap-2">
               {menus?.map((element) => (
-                <Fragment key={element.gemeDescricao}>
+                <Fragment key={element.geme_id}>
                   <div
                     onClick={() => {
                       handleExpandir(element)
@@ -139,11 +143,12 @@ export function Sidebar() {
                       'group flex w-full cursor-pointer items-center gap-2 rounded-md p-2 transition-all hover:bg-primary/20 dark:hover:bg-black/40',
                       {
                         'border-b border-white-200/70':
-                          isOpen === element.gemeId && element.ITENS.length > 0,
+                          isOpen === element.geme_id &&
+                          element.ITENS.length > 0,
                         'justify-start': isOpen,
                         'justify-center': !isOpen,
                         ' bg-primary/20 dark:bg-black/40':
-                          location.pathname === element.gemeUrl,
+                          location.pathname === element.geme_url,
                       },
                     )}
                   >
@@ -155,9 +160,9 @@ export function Sidebar() {
                     >
                       <div className="flex items-center gap-2 text-center">
                         <img
-                          src={element.gemeIcone}
+                          src={element.geme_icone}
                           className="h-5 w-5"
-                          alt={element.gemeDescricao}
+                          alt={element.geme_descricao}
                         />
                         <span
                           className={clsx(
@@ -167,7 +172,7 @@ export function Sidebar() {
                             },
                           )}
                         >
-                          {element.gemeDescricao}
+                          {element.geme_descricao}
                         </span>
                       </div>
                       {isOpen && element.ITENS.length > 0 && (
@@ -177,8 +182,8 @@ export function Sidebar() {
                             className={clsx(
                               'text-primary transition-transform dark:text-white',
                               {
-                                'rotate-180': isOpen === element.gemeId,
-                                'rotate-0': isOpen !== element.gemeId,
+                                'rotate-180': isOpen === element.geme_id,
+                                'rotate-0': isOpen !== element.geme_id,
                               },
                             )}
                           />
@@ -271,7 +276,10 @@ export function Sidebar() {
               </div>
             )}
             <div
-              onClick={() => console.log('888')}
+              onClick={() => {
+                setCurrentStatus(1)
+                Logout()
+              }}
               className={clsx(
                 'group flex w-full cursor-pointer items-center gap-2 rounded-md p-2 transition-all hover:bg-primary/20 dark:hover:bg-black/40',
                 {

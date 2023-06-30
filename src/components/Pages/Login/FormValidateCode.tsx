@@ -66,11 +66,11 @@ export function FormValidateCode({ onResponse, email }: FormValidateCodeProps) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="flex w-11/12 flex-col gap-3">
+    <div className="flex w-full flex-col items-center justify-center">
+      <div className="flex w-full flex-col gap-3">
         <TextAction
           size="base"
-          className="self-start text-left font-semibold text-black"
+          className="self-start text-left font-semibold text-black dark:text-white"
         >
           Informe o código que recebeu no email
         </TextAction>
@@ -80,7 +80,11 @@ export function FormValidateCode({ onResponse, email }: FormValidateCodeProps) {
             className="flex flex-col items-center justify-center gap-2"
           >
             <Input name="codigoValidacao" placeholder="Informe o código" />
-            <Button onClick={handleSubmit(onSubmit)}>
+            <Button
+              variant="structure"
+              className="bg-primary text-white dark:bg-white dark:text-black"
+              onClick={handleSubmit(onSubmit)}
+            >
               Verificar código
               <SealCheck size={18} weight="fill" />
             </Button>

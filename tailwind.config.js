@@ -23,6 +23,7 @@ export default {
       },
       white: {
         DEFAULT: '#fff',
+        800: '#fafafa',
         700: '#f8f9fe',
         600: '#e8e9f1',
         500: '#f2f2f2',
@@ -35,6 +36,7 @@ export default {
         500: '#a6a6a6',
         400: '#c5c6cc',
         300: '#d6d7db',
+        200: '#a1a1aa',
       },
       green: {
         DEFAULT: '#15803d',
@@ -78,8 +80,12 @@ export default {
         100: '#cce6ff',
         50: '#EAF2FF',
       },
-      border: 'rgb(122,122,122, 0.3)',
-      opacity: 'rgb(0, 0, 0, 0.5)',
+      border: {
+        DEFAULT: 'rgb(122,122,122, 0.3)',
+        500: 'rgb(122,122,122, 0.5)',
+        300: 'rgb(122,122,122, 0.8)',
+      },
+      opacity: 'rgb(0, 0, 0, 0.65)',
       transparent: 'transparent',
     },
     extend: {

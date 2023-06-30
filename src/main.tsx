@@ -10,14 +10,14 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 
-import { X } from '@phosphor-icons/react'
-import { QueryClientProvider } from '@tanstack/react-query'
-
-import routes from '~react-pages'
-
 import { Loader } from './components/System/Loader'
+
+import { ConfirmProvider } from './contexts/ConfirmContext'
 import { LoadingProvider } from './contexts/LoadingContext'
 import { queryClient } from './libs/queryClient'
+import { X } from '@phosphor-icons/react'
+import { QueryClientProvider } from '@tanstack/react-query'
+import routes from '~react-pages'
 
 const contextClass = {
   success: 'bg-green text-white font-medium',
@@ -42,21 +42,23 @@ const app = createRoot(document.getElementById('root')!)
 app.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <LoadingProvider>
-        <Router>
-          <ToastContainer
-            closeButton={CloseButton}
-            hideProgressBar
-            toastClassName={({ type }: any) =>
-              // @ts-expect-error
-              contextClass[type || 'default'] +
-              'relative flex mt-1 mx-1 p-1.5 min-h-10 rounded-lg justify-between overflow-hidden cursor-pointer'
-            }
-            autoClose={2500}
-          />
-          <App />
-        </Router>
-      </LoadingProvider>
+      <ConfirmProvider>
+        <LoadingProvider>
+          <Router>
+            <ToastContainer
+              closeButton={CloseButton}
+              hideProgressBar
+              toastClassName={({ type }: any) =>
+                // @ts-expect-error
+                contextClass[type || 'default'] +
+                'relative flex mt-1 mx-1 p-1.5 min-h-10 rounded-lg justify-between overflow-hidden cursor-pointer'
+              }
+              autoClose={2500}
+            />
+            <App />
+          </Router>
+        </LoadingProvider>
+      </ConfirmProvider>
     </QueryClientProvider>
   </StrictMode>,
 )
