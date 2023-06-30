@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 
 import { MenusProps } from '../@types/menus'
 
+import { IconsMenu } from './System/IconsMenu'
 import { Transition } from '@headlessui/react'
 import clsx from 'clsx'
 
@@ -63,13 +64,8 @@ export function Menu({ name, menu, show, icon, onClick }: MenuProps) {
           >
             <div className="flex items-center justify-center text-center">
               {icon && icon}
-              {!icon && element.geme_icone && (
-                <img
-                  src={element.geme_icone}
-                  alt={element.geme_descricao}
-                  className="h-5 w-5"
-                />
-              )}
+              {/* @ts-expect-error */}
+              <IconsMenu name={String(element.geme_descricao)} />
             </div>
             <span
               className={clsx(

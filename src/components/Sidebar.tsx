@@ -10,6 +10,7 @@ import { MenusProps } from '../@types/menus'
 
 import { Menu } from './Menu'
 import { Icon } from './System/Icon'
+import { IconsMenu } from './System/IconsMenu'
 import { Loader } from './System/Loader'
 import Logo from '@/assets/logo.png'
 import { Sun, Moon, SignOut, CaretDown } from '@phosphor-icons/react'
@@ -93,6 +94,7 @@ export function Sidebar() {
           }
         }
       }
+      console.log(res)
       setMenus(res)
     }
   }, [data, isLoading, isFetching])
@@ -142,7 +144,7 @@ export function Sidebar() {
                     className={clsx(
                       'group flex w-full cursor-pointer items-center gap-2 rounded-md p-2 transition-all hover:bg-primary/20 dark:hover:bg-black/40',
                       {
-                        'border-b border-white-200/70':
+                        'border-b border-primary-50 dark:border-white/40':
                           isOpen === element.geme_id &&
                           element.ITENS.length > 0,
                         'justify-start': isOpen,
@@ -159,11 +161,8 @@ export function Sidebar() {
                       })}
                     >
                       <div className="flex items-center gap-2 text-center">
-                        <img
-                          src={element.geme_icone}
-                          className="h-5 w-5"
-                          alt={element.geme_descricao}
-                        />
+                        {/* @ts-expect-error */}
+                        <IconsMenu name={String(element.geme_descricao)} />
                         <span
                           className={clsx(
                             'select-none text-sm font-medium text-primary/90 transition-all group-hover:text-primary dark:text-white/90 dark:group-hover:text-white',
