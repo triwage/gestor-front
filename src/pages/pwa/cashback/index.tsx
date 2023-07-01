@@ -5,7 +5,7 @@ import { Button } from '../../../components/Form/Button'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { usePWACategories } from '../../../services/pwa/categories'
+import { usePWACashback } from '../../../services/pwa/cashback'
 
 import { PWACashbackProps } from '../../../@types/pwa/cashback'
 
@@ -16,10 +16,10 @@ import { NotePencil, PlusCircle } from '@phosphor-icons/react'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
-export default function PWACategories() {
+export default function PWACashback() {
   const router = useNavigate()
 
-  const { data } = usePWACategories()
+  const { data } = usePWACashback()
 
   const [columnDefs] = useState<ColDef[]>([
     {

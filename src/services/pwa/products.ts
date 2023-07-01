@@ -43,7 +43,7 @@ export async function addPWAProduct(data: PWAProductsProps) {
       fopw_descricao: data.fopw_descricao,
       prpw_descricao: data.prpw_descricao,
       prpw_imagem: data.prpw_imagem || 'não nula',
-      prpw_valor: formataMoedaPFloat(data.prpw_valor),
+      prpw_valor: data.prpw_valor ? formataMoedaPFloat(data.prpw_valor) : null,
       prpw_ativo: data.prpw_ativo,
     }
 
@@ -55,7 +55,7 @@ export async function addPWAProduct(data: PWAProductsProps) {
       alerta('Produto adicionado com sucesso', 1)
       setTimeout(() => {
         location.href = '/pwa/produtos'
-      }, 800)
+      }, 400)
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -79,7 +79,7 @@ export async function updatePWAProduct(data: PWAProductsProps) {
       fopw_descricao: data.fopw_descricao,
       prpw_descricao: data.prpw_descricao,
       prpw_imagem: data.prpw_imagem,
-      prpw_valor: formataMoedaPFloat(data.prpw_valor),
+      prpw_valor: data.prpw_valor ? formataMoedaPFloat(data.prpw_valor) : null,
       prpw_ativo: data.prpw_ativo,
     }
 
@@ -91,7 +91,7 @@ export async function updatePWAProduct(data: PWAProductsProps) {
       alerta('Produto alterado com sucesso', 1)
       setTimeout(() => {
         location.href = '/pwa/produtos'
-      }, 800)
+      }, 400)
     }
   } catch (error) {
     if (error instanceof AxiosError) {

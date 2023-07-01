@@ -1,4 +1,4 @@
-export type PWAProductsProps = {
+export interface PWAProductsProps {
   prpw_id: number
   prpw_prrv_id: number
   prpw_max_id: number

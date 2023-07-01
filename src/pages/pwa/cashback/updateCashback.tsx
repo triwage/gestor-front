@@ -3,9 +3,9 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
-import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { InputCurrency } from '../../../components/Form/InputCurrency'
+import { Switch } from '../../../components/Form/Switch'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
@@ -17,6 +17,7 @@ import {
 import { PWACashbackProps } from '../../../@types/pwa/cashback'
 
 import useLoading from '../../../contexts/LoadingContext'
+import { FormataValorMonetario } from '../../../functions/currency'
 import { Container } from '../../../template/Container'
 import { CaretLeft, FloppyDiskBack } from '@phosphor-icons/react'
 
@@ -40,12 +41,24 @@ export default function UpdateCategoryPWA() {
   }
 
   useEffect(() => {
+    const checkTypeof = {
+      cash_valor: true,
+    }
     if (location.state) {
       const cashBackEdit = Object.keys(location.state)
 
-      cashBackEdit?.forEach((user) => {
+      cashBackEdit?.forEach((cashItem) => {
         // @ts-expect-error
-        setValue(String(user), location.state[user])
+        if (checkTypeof[String(cashItem)]) {
+          setValue(
+            // @ts-expect-error
+            String(cashItem),
+            FormataValorMonetario(location.state[cashItem], false),
+          )
+        } else {
+          // @ts-expect-error
+          setValue(String(cashItem), location.state[cashItem])
+        }
       })
     }
   }, [location])
@@ -77,7 +90,7 @@ export default function UpdateCategoryPWA() {
             </div>
 
             <div className="flex gap-2">
-              <Checkbox name="cash_ativo" label="Ativo" />
+              <Switch name="cash_ativo" label="Ativo" />
             </div>
 
             <div className="w-full border-t border-border pt-1">

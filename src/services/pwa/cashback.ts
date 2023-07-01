@@ -2,6 +2,7 @@ import { alerta } from '../../components/System/Alert'
 
 import { PWACashbackProps } from '../../@types/pwa/cashback'
 
+import { formataMoedaPFloat } from '../../functions/currency'
 import { haveData } from '../../functions/general'
 import { clearCharacters } from '../../functions/stringsAndObjects'
 import { api } from '../../libs/api'
@@ -33,7 +34,7 @@ export async function addPWACashback(data: PWACashbackProps) {
   try {
     const payload = {
       cash_descricao: data.cash_descricao,
-      cash_valor: data.cash_valor,
+      cash_valor: data.cash_valor ? formataMoedaPFloat(data.cash_valor) : null,
       cash_ativo: data.cash_ativo,
     }
 
@@ -45,7 +46,7 @@ export async function addPWACashback(data: PWACashbackProps) {
       alerta('Cashback criado com sucesso', 1)
       setTimeout(() => {
         location.href = '/pwa/cashback'
-      }, 800)
+      }, 400)
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -60,7 +61,7 @@ export async function updatePWACashback(data: PWACashbackProps) {
   try {
     const payload = {
       cash_descricao: data.cash_descricao,
-      cash_valor: data.cash_valor,
+      cash_valor: data.cash_valor ? formataMoedaPFloat(data.cash_valor) : null,
       cash_ativo: data.cash_ativo,
       cash_id: data.cash_id,
     }
@@ -73,7 +74,7 @@ export async function updatePWACashback(data: PWACashbackProps) {
       alerta('Cashback alterada com sucesso', 1)
       setTimeout(() => {
         location.href = '/pwa/cashback'
-      }, 800)
+      }, 400)
     }
   } catch (error) {
     if (error instanceof AxiosError) {

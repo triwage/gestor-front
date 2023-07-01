@@ -47,7 +47,7 @@ export async function addPWACategories(data: PWACategoriesProps) {
       alerta('Categoria criada com sucesso', 1)
       setTimeout(() => {
         location.href = '/pwa/categorias'
-      }, 800)
+      }, 400)
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -79,7 +79,7 @@ export async function updatePWACategory(data: PWACategoriesProps) {
       alerta('Categoria alterada com sucesso', 1)
       setTimeout(() => {
         location.href = '/pwa/categorias'
-      }, 800)
+      }, 400)
     }
   } catch (error) {
     if (error instanceof AxiosError) {

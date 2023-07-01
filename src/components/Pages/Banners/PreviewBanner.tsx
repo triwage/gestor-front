@@ -1,4 +1,4 @@
-import { BannersProps } from '../../../@types/banners'
+import { BannersProps } from '../../../@types/pwa/banners'
 import { Button } from '../../Form/Button'
 import { TextBody } from '../../Texts/TextBody'
 import { TextHeading } from '../../Texts/TextHeading'

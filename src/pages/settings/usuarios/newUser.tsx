@@ -3,8 +3,8 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
-import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
+import { Switch } from '../../../components/Form/Switch'
 import { ResetPassword } from '../../../components/ResetPassowrd'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
@@ -135,7 +135,7 @@ export default function NewUser() {
               )}
             </div>
             <div className="flex gap-2">
-              <Checkbox name="geus_admin" label="Admin" />
+              <Switch name="geus_admin" label="Admin" />
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button onClick={() => handleSubmit(handleAddNewUser)}>

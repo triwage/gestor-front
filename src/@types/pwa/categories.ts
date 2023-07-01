@@ -1,4 +1,4 @@
-export type PWACategoriesProps = {
+export interface PWACategoriesProps {
   pcpw_id: number
   pcpw_prrv_id: number | null
   pcpw_cash_id: number | null

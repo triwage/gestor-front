@@ -11,9 +11,9 @@ import { Icon } from '../../../components/System/Icon'
 import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { addNewBanner } from '../../../services/banners'
+import { addNewBanner } from '../../../services/pwa/banners'
 
-import { BannersProps } from '../../../@types/banners'
+import { BannersProps } from '../../../@types/pwa/banners'
 
 import { getBase64, handleUploadImage } from '../../../functions/general'
 import { addYearsDate } from '../../../functions/timesAndDates'
@@ -24,8 +24,8 @@ import * as yup from 'yup'
 
 const schemaBanners = yup
   .object({
-    gebaBotaoAcao: yup.string().required('Campo obrigatório'),
-    gebaDtaValidade: yup.string(),
+    geba_botao_acao: yup.string().required('Campo obrigatório'),
+    geba_dta_validade: yup.string(),
   })
   .required()
 
@@ -35,7 +35,7 @@ export default function AddBanner() {
     // @ts-expect-error
     resolver: yupResolver(schemaBanners),
   })
-  const { handleSubmit, watch, control } = formBanner
+  const { handleSubmit, watch, control, setValue } = formBanner
 
   const router = useNavigate()
   const location = useLocation()
@@ -52,31 +52,29 @@ export default function AddBanner() {
     }
   }
 
-  async function handleAddNewUser({
-    gebaTitulo,
-    gebaSubtitulo,
-    gebaBotaoTexto,
-    gebaBotaoAcao,
-    gebaStatus,
-    gebaDtaValidade,
-  }: BannersProps) {
+  async function handleAddNewUser(data: BannersProps) {
     if (!filesAnexed) {
       alerta('Faça o upload de uma imagem', 4)
       return
     }
-    await addNewBanner({
-      gebaTitulo,
-      gebaSubtitulo,
-      gebaBotaoTexto,
-      gebaBotaoAcao,
-      gebaStatus,
-      gebaImagem: filesAnexed,
-      gebaDtaValidade: gebaDtaValidade || addYearsDate(),
-    })
+    data.geba_dta_validade = data.geba_dta_validade || addYearsDate()
+    await addNewBanner(data)
   }
 
   useEffect(() => {
-    console.log(location.state)
+    if (location.state) {
+      const bannerEdit = Object.keys(location.state)
+
+      bannerEdit?.forEach((bannerItem) => {
+        if (bannerItem === 'geba_dta_validade') {
+          // @ts-expect-error
+          setValue('geba_dta_validade', new Date(location.state[bannerItem]))
+        } else {
+          // @ts-expect-error
+          setValue(String(bannerItem), location.state[bannerItem])
+        }
+      })
+    }
   }, [location])
 
   return (
@@ -97,14 +95,14 @@ export default function AddBanner() {
             onSubmit={handleSubmit(handleAddNewUser)}
           >
             <div className="flex gap-2">
-              <Input name="gebaBotaoAcao" label="Link" />
+              <Input name="geba_botao_acao" label="Link" />
               <DateInput
                 control={control}
-                name="gebaDtaValidade"
-                label="Tempo de duração"
+                name="geba_dta_validade"
+                label="Validade"
               />
             </div>
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-2 items-center gap-2 max-md:block">
               <div className="flex w-full flex-col gap-2 p-1">
                 {filesAnexed && (
                   <div className="h-max w-max">
@@ -125,7 +123,7 @@ export default function AddBanner() {
                     <FileImage size={20} weight="fill" />
                     Anexar imagem
                   </div>
-                  <TextAction className="text-sm text-black">
+                  <TextAction className="text-sm text-black dark:text-white">
                     Anexe uma imagem com proporção 2.22, Ex: 800x360
                   </TextAction>
                 </label>
@@ -139,12 +137,13 @@ export default function AddBanner() {
                 />
               </div>
               <Switch
-                name="gebaStatus"
-                label={watch('gebaStatus') ? 'Ativo' : 'Inativo'}
+                name="geba_status"
+                label={watch('geba_status') ? 'Ativo' : 'Inativo'}
               />
             </div>
             <Button onClick={() => handleSubmit(handleAddNewUser)}>
-              <FloppyDiskBack size={18} weight="fill" /> Salvar Banner
+              <FloppyDiskBack size={18} weight="fill" />
+              {location.state ? 'Atualizar Banner' : 'Salvar Banner'}
             </Button>
           </form>
         </FormProvider>

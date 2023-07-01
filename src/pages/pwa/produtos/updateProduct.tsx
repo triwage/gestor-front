@@ -3,10 +3,10 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
-import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { InputCurrency } from '../../../components/Form/InputCurrency'
 import { Select } from '../../../components/Form/Select'
+import { Switch } from '../../../components/Form/Switch'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
@@ -19,6 +19,7 @@ import { usePWAProviders } from '../../../services/pwa/providers'
 import { useRVProducts } from '../../../services/rv/products'
 
 import { PWAProductsProps } from '../../../@types/pwa/products'
+import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
@@ -31,8 +32,15 @@ import {
   UserSquare,
 } from '@phosphor-icons/react'
 
+interface Inputs extends PWAProductsProps {
+  cash: SelectProps | null
+  productRv: SelectProps | null
+  category: SelectProps | null
+  provider: SelectProps | null
+}
+
 export default function UpdateProductPWA() {
-  const formProduct = useForm<PWAProductsProps>()
+  const formProduct = useForm<Inputs>()
   const { handleSubmit, setValue, watch, control } = formProduct
 
   const { data: ProductsRV, isLoading, isFetching } = useRVProducts()
@@ -57,8 +65,13 @@ export default function UpdateProductPWA() {
   const router = useNavigate()
   const location = useLocation()
 
-  async function handleUpdateProductMax(data: PWAProductsProps) {
+  async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
+    data.prpw_cash_id = Number(data.cash?.value)
+    data.prpw_prrv_id = Number(data.productRv?.value)
+    data.prpw_pcpw_id = Number(data.category?.value)
+    data.prpw_fopw_id = Number(data.provider?.value)
+
     if (location.state) {
       await updatePWAProduct(data)
     } else {
@@ -139,21 +152,51 @@ export default function UpdateProductPWA() {
     if (location.state) {
       const productEdit = Object.keys(location.state)
 
-      productEdit?.forEach((user) => {
+      productEdit?.forEach((productItem) => {
         // @ts-expect-error
-        if (checkTypeof[String(user)]) {
+        if (checkTypeof[String(productItem)]) {
           setValue(
             // @ts-expect-error
-            String(user),
-            FormataValorMonetario(location.state[user], false),
+            String(productItem),
+            FormataValorMonetario(location.state[productItem], false),
           )
         } else {
           // @ts-expect-error
-          setValue(String(user), location.state[user])
+          setValue(String(productItem), location.state[productItem])
         }
       })
+
+      setValue(
+        'provider',
+        optionsProviders?.find(
+          (e) => e.value === location.state.prpw_fopw_id,
+        ) ?? null,
+      )
+      setValue(
+        'productRv',
+        optionsProductsRV?.find(
+          (e) => e.value === location.state.prpw_prrv_id,
+        ) ?? null,
+      )
+      setValue(
+        'cash',
+        optionsCashback?.find((e) => e.value === location.state.prpw_cash_id) ??
+          null,
+      )
+      setValue(
+        'category',
+        optionsCategories?.find(
+          (e) => e.value === location.state.prpw_pcpw_id,
+        ) ?? null,
+      )
     }
-  }, [location])
+  }, [
+    location,
+    optionsCashback,
+    optionsProviders,
+    optionsCategories,
+    optionsProductsRV,
+  ])
 
   return (
     <Container>
@@ -193,13 +236,13 @@ export default function UpdateProductPWA() {
               <Select
                 control={control}
                 label="Produto RV"
-                name="prpw_prrv_id"
+                name="productRv"
                 options={optionsProductsRV}
               />
               <Select
                 control={control}
                 label="Fornecedor"
-                name="prpw_fopw_id"
+                name="provider"
                 options={optionsProviders}
               />
             </div>
@@ -207,13 +250,13 @@ export default function UpdateProductPWA() {
               <Select
                 control={control}
                 label="Cashback"
-                name="prpw_cash_id"
+                name="cash"
                 options={optionsCashback}
               />
               <Select
                 control={control}
                 label="Categoria"
-                name="prpw_pcpw_id"
+                name="category"
                 options={optionsCategories}
               />
             </div>
@@ -253,7 +296,7 @@ export default function UpdateProductPWA() {
                   />
                 </div>
               </div>
-              <Checkbox name="prpw_ativo" label="Produto ativo" />
+              <Switch name="prpw_ativo" label="Produto ativo" />
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button onClick={() => handleSubmit(handleUpdateProductMax)}>

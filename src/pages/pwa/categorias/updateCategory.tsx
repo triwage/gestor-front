@@ -3,9 +3,9 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
-import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { Select } from '../../../components/Form/Select'
+import { Switch } from '../../../components/Form/Switch'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
@@ -19,6 +19,7 @@ import {
 import { useRVProducts } from '../../../services/rv/products'
 
 import { PWACategoriesProps } from '../../../@types/pwa/categories'
+import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
 import { handleUploadImage } from '../../../functions/general'
@@ -30,8 +31,13 @@ import {
   UserSquare,
 } from '@phosphor-icons/react'
 
+interface Inputs extends PWACategoriesProps {
+  cash: SelectProps | null
+  productRv: SelectProps | null
+}
+
 export default function UpdateCategoryPWA() {
-  const formCategory = useForm<PWACategoriesProps>()
+  const formCategory = useForm<Inputs>()
   const { handleSubmit, setValue, watch, control } = formCategory
 
   const { data: ProductsRV, isLoading, isFetching } = useRVProducts()
@@ -46,12 +52,10 @@ export default function UpdateCategoryPWA() {
   const router = useNavigate()
   const location = useLocation()
 
-  async function handleUpdateProductMax(data: PWACategoriesProps) {
+  async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
-    // @ts-expect-error
-    data.pcpw_cash_id = data.pcpw_cash_id.value
-    // @ts-expect-error
-    data.pcpw_prrv_id = data.pcpw_prrv_id.value
+    data.pcpw_cash_id = Number(data.cash?.value)
+    data.pcpw_prrv_id = Number(data.productRv?.value)
 
     if (location.state) {
       await updatePWACategory(data)
@@ -103,28 +107,23 @@ export default function UpdateCategoryPWA() {
     if (location.state) {
       const categoryEdit = Object.keys(location.state)
 
-      categoryEdit?.forEach((user) => {
+      categoryEdit?.forEach((categoryItem) => {
         // @ts-expect-error
-        setValue(String(user), location.state[user])
+        setValue(String(categoryItem), location.state[categoryItem])
       })
-      if (optionsCashback) {
-        setValue(
-          'pcpw_cash_id',
-          // @ts-expect-error
-          optionsCashback?.find((e) => e.value === location.state.pcpw_cash_id),
-        )
-      }
-      if (optionsProductsRV) {
-        setValue(
-          'pcpw_prrv_id',
-          // @ts-expect-error
-          optionsProductsRV?.find(
-            (e) => e.value === location.state.pcpw_prrv_id,
-          ),
-        )
-      }
+      setValue(
+        'cash',
+        optionsCashback?.find((e) => e.value === location.state.pcpw_cash_id) ??
+          null,
+      )
+      setValue(
+        'productRv',
+        optionsProductsRV?.find(
+          (e) => e.value === location.state.pcpw_prrv_id,
+        ) ?? null,
+      )
     }
-  }, [location])
+  }, [location, optionsProductsRV, optionsCashback])
 
   return (
     <Container>
@@ -153,7 +152,7 @@ export default function UpdateCategoryPWA() {
               <Select
                 control={control}
                 label="Cashback"
-                name="pcpw_cash_id"
+                name="cash"
                 options={optionsCashback}
               />
             </div>
@@ -162,10 +161,10 @@ export default function UpdateCategoryPWA() {
               <Select
                 control={control}
                 label="Produto RV"
-                name="pcpw_prrv_id"
+                name="productRv"
                 options={optionsProductsRV}
               />
-              <Checkbox name="pcpw_ativo" label="Ativo" />
+              <Switch name="pcpw_ativo" label="Ativo" />
             </div>
             <div className="flex gap-2">
               <div className="flex items-end gap-4">

@@ -50,7 +50,7 @@ export async function addPWAProviders(data: PWAProvidersProps) {
       alerta('Fornecedor adicionado com sucesso', 1)
       setTimeout(() => {
         location.href = '/pwa/fornecedores'
-      }, 800)
+      }, 400)
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -82,7 +82,7 @@ export async function updatePWAProviders(data: PWAProvidersProps) {
       alerta('Fornecedor alterado com sucesso', 1)
       setTimeout(() => {
         location.href = '/pwa/fornecedores'
-      }, 800)
+      }, 400)
     }
   } catch (error) {
     if (error instanceof AxiosError) {

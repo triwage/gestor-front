@@ -9,7 +9,6 @@ import { usePWAProviders } from '../../../services/pwa/providers'
 
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
 
-import { FormataValorMonetario } from '../../../functions/currency'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
 import { NotePencil, PlusCircle } from '@phosphor-icons/react'
@@ -68,16 +67,6 @@ export default function PWAProviders() {
       filter: true,
     },
     {
-      field: 'prpw_valor',
-      headerName: 'Valor',
-      maxWidth: 130,
-      flex: 1,
-      sortable: true,
-      cellRenderer: (params: { value: boolean }) => {
-        return FormataValorMonetario(params.value)
-      },
-    },
-    {
       field: 'fopw_descricao',
       headerName: 'Descrição',
       flex: 1,
@@ -88,7 +77,7 @@ export default function PWAProviders() {
     {
       field: 'fopw_instrucoes',
       headerName: 'Instruções',
-      maxWidth: 130,
+      minWidth: 90,
       flex: 1,
       sortable: true,
     },

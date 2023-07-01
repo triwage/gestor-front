@@ -3,9 +3,9 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
-import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { Select } from '../../../components/Form/Select'
+import { Switch } from '../../../components/Form/Switch'
 import { Textarea } from '../../../components/Form/Textarea'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
@@ -20,6 +20,7 @@ import {
 import { useRVProviders } from '../../../services/rv/providers'
 
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
+import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
 import { handleUploadImage } from '../../../functions/general'
@@ -31,8 +32,13 @@ import {
   UserSquare,
 } from '@phosphor-icons/react'
 
+interface Inputs extends PWAProvidersProps {
+  providerRv: SelectProps | null
+  cash: SelectProps | null
+}
+
 export default function UpdateProviderPWA() {
-  const formProvider = useForm<PWAProvidersProps>()
+  const formProvider = useForm<Inputs>()
   const { handleSubmit, setValue, watch, control } = formProvider
 
   const { setLoading } = useLoading()
@@ -47,8 +53,11 @@ export default function UpdateProviderPWA() {
   const router = useNavigate()
   const location = useLocation()
 
-  async function handleUpdateProductMax(data: PWAProvidersProps) {
+  async function handleUpdateProviderPWA(data: Inputs) {
     setLoading(true)
+    data.fopw_forv_id = Number(data.providerRv?.value)
+    data.fopw_cash_id = Number(data.cash?.value)
+
     if (location.state) {
       await updatePWAProviders(data)
     } else {
@@ -99,12 +108,23 @@ export default function UpdateProviderPWA() {
     if (location.state) {
       const providerEdit = Object.keys(location.state)
 
-      providerEdit?.forEach((user) => {
+      providerEdit?.forEach((providerItem) => {
         // @ts-expect-error
-        setValue(String(user), location.state[user])
+        setValue(String(providerItem), location.state[providerItem])
       })
+      setValue(
+        'providerRv',
+        optionsProvidersRV?.find(
+          (e) => e.value === location.state.fopw_forv_id,
+        ) ?? null,
+      )
+      setValue(
+        'cash',
+        optionsCashback?.find((e) => e.value === location.state.fopw_cash_id) ??
+          null,
+      )
     }
-  }, [location])
+  }, [location, optionsCashback, optionsProvidersRV])
 
   return (
     <Container>
@@ -126,7 +146,7 @@ export default function UpdateProviderPWA() {
         <FormProvider {...formProvider}>
           <form
             className="my-2 space-y-2"
-            onSubmit={handleSubmit(handleUpdateProductMax)}
+            onSubmit={handleSubmit(handleUpdateProviderPWA)}
           >
             <div className="flex gap-2">
               <Input name="fopw_nome" label="Nome" />
@@ -137,13 +157,13 @@ export default function UpdateProviderPWA() {
               <Select
                 control={control}
                 label="Fornecedor RV"
-                name="fopw_forv_id"
+                name="providerRv"
                 options={optionsProvidersRV}
               />
               <Select
                 control={control}
                 label="Cashback"
-                name="fopw_cash_id"
+                name="cash"
                 options={optionsCashback}
               />
             </div>
@@ -191,13 +211,15 @@ export default function UpdateProviderPWA() {
                   />
                 </div>
               </div>
-              <Checkbox name="fopw_ativo" label="Ativo" />
+              <Switch name="fopw_ativo" label="Ativo" />
             </div>
 
             <div className="w-full border-t border-border pt-1">
-              <Button onClick={() => handleSubmit(handleUpdateProductMax)}>
+              <Button onClick={() => handleSubmit(handleUpdateProviderPWA)}>
                 <FloppyDiskBack size={18} weight="fill" />
-                {location.state ? 'Atualizar produto' : 'Adicionar produto'}
+                {location.state
+                  ? 'Atualizar fornecedor'
+                  : 'Adicionar fornecedor'}
               </Button>
             </div>
           </form>
