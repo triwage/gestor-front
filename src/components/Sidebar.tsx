@@ -94,7 +94,7 @@ export function Sidebar() {
           }
         }
       }
-      console.log(res)
+
       setMenus(res)
     }
   }, [data, isLoading, isFetching])

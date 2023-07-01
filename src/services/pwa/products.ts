@@ -2,7 +2,6 @@ import { alerta } from '../../components/System/Alert'
 
 import { PWAProductsProps } from '../../@types/pwa/products'
 
-import useLoading from '../../contexts/LoadingContext'
 import { formataMoedaPFloat } from '../../functions/currency'
 import { haveData } from '../../functions/general'
 import { clearCharacters } from '../../functions/stringsAndObjects'
@@ -11,14 +10,10 @@ import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 
 export function usePWAProducts() {
-  const { setLoading } = useLoading()
-
   return useQuery({
     queryKey: ['PWAProducts'],
     queryFn: async (): Promise<PWAProductsProps[] | null> => {
       try {
-        setLoading(true)
-
         const res = await api.get('/pwa/products')
         const { data } = res.data
 
@@ -30,8 +25,6 @@ export function usePWAProducts() {
           console.error(error)
         }
         return null
-      } finally {
-        setLoading(false)
       }
     },
   })

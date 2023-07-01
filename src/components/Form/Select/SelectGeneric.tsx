@@ -15,7 +15,7 @@ const colourStyles = {
     styles: Record<string, any>,
     { isDisabled, isFocused, isSelected }: any,
   ) => {
-    const color = '#fff'
+    const color = '#a2c2f6'
     const selected = '#145dd2'
     return {
       ...styles,

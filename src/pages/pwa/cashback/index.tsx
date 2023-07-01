@@ -7,8 +7,9 @@ import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { usePWACategories } from '../../../services/pwa/categories'
 
-import { PWACategoriesProps } from '../../../@types/pwa/categories'
+import { PWACashbackProps } from '../../../@types/pwa/cashback'
 
+import { FormataValorMonetario } from '../../../functions/currency'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
 import { NotePencil, PlusCircle } from '@phosphor-icons/react'
@@ -31,12 +32,12 @@ export default function PWACategories() {
         alignItems: 'center',
         justifyContent: 'center',
       },
-      cellRenderer: (params: { data: PWACategoriesProps }) => {
+      cellRenderer: (params: { data: PWACashbackProps }) => {
         return (
           <div className="flex h-full w-full items-center justify-center gap-1">
             <Icon
               onClick={() => {
-                router('updateCategory', {
+                router('updateCashback', {
                   state: params.data,
                 })
               }}
@@ -53,44 +54,30 @@ export default function PWACategories() {
       },
     },
     {
-      field: 'pcpw_id',
+      field: 'cash_id',
       headerName: 'ID',
       sort: 'asc',
       maxWidth: 80,
     },
     {
-      field: 'pcpw_descricao',
-      headerName: 'Nome',
-      flex: 1,
-      width: 120,
-      sortable: true,
-      filter: true,
-    },
-    {
       field: 'cash_descricao',
-      headerName: 'Cashback',
+      headerName: 'Nome',
       minWidth: 80,
       flex: 1,
       sortable: true,
     },
     {
-      field: 'pcpw_imagem',
-      headerName: 'Imagem',
-      maxWidth: 85,
-      cellStyle: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      cellRenderer: (params: { value: string | undefined }) => {
-        if (params.value) {
-          return <img src={params.value} alt="Imagem" width={24} height={24} />
-        }
-        return '-'
+      field: 'cash_valor',
+      headerName: 'Valor',
+      maxWidth: 130,
+      flex: 1,
+      sortable: true,
+      cellRenderer: (params: { value: boolean }) => {
+        return FormataValorMonetario(params.value)
       },
     },
     {
-      field: 'pcpw_ativo',
+      field: 'cash_ativo',
       headerName: 'Status',
       maxWidth: 80,
       sortable: true,
@@ -115,11 +102,11 @@ export default function PWACategories() {
     <Container>
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
-          <TextHeading>Categorias PWA</TextHeading>
+          <TextHeading>Cashback PWA</TextHeading>
 
           <div className="flex items-center">
-            <Button onClick={() => router('updateCategory')}>
-              <PlusCircle size={18} /> Adicionar categoria
+            <Button onClick={() => router('updateCashback')}>
+              <PlusCircle size={18} /> Adicionar cashback
             </Button>
           </div>
         </div>
