@@ -26,9 +26,7 @@ export function Container({ children }: ContainerProps) {
   return (
     <main className="flex h-screen w-screen text-primary dark:text-white">
       <Sidebar />
-      <div className="h-full w-full bg-white p-2 dark:bg-black-700">
-        {children}
-      </div>
+      <div className="h-full w-full bg-white p-2 dark:bg-black">{children}</div>
     </main>
   )
 }
