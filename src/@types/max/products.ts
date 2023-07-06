@@ -4,5 +4,5 @@ export type MaxProductsProps = {
   descricao: string
   imagem_padrao_url: string
   preco: string
-  status: string
+  status: string | boolean
 }

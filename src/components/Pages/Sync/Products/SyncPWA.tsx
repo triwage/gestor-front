@@ -4,7 +4,6 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { usePWACashback } from '../../../../services/pwa/cashback'
 import { usePWACategories } from '../../../../services/pwa/categories'
 import { usePWAProviders } from '../../../../services/pwa/providers'
-import { useRVProducts } from '../../../../services/rv/products'
 
 import { PWAProductsProps } from '../../../../@types/pwa/products'
 import { SelectProps } from '../../../../@types/select'
@@ -20,9 +19,9 @@ import { Icon } from '../../../System/Icon'
 import { Loader } from '../../../System/Loader'
 import { TextAction } from '../../../Texts/TextAction'
 import { Transition } from '@headlessui/react'
-import { FloppyDiskBack, Images, UserSquare, X } from '@phosphor-icons/react'
+import { FloppyDiskBack, Images, Package, X } from '@phosphor-icons/react'
 
-interface SheetProps {
+interface SyncPWAProps {
   open: boolean
   onClosed: () => void
   prpw_descricao?: string
@@ -42,7 +41,7 @@ interface Inputs extends PWAProductsProps {
   provider: SelectProps | null
 }
 
-export function Sheet({
+export function SyncPWA({
   open,
   onClosed,
   prpw_descricao,
@@ -53,16 +52,11 @@ export function Sheet({
   productRv,
   category,
   provider,
-}: SheetProps) {
+}: SyncPWAProps) {
   const formProduct = useForm<Inputs>()
   const { handleSubmit, setValue, watch, control } = formProduct
 
-  const { data: ProductsRV, isLoading, isFetching } = useRVProducts()
-  const {
-    data: CashbackPWA,
-    isLoading: isLoading2,
-    isFetching: isFetching2,
-  } = usePWACashback()
+  const { data: CashbackPWA, isLoading, isFetching } = usePWACashback()
   const {
     data: CategoriesPWA,
     isLoading: isLoading3,
@@ -79,7 +73,7 @@ export function Sheet({
   async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
     data.prpw_cash_id = Number(data.cash?.value)
-    data.prpw_prrv_id = Number(data.productRv?.value)
+    data.prpw_prrv_id = Number(productRv)
     data.prpw_pcpw_id = Number(data.category?.value)
     data.prpw_fopw_id = Number(data.provider?.value)
 
@@ -87,19 +81,6 @@ export function Sheet({
 
     setLoading(false)
   }
-
-  const optionsProductsRV = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (ProductsRV) {
-      res = ProductsRV?.map((item) => {
-        return {
-          value: item.prrv_id,
-          label: item.prrv_nome,
-        }
-      })
-    }
-    return res
-  }, [ProductsRV])
 
   const optionsCashback = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
@@ -151,10 +132,6 @@ export function Sheet({
       'provider',
       optionsProviders?.find((e) => e.value === provider) ?? null,
     )
-    setValue(
-      'productRv',
-      optionsProductsRV?.find((e) => e.value === productRv) ?? null,
-    )
     setValue('cash', optionsCashback?.find((e) => e.value === cash) ?? null)
     setValue(
       'category',
@@ -173,25 +150,22 @@ export function Sheet({
     optionsCashback,
     optionsProviders,
     optionsCategories,
-    optionsProductsRV,
   ])
 
   return (
     <Transition
       className="fixed left-0 top-0 z-50 flex h-full w-full flex-col items-center justify-center bg-opacity"
       show={open}
-      enter="transition-all ease-in-out duration-75 delay-75"
+      enter="transition-all ease-in-out duration-200 delay-75"
       enterFrom="opacity-0 -translate-x-12"
       enterTo="opacity-100 translate-x-0"
-      leave="transition-all ease-in-out duration-75"
+      leave="transition-all ease-in-out duration-200"
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
       <div className="fixed right-0 top-0 z-50 flex h-full w-3/4 flex-col items-center bg-white dark:bg-black">
         {(isLoading ||
           isFetching ||
-          isLoading2 ||
-          isFetching2 ||
           isLoading3 ||
           isFetching3 ||
           isLoading4 ||
@@ -207,7 +181,7 @@ export function Sheet({
           />
         </div>
         <div className="mt-10 flex w-[98%] flex-col items-center">
-          <TextAction size="lg">Sincronizar produto com o PWA</TextAction>
+          <TextAction size="lg">Sincronizar produto com o APP</TextAction>
           <FormProvider {...formProduct}>
             <form
               className="mt-4 w-full space-y-2"
@@ -219,12 +193,6 @@ export function Sheet({
               </div>
 
               <div className="flex gap-2">
-                <Select
-                  control={control}
-                  label="Produto RV"
-                  name="productRv"
-                  options={[]}
-                />
                 <Select
                   control={control}
                   label="Fornecedor"
@@ -250,7 +218,7 @@ export function Sheet({
                 <div className="flex items-end gap-4">
                   {!watch('prpw_imagem') && (
                     <Icon>
-                      <UserSquare size={96} weight="fill" />
+                      <Package size={96} weight="fill" />
                     </Icon>
                   )}
 
@@ -287,7 +255,7 @@ export function Sheet({
               <div className="absolute bottom-2 w-[98%] border-t border-border pt-1">
                 <Button onClick={() => handleSubmit(handleUpdateProductMax)}>
                   <FloppyDiskBack size={18} weight="fill" />
-                  Cadastrar produto
+                  Cadastrar produto no APP
                 </Button>
               </div>
             </form>

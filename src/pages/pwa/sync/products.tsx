@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
-import { Sheet } from '../../../components/Pages/Sync/Products/SyncPWA'
+import { SyncMax } from '../../../components/Pages/Sync/Products/SyncMaxNivel'
+import { SyncPWA } from '../../../components/Pages/Sync/Products/SyncPWA'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
@@ -17,13 +18,9 @@ import { AgGridReact } from 'ag-grid-react'
 
 export default function Synchronization() {
   const [isOpenForm, setIsOpenForm] = useState(false)
+  const [isOpenFormMax, setIsOpenFormMax] = useState(false)
   const [productAdd, setProductAdd] = useState<null | RVProductsProps>(null)
   const { data } = useRVProducts()
-
-  function handleSyncProduct(item: RVProductsProps) {
-    setProductAdd(item)
-    setIsOpenForm(true)
-  }
 
   const [columnDefs] = useState<ColDef[]>([
     {
@@ -42,7 +39,10 @@ export default function Synchronization() {
             <div className="flex h-full w-full items-center justify-center gap-1">
               <Icon
                 title="Sincronizar com Max nível"
-                onClick={() => handleSyncProduct(params.data)}
+                onClick={() => {
+                  setProductAdd(params.data)
+                  setIsOpenFormMax(true)
+                }}
                 className="h-full w-full"
               >
                 <Broadcast
@@ -55,7 +55,10 @@ export default function Synchronization() {
             <div className="flex h-full w-full items-center justify-center gap-1">
               <Icon
                 title="Sincronizar com PWA"
-                onClick={() => handleSyncProduct(params.data)}
+                onClick={() => {
+                  setProductAdd(params.data)
+                  setIsOpenForm(true)
+                }}
                 className="h-full w-full"
               >
                 <DeviceMobile
@@ -171,7 +174,7 @@ export default function Synchronization() {
         </div>
       </div>
 
-      <Sheet
+      <SyncPWA
         open={isOpenForm}
         onClosed={() => setIsOpenForm(false)}
         prpw_descricao={productAdd?.prrv_nome}
@@ -180,6 +183,13 @@ export default function Synchronization() {
         productRv={productAdd?.prrv_rv_id}
         category={productAdd?.prrv_pcrv_id}
         provider={productAdd?.prrv_forv_id}
+      />
+      <SyncMax
+        open={isOpenFormMax}
+        onClosed={() => setIsOpenFormMax(false)}
+        nome={productAdd?.prrv_nome}
+        preco={productAdd?.prrv_valor}
+        status={productAdd?.prrv_ativo}
       />
     </Container>
   )
