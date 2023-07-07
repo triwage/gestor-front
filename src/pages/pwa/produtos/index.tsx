@@ -101,19 +101,43 @@ export default function PWAProducts() {
       filter: true,
     },
     {
-      field: 'prpw_imagem',
-      headerName: 'Imagem',
-      maxWidth: 85,
-      cellStyle: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      cellRenderer: (params: { value: string | undefined }) => {
-        if (params.value !== 'não nula') {
-          return <img src={params.value} alt="Imagem" width={24} height={24} />
+      field: 'prpw_prrv_id',
+      headerName: 'RV Cad.',
+      maxWidth: 80,
+      sortable: true,
+      cellStyle: (params) => {
+        if (params.value) {
+          return { color: '#fff', backgroundColor: '#15803d' }
+        } else {
+          return { color: '#fff', backgroundColor: '#ed3241' }
         }
-        return '-'
+      },
+      cellRenderer: (params: { value: string }) => {
+        if (params.value) {
+          return 'Ativo'
+        } else {
+          return 'Inativo'
+        }
+      },
+    },
+    {
+      field: 'prpw_max_id',
+      headerName: 'Max Cad.',
+      maxWidth: 80,
+      sortable: true,
+      cellStyle: (params) => {
+        if (params.value) {
+          return { color: '#fff', backgroundColor: '#15803d' }
+        } else {
+          return { color: '#fff', backgroundColor: '#ed3241' }
+        }
+      },
+      cellRenderer: (params: { value: string }) => {
+        if (params.value) {
+          return 'Ativo'
+        } else {
+          return 'Inativo'
+        }
       },
     },
     {

@@ -12,6 +12,7 @@ import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
+import { useMaxProducts } from '../../../services/max/products'
 import { usePWACashback } from '../../../services/pwa/cashback'
 import { usePWACategories } from '../../../services/pwa/categories'
 import { addPWAProduct, updatePWAProduct } from '../../../services/pwa/products'
@@ -29,12 +30,13 @@ import {
   CaretLeft,
   FloppyDiskBack,
   Images,
-  UserSquare,
+  Package,
 } from '@phosphor-icons/react'
 
 interface Inputs extends PWAProductsProps {
   cash: SelectProps | null
   productRv: SelectProps | null
+  productMax: SelectProps | null
   category: SelectProps | null
   provider: SelectProps | null
 }
@@ -59,6 +61,11 @@ export default function UpdateProductPWA() {
     isLoading: isLoading4,
     isFetching: isFetching4,
   } = usePWAProviders()
+  const {
+    data: ProductsMax,
+    isLoading: isLoading5,
+    isFetching: isFetching5,
+  } = useMaxProducts()
 
   const { setLoading } = useLoading()
 
@@ -69,6 +76,7 @@ export default function UpdateProductPWA() {
     setLoading(true)
     data.prpw_cash_id = Number(data.cash?.value)
     data.prpw_prrv_id = Number(data.productRv?.value)
+    data.prpw_max_id = Number(data.productMax?.value)
     data.prpw_pcpw_id = Number(data.category?.value)
     data.prpw_fopw_id = Number(data.provider?.value)
 
@@ -104,6 +112,19 @@ export default function UpdateProductPWA() {
     }
     return res
   }, [ProductsRV])
+
+  const optionsProductsMax = useMemo(() => {
+    let res = [] as Array<{ value: number; label: string }>
+    if (ProductsMax) {
+      res = ProductsMax?.map((item) => {
+        return {
+          value: Number(item.id),
+          label: item.nome,
+        }
+      })
+    }
+    return res
+  }, [ProductsMax])
 
   const optionsCashback = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
@@ -165,17 +186,22 @@ export default function UpdateProductPWA() {
           setValue(String(productItem), location.state[productItem])
         }
       })
-
-      setValue(
-        'provider',
-        optionsProviders?.find(
-          (e) => e.value === location.state.prpw_fopw_id,
-        ) ?? null,
-      )
       setValue(
         'productRv',
         optionsProductsRV?.find(
           (e) => e.value === location.state.prpw_prrv_id,
+        ) ?? null,
+      )
+      setValue(
+        'productMax',
+        optionsProductsMax?.find(
+          (e) => e.value === location.state.prpw_max_id,
+        ) ?? null,
+      )
+      setValue(
+        'provider',
+        optionsProviders?.find(
+          (e) => e.value === location.state.prpw_fopw_id,
         ) ?? null,
       )
       setValue(
@@ -196,6 +222,7 @@ export default function UpdateProductPWA() {
     optionsProviders,
     optionsCategories,
     optionsProductsRV,
+    optionsProductsMax,
   ])
 
   return (
@@ -207,7 +234,9 @@ export default function UpdateProductPWA() {
         isLoading3 ||
         isFetching3 ||
         isLoading4 ||
-        isFetching4) && <Loader />}
+        isFetching4 ||
+        isLoading5 ||
+        isFetching5) && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -232,39 +261,56 @@ export default function UpdateProductPWA() {
               <InputCurrency name="prpw_valor" label="Preço" />
             </div>
 
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 items-center gap-2">
               <Select
                 control={control}
                 label="Produto RV"
                 name="productRv"
                 options={optionsProductsRV}
               />
+              <div className="flex items-center gap-2">
+                <Select
+                  control={control}
+                  label="Produto MAX"
+                  name="productMax"
+                  options={optionsProductsMax}
+                />
+                <Button
+                  title="Adicionar novo produto na Max nível"
+                  className="mt-4 w-[10%]"
+                >
+                  +
+                </Button>
+              </div>
+            </div>
+            <div className="flex gap-2">
               <Select
                 control={control}
                 label="Fornecedor"
                 name="provider"
                 options={optionsProviders}
               />
-            </div>
-            <div className="flex gap-2">
               <Select
                 control={control}
                 label="Cashback"
                 name="cash"
                 options={optionsCashback}
               />
+            </div>
+            <div className="grid grid-cols-2 items-center gap-2">
               <Select
                 control={control}
                 label="Categoria"
                 name="category"
                 options={optionsCategories}
               />
+              <Switch name="prpw_ativo" label="Produto ativo" />
             </div>
-            <div className="grid grid-cols-2 items-center gap-2">
+            <div className="w-full">
               <div className="flex items-end gap-4">
                 {!watch('prpw_imagem') && (
                   <Icon>
-                    <UserSquare size={96} weight="fill" />
+                    <Package size={96} weight="fill" />
                   </Icon>
                 )}
 
@@ -296,7 +342,6 @@ export default function UpdateProductPWA() {
                   />
                 </div>
               </div>
-              <Switch name="prpw_ativo" label="Produto ativo" />
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button onClick={() => handleSubmit(handleUpdateProductMax)}>
