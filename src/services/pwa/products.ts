@@ -1,6 +1,10 @@
 import { alerta } from '../../components/System/Alert'
 
-import { PWAProductsProps } from '../../@types/pwa/products'
+import {
+  Categoryes,
+  PWAProductsCategoriesProps,
+  PWAProductsProps,
+} from '../../@types/pwa/products'
 
 import { formataMoedaPFloat } from '../../functions/currency'
 import { haveData } from '../../functions/general'
@@ -30,6 +34,34 @@ export function usePWAProducts() {
   })
 }
 
+export function usePWACategoriesOfProdutos(id: number) {
+  return useQuery({
+    queryKey: ['PWACategoriesOfProducts'],
+    queryFn: async (): Promise<Categoryes[] | null> => {
+      try {
+        if (!id) {
+          return null
+        }
+        const res = await api.get(`/pwa/products-prod-categories/product/${id}`)
+        const { data } = res.data
+
+        if (haveData(data)) {
+          return data[0].categorias
+        }
+        return null
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          alerta(clearCharacters(error.response?.data?.error))
+        } else {
+          console.error(error)
+        }
+        return null
+      }
+    },
+    cacheTime: Infinity,
+  })
+}
+
 export async function addPWAProduct(data: PWAProductsProps) {
   try {
     const payload = {
@@ -49,13 +81,10 @@ export async function addPWAProduct(data: PWAProductsProps) {
 
     const res = await api.post('/pwa/products/', payload)
 
-    const { success } = res.data
+    const { success, data: dataRes } = res.data
 
     if (success) {
-      alerta('Produto adicionado com sucesso', 1)
-      setTimeout(() => {
-        location.href = '/pwa/produtos'
-      }, 400)
+      return haveData(dataRes)
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -63,6 +92,7 @@ export async function addPWAProduct(data: PWAProductsProps) {
     } else {
       console.error(error)
     }
+    return null
   }
 }
 
@@ -85,13 +115,55 @@ export async function updatePWAProduct(data: PWAProductsProps) {
 
     const res = await api.put(`/pwa/products/${data.prpw_id}`, payload)
 
-    const { success } = res.data
+    const { success, data: dataRes } = res.data
 
     if (success) {
-      alerta('Produto alterado com sucesso', 1)
-      setTimeout(() => {
-        location.href = '/pwa/produtos'
-      }, 400)
+      return haveData(dataRes)
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
+}
+
+export async function addCategoriesInProduct({
+  prpc_pcpw_id: categoryId,
+  prpc_prpw_id: productId,
+}: PWAProductsCategoriesProps) {
+  try {
+    const payload = {
+      prpc_pcpw_id: categoryId,
+      prpc_prpw_id: productId,
+    }
+
+    const res = await api.post('/pwa/products-prod-categories', payload)
+
+    const { success, error } = res.data
+
+    if (!success) {
+      alerta(clearCharacters(error))
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+  }
+}
+
+export async function removeCategoriesInProduct(id: number) {
+  try {
+    const res = await api.post(`/pwa/products-prod-categories/${id}`)
+
+    const { success, error } = res.data
+
+    if (!success) {
+      alerta(clearCharacters(error))
     }
   } catch (error) {
     if (error instanceof AxiosError) {

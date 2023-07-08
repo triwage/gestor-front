@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { FieldOnGrid } from '../../../components/FieldOnGrid'
+import { Button } from '../../../components/Form/Button'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
@@ -23,6 +24,7 @@ export default function RVProducts() {
   const { setLoading } = useLoading()
 
   const router = useNavigate()
+  const gridRef = useRef(null)
 
   async function handleUploadProduct(data: RVProductsProps) {
     setLoading(true)
@@ -33,8 +35,11 @@ export default function RVProducts() {
   const [columnDefs] = useState<ColDef[]>([
     {
       field: '',
-      maxWidth: 40,
+      maxWidth: 70,
       lockVisible: true,
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
+      showDisabledCheckboxes: true,
       cellStyle: {
         textAlign: 'center',
         display: 'flex',
@@ -53,7 +58,7 @@ export default function RVProducts() {
               className="h-full w-full"
             >
               <NotePencil
-                size={20}
+                size={22}
                 weight="fill"
                 className="text-primary dark:text-white"
               />
@@ -156,10 +161,12 @@ export default function RVProducts() {
     },
   ])
 
-  // const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
-  //   console.log('Data after change is', event.data)
-  // }, [])
+  function handleSyncData() {
+    // @ts-expect-error
+    const selectedData = gridRef?.current?.api?.getSelectedRows()
 
+    console.log(selectedData)
+  }
   return (
     <Container>
       <div className="flex h-full w-full flex-col">
@@ -167,13 +174,29 @@ export default function RVProducts() {
           <TextHeading>Produtos RV</TextHeading>
         </div>
 
+        <div className="my-2 flex w-full items-center gap-2">
+          <Button
+            variant="structure"
+            className="bg-green text-white"
+            onClick={handleSyncData}
+          >
+            Sincronizar com APP
+          </Button>
+          <Button variant="structure" className="bg-purple text-white">
+            Sincronizar com Max Nível
+          </Button>
+        </div>
+
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
+            ref={gridRef}
             rowData={data}
             columnDefs={columnDefs}
             animateRows={true}
             pagination={true}
             paginationPageSize={17}
+            rowSelection="multiple"
+            suppressRowClickSelection={true}
             gridOptions={{ localeText: AgGridTranslation }}
           />
         </div>

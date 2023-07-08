@@ -7,31 +7,44 @@ import { Input } from '../../../components/Form/Input'
 import { InputCurrency } from '../../../components/Form/InputCurrency'
 import { Select } from '../../../components/Form/Select'
 import { Switch } from '../../../components/Form/Switch'
+import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
+import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
-import { useMaxProducts } from '../../../services/max/products'
+import { addMaxProduct, useMaxProducts } from '../../../services/max/products'
 import { usePWACashback } from '../../../services/pwa/cashback'
 import { usePWACategories } from '../../../services/pwa/categories'
-import { addPWAProduct, updatePWAProduct } from '../../../services/pwa/products'
+import {
+  addCategoriesInProduct,
+  addPWAProduct,
+  removeCategoriesInProduct,
+  updatePWAProduct,
+  usePWACategoriesOfProdutos,
+} from '../../../services/pwa/products'
 import { usePWAProviders } from '../../../services/pwa/providers'
 import { useRVProducts } from '../../../services/rv/products'
 
+import { MaxProductsProps } from '../../../@types/max/products'
 import { PWAProductsProps } from '../../../@types/pwa/products'
 import { SelectProps } from '../../../@types/select'
 
+import useConfirm from '../../../contexts/ConfirmContext'
 import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
   CaretLeft,
   FloppyDiskBack,
   Images,
   Package,
 } from '@phosphor-icons/react'
+import clsx from 'clsx'
+import * as yup from 'yup'
 
 interface Inputs extends PWAProductsProps {
   cash: SelectProps | null
@@ -41,9 +54,25 @@ interface Inputs extends PWAProductsProps {
   provider: SelectProps | null
 }
 
+const schemaProduct = yup
+  .object({
+    prpw_descricao: yup.string().required('Informe o nome'),
+    prpw_valor: yup.string().required('Informe um valor'),
+  })
+  .required()
+
 export default function UpdateProductPWA() {
-  const formProduct = useForm<Inputs>()
+  const formProduct = useForm<Inputs>({
+    // @ts-expect-error
+    resolver: yupResolver(schemaProduct),
+  })
   const { handleSubmit, setValue, watch, control } = formProduct
+
+  const { Confirm } = useConfirm()
+  const { setLoading } = useLoading()
+
+  const router = useNavigate()
+  const location = useLocation()
 
   const { data: ProductsRV, isLoading, isFetching } = useRVProducts()
   const {
@@ -65,27 +94,89 @@ export default function UpdateProductPWA() {
     data: ProductsMax,
     isLoading: isLoading5,
     isFetching: isFetching5,
+    refetch,
   } = useMaxProducts()
-
-  const { setLoading } = useLoading()
-
-  const router = useNavigate()
-  const location = useLocation()
+  const {
+    data: CategoriesOfProducts,
+    isLoading: isLoading6,
+    isFetching: isFetching6,
+    isFetchedAfterMount,
+  } = usePWACategoriesOfProdutos(location?.state?.prpw_id)
 
   async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
+
     data.prpw_cash_id = Number(data.cash?.value)
     data.prpw_prrv_id = Number(data.productRv?.value)
     data.prpw_max_id = Number(data.productMax?.value)
     data.prpw_pcpw_id = Number(data.category?.value)
     data.prpw_fopw_id = Number(data.provider?.value)
-
+    let res = null as PWAProductsProps | null
     if (location.state) {
-      await updatePWAProduct(data)
+      res = await updatePWAProduct(data)
     } else {
-      await addPWAProduct(data)
+      res = await addPWAProduct(data)
     }
+
+    if (res) {
+      optionsCategories.forEach(async (category) => {
+        if (data.prpw_pcpw_id !== category.value) {
+          // @ts-expect-error
+          const fieldValue = watch(`optionsCategories-${category.value}`)
+          const currentCategory = CategoriesOfProducts?.find(
+            (e) => e.prpc_pcpw_id === category.value,
+          )
+
+          if (!currentCategory && fieldValue) {
+            await addCategoriesInProduct({
+              prpc_pcpw_id: category.value,
+              prpc_prpw_id: Number(res?.prpw_id),
+            })
+          } else if (currentCategory && !fieldValue) {
+            await removeCategoriesInProduct(currentCategory?.prpc_id)
+          }
+        }
+      })
+
+      alerta('Produto adicionado com sucesso', 1)
+      setTimeout(() => {
+        router('/pwa/produtos')
+      }, 400)
+    }
+
     setLoading(false)
+  }
+
+  async function handleAddProductInMax() {
+    const check = await Confirm({
+      title: 'Adicionar produto',
+      message: 'Tem certeza que deseja adicionar um novo produto na max nível?',
+      confirm: 'Adicionar',
+    })
+
+    if (check) {
+      setLoading(true)
+      const nome = String(watch('prpw_descricao'))
+      const preco = String(watch('prpw_valor'))
+
+      const data = {
+        id: '',
+        nome,
+        descricao: '',
+        imagem_padrao_url: null,
+        preco,
+        status: '1',
+      }
+      const res = (await addMaxProduct(data)) as MaxProductsProps
+      refetch()
+      if (res) {
+        setValue(
+          'productMax',
+          optionsProductsMax?.find((e) => e.value === Number(res.id)) ?? null,
+        )
+      }
+      setLoading(false)
+    }
   }
 
   async function getImage(event: ChangeEvent<HTMLInputElement>) {
@@ -215,6 +306,13 @@ export default function UpdateProductPWA() {
           (e) => e.value === location.state.prpw_pcpw_id,
         ) ?? null,
       )
+
+      if (isFetchedAfterMount) {
+        CategoriesOfProducts?.forEach((item) => {
+          // @ts-expect-error
+          setValue(`optionsCategories-${item.prpc_pcpw_id}`, true)
+        })
+      }
     }
   }, [
     location,
@@ -223,6 +321,7 @@ export default function UpdateProductPWA() {
     optionsCategories,
     optionsProductsRV,
     optionsProductsMax,
+    CategoriesOfProducts,
   ])
 
   return (
@@ -236,7 +335,9 @@ export default function UpdateProductPWA() {
         isLoading4 ||
         isFetching4 ||
         isLoading5 ||
-        isFetching5) && <Loader />}
+        isFetching5 ||
+        isLoading6 ||
+        isFetching6) && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -275,12 +376,21 @@ export default function UpdateProductPWA() {
                   name="productMax"
                   options={optionsProductsMax}
                 />
-                <Button
-                  title="Adicionar novo produto na Max nível"
-                  className="mt-4 w-[10%]"
-                >
-                  +
-                </Button>
+                {!location?.state ||
+                  (!watch('productMax') && (
+                    <div className="mt-4 w-[80px]">
+                      <Button
+                        type="button"
+                        onClick={handleAddProductInMax}
+                        title="Adicionar novo produto na Max nível"
+                        disable={
+                          !watch('prpw_descricao') || !watch('prpw_valor')
+                        }
+                      >
+                        +
+                      </Button>
+                    </div>
+                  ))}
               </div>
             </div>
             <div className="flex gap-2">
@@ -305,6 +415,45 @@ export default function UpdateProductPWA() {
                 options={optionsCategories}
               />
               <Switch name="prpw_ativo" label="Produto ativo" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <TextAction className="text-sm font-medium text-black dark:text-white">
+                Outras categorias
+              </TextAction>
+              <div className="flex flex-wrap gap-2">
+                {optionsCategories.map(
+                  (item) =>
+                    watch('category')?.value !== item.value && (
+                      <div
+                        onClick={() =>
+                          setValue(
+                            // @ts-expect-error
+                            String(`optionsCategories-${item.value}`),
+                            // @ts-expect-error
+                            !watch(String(`optionsCategories-${item.value}`)),
+                          )
+                        }
+                        key={item.value}
+                        className={clsx(
+                          'flex cursor-pointer select-none items-center justify-center rounded-xl border px-2 py-1 text-sm',
+                          {
+                            'border-primary bg-white text-primary dark:border-border-500 dark:bg-white-200/10 dark:text-white':
+                              !watch(
+                                // @ts-expect-error
+                                String(`optionsCategories-${item.value}`),
+                              ),
+                            'border-primary bg-primary text-white': watch(
+                              // @ts-expect-error
+                              String(`optionsCategories-${item.value}`),
+                            ),
+                          },
+                        )}
+                      >
+                        {item.label}
+                      </div>
+                    ),
+                )}
+              </div>
             </div>
             <div className="w-full">
               <div className="flex items-end gap-4">
@@ -344,7 +493,10 @@ export default function UpdateProductPWA() {
               </div>
             </div>
             <div className="w-full border-t border-border pt-1">
-              <Button onClick={() => handleSubmit(handleUpdateProductMax)}>
+              <Button
+                type="submit"
+                onClick={() => handleSubmit(handleUpdateProductMax)}
+              >
                 <FloppyDiskBack size={18} weight="fill" />
                 {location.state ? 'Atualizar produto' : 'Adicionar produto'}
               </Button>

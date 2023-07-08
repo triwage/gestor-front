@@ -1,11 +1,10 @@
 import { InputHTMLAttributes } from 'react'
 import { FieldValues, RegisterOptions, useFormContext } from 'react-hook-form'
 
-import clsx from 'clsx'
-
 import { formatarMoeda } from '../../../functions/currency'
 import { getParseMessageError } from '../../../functions/stringsAndObjects'
 import { TextAction } from '../../Texts/TextAction'
+import clsx from 'clsx'
 
 export interface InputCurrencyProps
   extends InputHTMLAttributes<HTMLInputElement> {
@@ -63,7 +62,7 @@ export function InputCurrency({
         />
       </div>
       {fieldError && (
-        <TextAction size="sm" className="font-semibold text-red">
+        <TextAction size="xs" className="font-semibold text-red">
           {fieldError.message?.toString()}
         </TextAction>
       )}

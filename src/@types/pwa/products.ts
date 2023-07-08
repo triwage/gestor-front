@@ -13,3 +13,20 @@ export interface PWAProductsProps {
   prpw_valor: string | null
   prpw_ativo: boolean
 }
+
+export interface Categoryes {
+  prpc_id: number
+  prpc_pcpw_id: number
+  pcpw_descricao: string
+}
+
+export interface PWACategoriesOfProducts {
+  prpc_prpw_id: number
+  prpw_descricao: string
+  categorias: Categoryes[]
+}
+
+export interface PWAProductsCategoriesProps {
+  prpc_pcpw_id: number // categoria id
+  prpc_prpw_id: number // produto id
+}

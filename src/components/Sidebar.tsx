@@ -115,7 +115,7 @@ export function Sidebar() {
       <div
         // onClick={() => setIsOpen(!isOpen)}
         className={clsx(
-          'h-screen max-h-screen w-full border-r-[0.5px] border-primary bg-white transition-all dark:border-0 dark:bg-primary',
+          'h-screen max-h-screen w-full border-r-[0.5px] border-primary/60 bg-white transition-all dark:border-0 dark:bg-primary',
           {
             'max-w-[230px]': isOpen,
             'max-w-[60px]': !isOpen,

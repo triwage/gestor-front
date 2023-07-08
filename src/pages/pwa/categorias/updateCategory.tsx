@@ -6,17 +6,22 @@ import { Button } from '../../../components/Form/Button'
 import { Input } from '../../../components/Form/Input'
 import { Select } from '../../../components/Form/Select'
 import { Switch } from '../../../components/Form/Switch'
+import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
+import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
 import { usePWACashback } from '../../../services/pwa/cashback'
 import {
+  addCategoriesInProvider,
   addPWACategories,
+  removeCategoriesInProvider,
   updatePWACategory,
+  usePWACategoriesOfProviders,
 } from '../../../services/pwa/categories'
-import { useRVProducts } from '../../../services/rv/products'
+import { usePWAProviders } from '../../../services/pwa/providers'
 
 import { PWACategoriesProps } from '../../../@types/pwa/categories'
 import { SelectProps } from '../../../@types/select'
@@ -30,38 +35,67 @@ import {
   Images,
   UserSquare,
 } from '@phosphor-icons/react'
+import clsx from 'clsx'
 
 interface Inputs extends PWACategoriesProps {
   cash: SelectProps | null
-  productRv: SelectProps | null
 }
 
 export default function UpdateCategoryPWA() {
   const formCategory = useForm<Inputs>()
   const { handleSubmit, setValue, watch, control } = formCategory
 
-  const { data: ProductsRV, isLoading, isFetching } = useRVProducts()
-  const {
-    data: CashbackPWA,
-    isLoading: isLoading2,
-    isFetching: isFetching2,
-  } = usePWACashback()
-
-  const { setLoading } = useLoading()
-
   const router = useNavigate()
   const location = useLocation()
+
+  const { data: CashbackPWA, isLoading, isFetching } = usePWACashback()
+  const {
+    data: ProvidersPWA,
+    isLoading: isLoading2,
+    isFetching: isFetching2,
+  } = usePWAProviders()
+  const {
+    data: CategoriesOfProviders,
+    isLoading: isLoading3,
+    isFetching: isFetching3,
+    isFetchedAfterMount,
+  } = usePWACategoriesOfProviders(location?.state?.pcpw_id)
+
+  const { setLoading } = useLoading()
 
   async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
     data.pcpw_cash_id = Number(data.cash?.value)
-    data.pcpw_prrv_id = Number(data.productRv?.value)
-
+    let message = 'Categoria criada com sucesso'
+    let res = null as PWACategoriesProps | null
     if (location.state) {
-      await updatePWACategory(data)
+      message = 'Categoria alterada com sucesso'
+      res = await updatePWACategory(data)
     } else {
-      await addPWACategories(data)
+      res = await addPWACategories(data)
     }
+
+    optionsProviders.forEach(async (provider) => {
+      // @ts-expect-error
+      const fieldValue = watch(`optionsProviders-${provider.value}`)
+      const currentProvider = CategoriesOfProviders?.find(
+        (e) => e.fopc_fopw_id === provider.value,
+      )
+      if (!currentProvider && fieldValue) {
+        await addCategoriesInProvider({
+          fopc_fopw_id: provider.value,
+          prpc_pcpw_id: Number(res?.pcpw_id),
+        })
+      } else if (currentProvider && !fieldValue) {
+        await removeCategoriesInProvider(currentProvider?.fopc_id)
+      }
+    })
+
+    alerta(message, 1)
+    setTimeout(() => {
+      router('/pwa/categorias')
+    }, 400)
+
     setLoading(false)
   }
 
@@ -77,18 +111,19 @@ export default function UpdateCategoryPWA() {
     }
   }
 
-  const optionsProductsRV = useMemo(() => {
+  const optionsProviders = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
-    if (ProductsRV) {
-      res = ProductsRV?.map((item) => {
+
+    if (ProvidersPWA) {
+      res = ProvidersPWA?.map((item) => {
         return {
-          value: item.prrv_id,
-          label: item.prrv_nome,
+          value: item.fopw_id,
+          label: item.fopw_nome,
         }
       })
     }
     return res
-  }, [ProductsRV])
+  }, [ProvidersPWA])
 
   const optionsCashback = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
@@ -116,18 +151,24 @@ export default function UpdateCategoryPWA() {
         optionsCashback?.find((e) => e.value === location.state.pcpw_cash_id) ??
           null,
       )
-      setValue(
-        'productRv',
-        optionsProductsRV?.find(
-          (e) => e.value === location.state.pcpw_prrv_id,
-        ) ?? null,
-      )
+
+      if (isFetchedAfterMount) {
+        CategoriesOfProviders?.forEach((item) => {
+          // @ts-expect-error
+          setValue(`optionsProviders-${item.fopc_fopw_id}`, true)
+        })
+      }
     }
-  }, [location, optionsProductsRV, optionsCashback])
+  }, [location, optionsCashback, CategoriesOfProviders])
 
   return (
     <Container>
-      {(isLoading || isFetching || isLoading2 || isFetching2) && <Loader />}
+      {(isLoading ||
+        isFetching ||
+        isLoading2 ||
+        isFetching2 ||
+        isLoading3 ||
+        isFetching3) && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -158,12 +199,43 @@ export default function UpdateCategoryPWA() {
             </div>
 
             <div className="grid grid-cols-2 items-center gap-2">
-              <Select
-                control={control}
-                label="Produto RV"
-                name="productRv"
-                options={optionsProductsRV}
-              />
+              <div className="flex flex-col gap-0.5">
+                <TextAction className="text-sm font-medium text-black dark:text-white">
+                  Fornecedores vínculados a essa categoria
+                </TextAction>
+                <div className="flex flex-wrap gap-2">
+                  {optionsProviders.map((item) => (
+                    <div
+                      onClick={() =>
+                        setValue(
+                          // @ts-expect-error
+                          String(`optionsProviders-${item.value}`),
+                          // @ts-expect-error
+                          !watch(String(`optionsProviders-${item.value}`)),
+                        )
+                      }
+                      key={item.value}
+                      className={clsx(
+                        'flex cursor-pointer select-none items-center justify-center rounded-xl border px-2 py-1 text-sm',
+                        {
+                          'border-primary bg-white text-primary dark:border-border-500 dark:bg-white-200/10 dark:text-white':
+                            !watch(
+                              // @ts-expect-error
+                              String(`optionsProviders-${item.value}`),
+                            ),
+                          'border-primary bg-primary text-white': watch(
+                            // @ts-expect-error
+                            String(`optionsProviders-${item.value}`),
+                          ),
+                        },
+                      )}
+                    >
+                      {item.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <Switch name="pcpw_ativo" label="Ativo" />
             </div>
             <div className="flex gap-2">

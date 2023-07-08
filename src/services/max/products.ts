@@ -5,6 +5,7 @@ import { useMaxProductsStore } from '../../store/useMaxProductsStore'
 import { MaxProductsProps } from '../../@types/max/products'
 
 import useLoading from '../../contexts/LoadingContext'
+import { formataMoedaPFloat } from '../../functions/currency'
 import { haveData } from '../../functions/general'
 import { clearCharacters } from '../../functions/stringsAndObjects'
 import { api } from '../../libs/api'
@@ -53,16 +54,20 @@ export async function addMaxProduct(data: MaxProductsProps) {
       nome: data.nome,
       descricao: data.descricao,
       imagem_padrao_url: data.imagem_padrao_url,
-      preco: data.preco,
+      preco: data.preco ? formataMoedaPFloat(data.preco) : null,
       status: data.status ? '1' : '0',
     }
 
     const res = await api.post('/maxnivel/products', payload)
 
-    const { success } = res.data
+    const { success, error, data: resData } = res.data
 
-    if (success) {
-      alerta('Produto adicionado com sucesso', 1)
+    if (success && haveData(resData)) {
+      alerta('Produto adicionado na Max nível com sucesso', 1)
+      return resData
+    } else {
+      alerta(clearCharacters(error))
+      return null
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -70,6 +75,7 @@ export async function addMaxProduct(data: MaxProductsProps) {
     } else {
       console.error(error)
     }
+    return null
   }
 }
 

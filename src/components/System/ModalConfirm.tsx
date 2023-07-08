@@ -46,10 +46,10 @@ export function ModalConfirm({
           >
             {message}
           </Text>
-          <div className="mt-4 flex w-1/3 items-center gap-4 self-end">
+          <div className="mt-4 flex w-1/3 items-center gap-2 self-end">
             <Button
               onClick={onClose}
-              className="border border-black bg-white text-black dark:border-border-500 dark:bg-black dark:text-white"
+              className="border border-border-500 bg-white text-black dark:border-border-500 dark:bg-black dark:text-white"
               variant="structure"
             >
               {cancel}
