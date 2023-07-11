@@ -18,7 +18,10 @@ import { RVProductsProps } from '../../../@types/rv/products'
 
 import useConfirm from '../../../contexts/ConfirmContext'
 import useLoading from '../../../contexts/LoadingContext'
-import { FormataValorMonetario } from '../../../functions/currency'
+import {
+  FormataValorMonetario,
+  formataMoedaPFloat,
+} from '../../../functions/currency'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
 import { NotePencil } from '@phosphor-icons/react'
@@ -123,21 +126,63 @@ export default function RVProducts() {
       },
     },
     {
-      field: 'prrv_valor_minimo',
-      headerName: 'Valor mínimo',
-      maxWidth: 150,
+      field: 'prpw_id',
+      headerName: 'PWA Cad.',
+      maxWidth: 80,
       sortable: true,
+      editable: true,
+      cellEditor: FieldOnGrid,
+      cellEditorPopup: true,
+      cellEditorPopupPosition: 'under',
+      valueSetter: (params) => {
+        const newVal = params.newValue
+        params.data.prrv_ativo = newVal
+        handleUploadProduct(params.data)
+        return newVal
+      },
+      cellStyle: (params) => {
+        if (params.value) {
+          return { color: '#fff', backgroundColor: '#15803d' }
+        } else {
+          return { color: '#fff', backgroundColor: '#ed3241' }
+        }
+      },
       cellRenderer: (params: { value: boolean }) => {
-        return FormataValorMonetario(params.value)
+        if (params.value) {
+          return 'Sim'
+        } else {
+          return 'Não'
+        }
       },
     },
     {
-      field: 'prrv_valor_maximo',
-      headerName: 'Valor máximo',
-      maxWidth: 150,
+      field: 'prrv_max_id',
+      headerName: 'Max Cad.',
+      maxWidth: 80,
       sortable: true,
+      editable: true,
+      cellEditor: FieldOnGrid,
+      cellEditorPopup: true,
+      cellEditorPopupPosition: 'under',
+      valueSetter: (params) => {
+        const newVal = params.newValue
+        params.data.prrv_ativo = newVal
+        handleUploadProduct(params.data)
+        return newVal
+      },
+      cellStyle: (params) => {
+        if (params.value) {
+          return { color: '#fff', backgroundColor: '#15803d' }
+        } else {
+          return { color: '#fff', backgroundColor: '#ed3241' }
+        }
+      },
       cellRenderer: (params: { value: boolean }) => {
-        return FormataValorMonetario(params.value)
+        if (params.value) {
+          return 'Sim'
+        } else {
+          return 'Não'
+        }
       },
     },
     {
@@ -198,10 +243,13 @@ export default function RVProducts() {
         setCurrentSync(`${index}/${selectedData.length}`)
         const productApp = {} as PWAProductsProps
         productApp.prpw_ativo = item.prrv_ativo
-        productApp.prpw_valor = item.prrv_valor
+        productApp.prpw_valor = formataMoedaPFloat(
+          FormataValorMonetario(item.prrv_valor, false),
+        )
         productApp.prpw_prrv_id = item.prrv_id
         productApp.prpw_descricao = item.prrv_nome
         productApp.prpw_id = item.prpw_id
+
         let res = true
         if (item.prpw_id) {
           res = await updatePWAProduct(productApp)
@@ -217,9 +265,9 @@ export default function RVProducts() {
         alerta('Sincronização finalizada', 1)
       }
       setCurrentSync(null)
-      setTimeout(() => {
-        router(0)
-      }, 400)
+      // setTimeout(() => {
+      //   router(0)
+      // }, 400)
     }
   }
 

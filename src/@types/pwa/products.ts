@@ -10,7 +10,7 @@ export interface PWAProductsProps {
   fopw_descricao: string | null
   prpw_descricao: string | null
   prpw_imagem: string
-  prpw_valor: string | null
+  prpw_valor: string | null | number
   prpw_ativo: boolean
 }
 
