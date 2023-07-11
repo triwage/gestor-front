@@ -52,8 +52,8 @@ export async function addMaxProduct(data: MaxProductsProps) {
   try {
     const payload = {
       nome: data.nome,
-      descricao: data.descricao,
-      imagem_padrao_url: data.imagem_padrao_url,
+      descricao: data.descricao ?? '',
+      imagem_padrao_url: data.imagem_padrao_url ?? '',
       preco: data.preco ? formataMoedaPFloat(data.preco) : null,
       status: data.status ? '1' : '0',
     }
@@ -62,8 +62,7 @@ export async function addMaxProduct(data: MaxProductsProps) {
 
     const { success, error, data: resData } = res.data
 
-    if (success && haveData(resData)) {
-      alerta('Produto adicionado na Max nível com sucesso', 1)
+    if (success) {
       return resData
     } else {
       alerta(clearCharacters(error))
@@ -84,8 +83,8 @@ export async function updateMaxProduct(data: MaxProductsProps) {
     const payload = {
       id: data.id,
       nome: data.nome,
-      descricao: data.descricao,
-      imagem_padrao_url: data.imagem_padrao_url,
+      descricao: data.descricao ?? 'Sem descrição',
+      imagem_padrao_url: data.imagem_padrao_url ?? '',
       preco: data.preco,
       status: data.status,
     }
@@ -95,7 +94,9 @@ export async function updateMaxProduct(data: MaxProductsProps) {
     const { success } = res.data
 
     if (success) {
-      alerta('Produto alterado com sucesso', 1)
+      return true
+    } else {
+      return false
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -103,5 +104,6 @@ export async function updateMaxProduct(data: MaxProductsProps) {
     } else {
       console.error(error)
     }
+    return false
   }
 }

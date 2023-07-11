@@ -65,18 +65,18 @@ export function usePWACategoriesOfProdutos(id: number) {
 export async function addPWAProduct(data: PWAProductsProps) {
   try {
     const payload = {
-      prpw_prrv_id: data.prpw_prrv_id,
-      prpw_max_id: data.prpw_max_id,
-      prpw_cash_id: data.prpw_cash_id,
-      cash_descricao: data.cash_descricao,
-      prpw_pcpw_id: data.prpw_pcpw_id,
-      pcpw_descricao: data.pcpw_descricao,
-      prpw_fopw_id: data.prpw_fopw_id,
-      fopw_descricao: data.fopw_descricao,
-      prpw_descricao: data.prpw_descricao,
+      prpw_prrv_id: data.prpw_prrv_id ?? null,
+      prpw_max_id: data.prpw_max_id ?? null,
+      prpw_cash_id: data.prpw_cash_id ?? null,
+      cash_descricao: data.cash_descricao ?? null,
+      prpw_pcpw_id: data.prpw_pcpw_id ?? null,
+      pcpw_descricao: data.pcpw_descricao ?? null,
+      prpw_fopw_id: data.prpw_fopw_id ?? null,
+      fopw_descricao: data.fopw_descricao ?? null,
+      prpw_descricao: data.prpw_descricao ?? null,
       prpw_imagem: data.prpw_imagem || 'não nula',
       prpw_valor: data.prpw_valor ? formataMoedaPFloat(data.prpw_valor) : null,
-      prpw_ativo: data.prpw_ativo,
+      prpw_ativo: data.prpw_ativo ?? false,
     }
 
     const res = await api.post('/pwa/products/', payload)
@@ -100,17 +100,17 @@ export async function updatePWAProduct(data: PWAProductsProps) {
   try {
     const payload = {
       prpw_prrv_id: data.prpw_prrv_id,
-      prpw_max_id: data.prpw_max_id,
-      prpw_cash_id: data.prpw_cash_id,
-      cash_descricao: data.cash_descricao,
-      prpw_pcpw_id: data.prpw_pcpw_id,
-      pcpw_descricao: data.pcpw_descricao,
-      prpw_fopw_id: data.prpw_fopw_id,
-      fopw_descricao: data.fopw_descricao,
-      prpw_descricao: data.prpw_descricao,
-      prpw_imagem: data.prpw_imagem,
+      prpw_max_id: data.prpw_max_id ?? null,
+      prpw_cash_id: data.prpw_cash_id ?? null,
+      cash_descricao: data.cash_descricao ?? null,
+      prpw_pcpw_id: data.prpw_pcpw_id ?? null,
+      pcpw_descricao: data.pcpw_descricao ?? null,
+      prpw_fopw_id: data.prpw_fopw_id ?? null,
+      fopw_descricao: data.fopw_descricao ?? null,
+      prpw_descricao: data.prpw_descricao ?? null,
+      prpw_imagem: data.prpw_imagem || 'não nula',
       prpw_valor: data.prpw_valor ? formataMoedaPFloat(data.prpw_valor) : null,
-      prpw_ativo: data.prpw_ativo,
+      prpw_ativo: data.prpw_ativo ?? false,
     }
 
     const res = await api.put(`/pwa/products/${data.prpw_id}`, payload)

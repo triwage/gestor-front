@@ -97,6 +97,12 @@ export default {
       fontFamily: {
         sans: 'var(--font-inter)',
       },
+      screens: {
+        md: { min: '968px' },
+        // => @media (min-width: 968px) { ... }
+        'md-max': { max: '967px' },
+        // => @media (max-width: 967px) { ... }
+      },
     },
   },
   // eslint-disable-next-line no-undef

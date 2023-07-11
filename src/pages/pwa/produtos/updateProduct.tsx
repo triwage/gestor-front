@@ -34,7 +34,7 @@ import { SelectProps } from '../../../@types/select'
 import useConfirm from '../../../contexts/ConfirmContext'
 import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
-import { handleUploadImage } from '../../../functions/general'
+import { getBase64, handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
@@ -47,6 +47,7 @@ import clsx from 'clsx'
 import * as yup from 'yup'
 
 interface Inputs extends PWAProductsProps {
+  imagem_aux: File
   cash: SelectProps | null
   productRv: SelectProps | null
   productMax: SelectProps | null
@@ -105,6 +106,13 @@ export default function UpdateProductPWA() {
 
   async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
+
+    const imageAnexed = watch('imagem_aux')
+    if (imageAnexed) {
+      data.prpw_imagem = await uploadImages(imageAnexed)
+    } else {
+      data.prpw_imagem = watch('prpw_imagem')
+    }
 
     data.prpw_cash_id = Number(data.cash?.value)
     data.prpw_prrv_id = Number(data.productRv?.value)
@@ -180,15 +188,18 @@ export default function UpdateProductPWA() {
   }
 
   async function getImage(event: ChangeEvent<HTMLInputElement>) {
+    setLoading(true)
     const res = await handleUploadImage(event)
     if (res) {
-      const imageCloud = await uploadImages(res)
-      setValue('prpw_imagem', imageCloud)
+      const imageFinal = (await getBase64(res)) as string
+      setValue('prpw_imagem', imageFinal)
+      setValue('imagem_aux', res)
     }
     const inputElem = document.getElementById('newFile') as HTMLInputElement
     if (inputElem) {
       inputElem.value = ''
     }
+    setLoading(false)
   }
 
   const optionsProductsRV = useMemo(() => {
@@ -475,7 +486,7 @@ export default function UpdateProductPWA() {
                     htmlFor="newFile"
                     className="flex w-max cursor-pointer flex-col"
                   >
-                    <div className="flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
+                    <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                       <Images size={20} weight="fill" />
                       {!watch('prpw_imagem')
                         ? 'Adicionar imagem'

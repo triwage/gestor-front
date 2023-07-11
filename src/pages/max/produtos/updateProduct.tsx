@@ -7,6 +7,7 @@ import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { InputCurrency } from '../../../components/Form/InputCurrency'
 import { Textarea } from '../../../components/Form/Textarea'
+import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
@@ -17,7 +18,7 @@ import { MaxProductsProps } from '../../../@types/max/products'
 
 import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
-import { handleUploadImage } from '../../../functions/general'
+import { getBase64, handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import {
   CaretLeft,
@@ -37,10 +38,23 @@ export default function UpdateMaxProduct() {
 
   async function handleUpdateProductMax(data: MaxProductsProps) {
     setLoading(true)
-    if (location.state) {
-      await updateMaxProduct(data)
+    const imageAnexed = watch('imagem_aux')
+    if (imageAnexed) {
+      data.imagem_padrao_url = await uploadImages(imageAnexed)
     } else {
-      await addMaxProduct(data)
+      data.imagem_padrao_url = watch('imagem_padrao_url')
+    }
+
+    if (location.state) {
+      const updateRes = await updateMaxProduct(data)
+      if (updateRes) {
+        alerta('Produto alterado com sucesso', 1)
+      }
+    } else {
+      const res = await addMaxProduct(data)
+      if (res) {
+        alerta('Produto adicionado na Max nível com sucesso', 1)
+      }
     }
     setLoading(false)
   }
@@ -48,8 +62,9 @@ export default function UpdateMaxProduct() {
   async function getImage(event: ChangeEvent<HTMLInputElement>) {
     const res = await handleUploadImage(event)
     if (res) {
-      const imageCloud = await uploadImages(res)
-      setValue('imagem_padrao_url', imageCloud)
+      const imageFinal = (await getBase64(res)) as string
+      setValue('imagem_padrao_url', imageFinal)
+      setValue('imagem_aux', res)
     }
     const inputElem = document.getElementById('newFile') as HTMLInputElement
     if (inputElem) {
@@ -119,7 +134,7 @@ export default function UpdateMaxProduct() {
 
                 {watch('imagem_padrao_url') && (
                   <img
-                    src={watch('imagem_padrao_url')}
+                    src={watch('imagem_padrao_url') ?? ''}
                     alt="Logo"
                     className="h-full max-h-48"
                   />
@@ -129,7 +144,7 @@ export default function UpdateMaxProduct() {
                     htmlFor="newFile"
                     className="flex w-max cursor-pointer flex-col"
                   >
-                    <div className="flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
+                    <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                       <Images size={20} weight="fill" />
                       {!watch('imagem_padrao_url')
                         ? 'Adicionar imagem'

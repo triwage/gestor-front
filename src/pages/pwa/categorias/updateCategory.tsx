@@ -27,7 +27,7 @@ import { PWACategoriesProps } from '../../../@types/pwa/categories'
 import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
-import { handleUploadImage } from '../../../functions/general'
+import { getBase64, handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import {
   CaretLeft,
@@ -39,6 +39,7 @@ import clsx from 'clsx'
 
 interface Inputs extends PWACategoriesProps {
   cash: SelectProps | null
+  imagem_aux: File
 }
 
 export default function UpdateCategoryPWA() {
@@ -65,6 +66,13 @@ export default function UpdateCategoryPWA() {
 
   async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
+    const imageAnexed = watch('imagem_aux')
+    if (imageAnexed) {
+      data.pcpw_imagem = await uploadImages(imageAnexed)
+    } else {
+      data.pcpw_imagem = watch('pcpw_imagem')
+    }
+
     data.pcpw_cash_id = Number(data.cash?.value)
     let message = 'Categoria criada com sucesso'
     let res = null as PWACategoriesProps | null
@@ -102,8 +110,9 @@ export default function UpdateCategoryPWA() {
   async function getImage(event: ChangeEvent<HTMLInputElement>) {
     const res = await handleUploadImage(event)
     if (res) {
-      const imageCloud = await uploadImages(res)
-      setValue('pcpw_imagem', imageCloud)
+      const imageFinal = (await getBase64(res)) as string
+      setValue('pcpw_imagem', imageFinal)
+      setValue('imagem_aux', res)
     }
     const inputElem = document.getElementById('newFile') as HTMLInputElement
     if (inputElem) {
@@ -258,7 +267,7 @@ export default function UpdateCategoryPWA() {
                     htmlFor="newFile"
                     className="flex w-max cursor-pointer flex-col"
                   >
-                    <div className="flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
+                    <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                       <Images size={20} weight="fill" />
                       {!watch('pcpw_imagem')
                         ? 'Adicionar imagem'

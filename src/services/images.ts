@@ -19,5 +19,6 @@ export async function uploadImages(image: File) {
     return haveData(data)
   } catch (error) {
     alerta('Não foi possível anexar o arquivo')
+    return null
   }
 }

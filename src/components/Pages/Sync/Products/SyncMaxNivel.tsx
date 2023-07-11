@@ -105,7 +105,7 @@ export function SyncMax({ open, onClosed, nome, preco, status }: SyncMaxProps) {
 
                   {watch('imagem_padrao_url') && (
                     <img
-                      src={watch('imagem_padrao_url')}
+                      src={watch('imagem_padrao_url') ?? ''}
                       alt="Logo"
                       className="h-full max-h-48"
                     />
@@ -115,7 +115,7 @@ export function SyncMax({ open, onClosed, nome, preco, status }: SyncMaxProps) {
                       htmlFor="newFile"
                       className="flex w-max cursor-pointer flex-col"
                     >
-                      <div className="flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
+                      <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                         <Images size={20} weight="fill" />
                         {!watch('imagem_padrao_url')
                           ? 'Adicionar imagem'

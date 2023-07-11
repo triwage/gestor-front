@@ -5,4 +5,5 @@ export type MaxProductsProps = {
   imagem_padrao_url: string | null
   preco: string
   status: string | boolean
+  imagem_aux?: File
 }

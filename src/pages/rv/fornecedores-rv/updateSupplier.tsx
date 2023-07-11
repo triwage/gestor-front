@@ -16,7 +16,7 @@ import { updateRVSupplier } from '../../../services/rv/providers'
 import { RVProvidersProps } from '../../../@types/rv/providers'
 
 import useLoading from '../../../contexts/LoadingContext'
-import { handleUploadImage } from '../../../functions/general'
+import { getBase64, handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import { CaretLeft, FloppyDiskBack, Images } from '@phosphor-icons/react'
 
@@ -32,6 +32,13 @@ export default function UpdateSupplier() {
   const location = useLocation()
 
   async function handleUpdateSupplier(data: RVProvidersProps) {
+    const imageAnexed = watch('imagem_aux')
+    if (imageAnexed) {
+      data.forv_logo = await uploadImages(imageAnexed)
+    } else {
+      data.forv_logo = watch('forv_logo')
+    }
+
     // @ts-expect-error
     data.forv_pcrv_id = data.forv_kind.value
     // @ts-expect-error
@@ -47,8 +54,9 @@ export default function UpdateSupplier() {
   async function getImage(event: ChangeEvent<HTMLInputElement>) {
     const res = await handleUploadImage(event)
     if (res) {
-      const imageCloud = await uploadImages(res)
-      setValue('forv_logo', imageCloud)
+      const imageFinal = (await getBase64(res)) as string
+      setValue('forv_logo', imageFinal)
+      setValue('imagem_aux', res)
     }
     const inputElem = document.getElementById('newFile') as HTMLInputElement
     if (inputElem) {

@@ -234,7 +234,7 @@ export function SyncPWA({
                       htmlFor="newFile"
                       className="flex w-max cursor-pointer flex-col"
                     >
-                      <div className="flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
+                      <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                         <Images size={20} weight="fill" />
                         {!watch('prpw_imagem')
                           ? 'Adicionar imagem'

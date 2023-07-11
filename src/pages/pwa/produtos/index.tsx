@@ -114,9 +114,9 @@ export default function PWAProducts() {
       },
       cellRenderer: (params: { value: string }) => {
         if (params.value) {
-          return 'Ativo'
+          return 'Sim'
         } else {
-          return 'Inativo'
+          return 'Não'
         }
       },
     },
@@ -134,9 +134,9 @@ export default function PWAProducts() {
       },
       cellRenderer: (params: { value: string }) => {
         if (params.value) {
-          return 'Ativo'
+          return 'Sim'
         } else {
-          return 'Inativo'
+          return 'Não'
         }
       },
     },

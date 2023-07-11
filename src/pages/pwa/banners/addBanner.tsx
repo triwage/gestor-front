@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
@@ -11,10 +11,12 @@ import { Icon } from '../../../components/System/Icon'
 import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { addNewBanner } from '../../../services/pwa/banners'
+import { uploadImages } from '../../../services/images'
+import { addNewBanner, updateBanner } from '../../../services/pwa/banners'
 
 import { BannersProps } from '../../../@types/pwa/banners'
 
+import useLoading from '../../../contexts/LoadingContext'
 import { getBase64, handleUploadImage } from '../../../functions/general'
 import { addYearsDate } from '../../../functions/timesAndDates'
 import { Container } from '../../../template/Container'
@@ -30,35 +32,59 @@ const schemaBanners = yup
   .required()
 
 export default function AddBanner() {
-  const [filesAnexed, setFilesAnexed] = useState<string | null>(null)
   const formBanner = useForm<BannersProps>({
     // @ts-expect-error
     resolver: yupResolver(schemaBanners),
   })
   const { handleSubmit, watch, control, setValue } = formBanner
 
+  const { setLoading } = useLoading()
   const router = useNavigate()
   const location = useLocation()
 
   async function getImage(event: ChangeEvent<HTMLInputElement>) {
+    setLoading(true)
     const res = await handleUploadImage(event)
     if (res) {
       const imageFinal = (await getBase64(res)) as string
-      setFilesAnexed(imageFinal)
+      setValue('geba_imagem', imageFinal)
+      setValue('geba_imagem_altura', res)
     }
     const inputElem = document.getElementById('newFile') as HTMLInputElement
     if (inputElem) {
       inputElem.value = ''
     }
+    setLoading(false)
   }
 
-  async function handleAddNewUser(data: BannersProps) {
-    if (!filesAnexed) {
+  async function handleAddNewBanner(data: BannersProps) {
+    setLoading(true)
+    let imageAnexed = watch('geba_imagem_altura')
+    if (typeof imageAnexed !== 'object') {
+      imageAnexed = watch('geba_imagem')
+    }
+    if (!imageAnexed) {
       alerta('Faça o upload de uma imagem', 4)
+      setLoading(false)
       return
     }
+    if (typeof imageAnexed === 'object') {
+      data.geba_imagem = await uploadImages(imageAnexed)
+      if (!data.geba_imagem) {
+        setLoading(false)
+        return
+      }
+    } else {
+      data.geba_imagem = imageAnexed
+    }
     data.geba_dta_validade = data.geba_dta_validade || addYearsDate()
-    await addNewBanner(data)
+
+    if (location.state) {
+      await updateBanner(data)
+    } else {
+      await addNewBanner(data)
+    }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -92,7 +118,7 @@ export default function AddBanner() {
         <FormProvider {...formBanner}>
           <form
             className="my-2 space-y-2"
-            onSubmit={handleSubmit(handleAddNewUser)}
+            onSubmit={handleSubmit(handleAddNewBanner)}
           >
             <div className="flex gap-2">
               <Input name="geba_botao_acao" label="Link" />
@@ -102,12 +128,12 @@ export default function AddBanner() {
                 label="Validade"
               />
             </div>
-            <div className="grid grid-cols-2 items-center gap-2 max-md:block">
+            <div className="max-md:block grid grid-cols-2 items-center gap-2">
               <div className="flex w-full flex-col gap-2 p-1">
-                {filesAnexed && (
+                {watch('geba_imagem') && (
                   <div className="h-max w-max">
                     <img
-                      src={filesAnexed}
+                      src={watch('geba_imagem') ?? ''}
                       alt="Banner"
                       width={335}
                       height={151}
@@ -119,9 +145,11 @@ export default function AddBanner() {
                   htmlFor="newFile"
                   className="flex w-max cursor-pointer flex-col"
                 >
-                  <div className="flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
+                  <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                     <FileImage size={20} weight="fill" />
-                    Anexar imagem
+                    {!watch('geba_imagem')
+                      ? 'Adicionar imagem'
+                      : 'Alterar imagem'}
                   </div>
                   <TextAction className="text-sm text-black dark:text-white">
                     Anexe uma imagem com proporção 2.22, Ex: 800x360
@@ -141,7 +169,7 @@ export default function AddBanner() {
                 label={watch('geba_status') ? 'Ativo' : 'Inativo'}
               />
             </div>
-            <Button onClick={() => handleSubmit(handleAddNewUser)}>
+            <Button onClick={() => handleSubmit(handleAddNewBanner)}>
               <FloppyDiskBack size={18} weight="fill" />
               {location.state ? 'Atualizar Banner' : 'Salvar Banner'}
             </Button>

@@ -7,4 +7,5 @@ export type RVProvidersProps = {
   forv_logo: string
   forv_pcrv_id: number
   pcrv_kind: string
+  imagem_aux?: File
 }

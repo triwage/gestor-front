@@ -32,7 +32,7 @@ export function ModalConfirm({
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="flex h-max w-max min-w-[45%] max-w-fit flex-col items-center justify-center gap-1 overflow-auto rounded-lg border border-border bg-white px-6 py-4 dark:bg-black">
+      <div className="flex h-max w-1/2 flex-col items-center justify-center gap-1 overflow-auto rounded-lg border border-border bg-white px-6 py-4 dark:bg-black md-max:w-[65%]">
         <Text
           size="lg"
           className="w-full text-left font-semibold text-black dark:text-white-800"

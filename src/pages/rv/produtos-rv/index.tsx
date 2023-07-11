@@ -3,13 +3,20 @@ import { useNavigate } from 'react-router'
 
 import { FieldOnGrid } from '../../../components/FieldOnGrid'
 import { Button } from '../../../components/Form/Button'
+import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
+import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
+import { addMaxProduct, updateMaxProduct } from '../../../services/max/products'
+import { addPWAProduct, updatePWAProduct } from '../../../services/pwa/products'
 import { updateRVProduct, useRVProducts } from '../../../services/rv/products'
 
+import { MaxProductsProps } from '../../../@types/max/products'
+import { PWAProductsProps } from '../../../@types/pwa/products'
 import { RVProductsProps } from '../../../@types/rv/products'
 
+import useConfirm from '../../../contexts/ConfirmContext'
 import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
@@ -19,8 +26,11 @@ import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function RVProducts() {
+  const [currentSync, setCurrentSync] = useState<null | string>(null)
+
   const { data } = useRVProducts()
 
+  const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
 
   const router = useNavigate()
@@ -40,6 +50,7 @@ export default function RVProducts() {
       headerCheckboxSelection: true,
       checkboxSelection: true,
       showDisabledCheckboxes: true,
+      headerCheckboxSelectionCurrentPageOnly: true,
       cellStyle: {
         textAlign: 'center',
         display: 'flex',
@@ -161,12 +172,106 @@ export default function RVProducts() {
     },
   ])
 
-  function handleSyncData() {
-    // @ts-expect-error
-    const selectedData = gridRef?.current?.api?.getSelectedRows()
+  async function handleSyncDataApp() {
+    const selectedData =
+      // @ts-expect-error
+      gridRef?.current?.api?.getSelectedRows() as RVProductsProps[]
 
-    console.log(selectedData)
+    if (selectedData.length === 0) {
+      alerta('Nenhum produto foi selecionado', 4)
+      return
+    }
+    const sameInApp = selectedData?.some((e) => e.prpw_id)
+    let message = 'Sincronizar produtos no APP'
+    if (sameInApp) {
+      message = 'Ao continuar poderá substituir dados já existentes'
+    }
+
+    const check = await Confirm({
+      title: `${selectedData.length} produtos selecionados`,
+      message,
+    })
+
+    if (check) {
+      let allSuccess = true
+      selectedData.forEach(async (item, index) => {
+        setCurrentSync(`${index}/${selectedData.length}`)
+        const productApp = {} as PWAProductsProps
+        productApp.prpw_ativo = item.prrv_ativo
+        productApp.prpw_valor = item.prrv_valor
+        productApp.prpw_prrv_id = item.prrv_id
+        productApp.prpw_descricao = item.prrv_nome
+        productApp.prpw_id = item.prpw_id
+        let res = true
+        if (item.prpw_id) {
+          res = await updatePWAProduct(productApp)
+        } else {
+          res = await addPWAProduct(productApp)
+        }
+
+        if (!res) {
+          allSuccess = false
+        }
+      })
+      if (allSuccess) {
+        alerta('Sincronização finalizada', 1)
+      }
+      setCurrentSync(null)
+      setTimeout(() => {
+        router(0)
+      }, 400)
+    }
   }
+
+  async function handleSyncDataMax() {
+    const selectedData =
+      // @ts-expect-error
+      gridRef?.current?.api?.getSelectedRows() as RVProductsProps[]
+
+    if (selectedData.length === 0) {
+      alerta('Nenhum produto foi selecionado', 4)
+      return
+    }
+    const sameInApp = selectedData?.some((e) => e.prrv_max_id)
+    let message = 'Sincronizar produtos na Max nível'
+    if (sameInApp) {
+      message = 'Ao continuar poderá substituir dados já existentes'
+    }
+
+    const check = await Confirm({
+      title: `${selectedData.length} produtos selecionados`,
+      message,
+    })
+
+    if (check) {
+      let allSuccess = true
+      selectedData.forEach(async (item, index) => {
+        setCurrentSync(`${index}/${selectedData.length}`)
+        const productMax = {} as MaxProductsProps
+        productMax.status = item.prrv_ativo
+        productMax.preco = item.prrv_valor
+        productMax.nome = item.prrv_nome
+        productMax.id = String(item.prrv_max_id) // id do produto max
+        let res = true
+        if (item.prrv_max_id) {
+          res = await updateMaxProduct(productMax)
+        } else {
+          res = await addMaxProduct(productMax)
+        }
+        if (!res) {
+          allSuccess = false
+        }
+      })
+      if (allSuccess) {
+        alerta('Sincronização finalizada', 1)
+      }
+      setCurrentSync(null)
+      setTimeout(() => {
+        router(0)
+      }, 400)
+    }
+  }
+
   return (
     <Container>
       <div className="flex h-full w-full flex-col">
@@ -174,16 +279,42 @@ export default function RVProducts() {
           <TextHeading>Produtos RV</TextHeading>
         </div>
 
+        {currentSync && (
+          <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-opacity">
+            <div className="flex flex-col items-center justify-center gap-5">
+              <div className="loader-spin"></div>
+              <div className="flex flex-col items-center justify-center">
+                <TextAction
+                  size="md"
+                  className="font-bold text-white dark:text-white"
+                >
+                  {currentSync}
+                </TextAction>
+                <TextAction
+                  size="md"
+                  className="font-bold text-white dark:text-white"
+                >
+                  Sincronizando
+                </TextAction>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="my-2 flex w-full items-center gap-2">
           <Button
             variant="structure"
             className="bg-green text-white"
-            onClick={handleSyncData}
+            onClick={handleSyncDataApp}
           >
-            Sincronizar com APP
+            Sincronizar com o APP
           </Button>
-          <Button variant="structure" className="bg-purple text-white">
-            Sincronizar com Max Nível
+          <Button
+            onClick={handleSyncDataMax}
+            variant="structure"
+            className="bg-purple text-white"
+          >
+            Sincronizar com a Max Nível
           </Button>
         </div>
 

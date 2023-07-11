@@ -248,3 +248,15 @@ input:-webkit-autofill {
 .ag-header-cell-menu-button:not(.ag-header-menu-always-show) {
   opacity: 100% !important;
 }
+
+.css-feonkk-Input2 {
+  color: #000 !important; 
+}
+
+.dark .css-feonkk-Input2 {
+  color: #fff !important; 
+}
+
+.css-w9q2zk-Input2 {
+  border: 0 !important;
+}

@@ -31,7 +31,7 @@ import { PWAProvidersProps } from '../../../@types/pwa/providers'
 import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
-import { handleUploadImage } from '../../../functions/general'
+import { getBase64, handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import {
   CaretLeft,
@@ -44,6 +44,7 @@ import clsx from 'clsx'
 interface Inputs extends PWAProvidersProps {
   providerRv: SelectProps | null
   cash: SelectProps | null
+  imagem_aux: File
 }
 
 export default function UpdateProviderPWA() {
@@ -74,6 +75,13 @@ export default function UpdateProviderPWA() {
 
   async function handleUpdateProviderPWA(data: Inputs) {
     setLoading(true)
+    const imageAnexed = watch('imagem_aux')
+    if (imageAnexed) {
+      data.fopw_imagem = await uploadImages(imageAnexed)
+    } else {
+      data.fopw_imagem = watch('fopw_imagem')
+    }
+
     data.fopw_forv_id = Number(data.providerRv?.value)
     data.fopw_cash_id = Number(data.cash?.value)
 
@@ -115,8 +123,9 @@ export default function UpdateProviderPWA() {
   async function getImage(event: ChangeEvent<HTMLInputElement>) {
     const res = await handleUploadImage(event)
     if (res) {
-      const imageCloud = await uploadImages(res)
-      setValue('fopw_imagem', imageCloud)
+      const imageFinal = (await getBase64(res)) as string
+      setValue('fopw_imagem', imageFinal)
+      setValue('imagem_aux', res)
     }
     const inputElem = document.getElementById('newFile') as HTMLInputElement
     if (inputElem) {
@@ -307,7 +316,7 @@ export default function UpdateProviderPWA() {
                     htmlFor="newFile"
                     className="flex w-max cursor-pointer flex-col"
                   >
-                    <div className="flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
+                    <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                       <Images size={20} weight="fill" />
                       {!watch('fopw_imagem')
                         ? 'Adicionar imagem'
