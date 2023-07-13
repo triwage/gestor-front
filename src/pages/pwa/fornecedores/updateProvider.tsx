@@ -1,13 +1,15 @@
-import { ChangeEvent, useEffect, useMemo } from 'react'
+import { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
+import { ButtonText } from '../../../components/Form/ButtonText'
 import { Input } from '../../../components/Form/Input'
 import { Select } from '../../../components/Form/Select'
 import { Switch } from '../../../components/Form/Switch'
 import { Textarea } from '../../../components/Form/Textarea'
 import { alerta } from '../../../components/System/Alert'
+import { Dialog } from '../../../components/System/Dialog'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextAction } from '../../../components/Texts/TextAction'
@@ -30,6 +32,7 @@ import { useRVProviders } from '../../../services/rv/providers'
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
 import { SelectProps } from '../../../@types/select'
 
+import useConfirm from '../../../contexts/ConfirmContext'
 import useLoading from '../../../contexts/LoadingContext'
 import { getBase64, handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
@@ -37,6 +40,7 @@ import {
   CaretLeft,
   FloppyDiskBack,
   Images,
+  PlusSquare,
   UserSquare,
 } from '@phosphor-icons/react'
 import clsx from 'clsx'
@@ -48,12 +52,14 @@ interface Inputs extends PWAProvidersProps {
 }
 
 export default function UpdateProviderPWA() {
+  const [isOpenForm, setIsOpenForm] = useState(false)
   const formProvider = useForm<Inputs>()
   const { handleSubmit, setValue, watch, control } = formProvider
 
   const router = useNavigate()
   const location = useLocation()
   const { setLoading } = useLoading()
+  const { Confirm } = useConfirm()
 
   const { data: ProvidersRV, isLoading, isFetching } = useRVProviders()
   const {
@@ -257,10 +263,15 @@ export default function UpdateProviderPWA() {
               />
             </div>
             <div className="grid grid-cols-2 items-center gap-2">
-              <div className="flex flex-col gap-0.5">
-                <TextAction className="text-sm font-medium text-black dark:text-white">
-                  Categorias vínculadas a esse fornecedor
-                </TextAction>
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-3 items-center gap-2">
+                  <TextAction className="col-span-2 text-sm font-medium text-black dark:text-white">
+                    Categorias vínculadas a esse fornecedor
+                  </TextAction>
+                  <ButtonText onClick={() => setIsOpenForm(true)} type="button">
+                    Adicionar categoria <PlusSquare size={20} weight="fill" />
+                  </ButtonText>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {optionsCategories.map((item) => (
                     <div
@@ -345,6 +356,22 @@ export default function UpdateProviderPWA() {
           </form>
         </FormProvider>
       </div>
+
+      <Dialog
+        open={isOpenForm}
+        closeDialog={async () => {
+          const check = await Confirm({
+            title: 'Operação em andamento',
+            message:
+              'Ao sair perderá os dados já informados, tem certeza disso?',
+          })
+          if (check) {
+            setIsOpenForm(false)
+          }
+        }}
+      >
+        <h1>teste</h1>
+      </Dialog>
     </Container>
   )
 }

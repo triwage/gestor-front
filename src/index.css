@@ -254,9 +254,23 @@ input:-webkit-autofill {
 }
 
 .dark .css-feonkk-Input2 {
-  color: #fff !important; 
+  color: #fff !important;
 }
 
 .css-w9q2zk-Input2 {
   border: 0 !important;
+  caret-color: #000 !important; 
 }
+
+.dark .css-w9q2zk-Input2 {
+  border: 0 !important;
+  caret-color: #fff !important; 
+}
+
+textarea:focus, input:focus, select:focus {
+    box-shadow: 0 0 0 0 !important;
+    border: 0 none !important;
+    outline: 0 !important;
+    -webkit-box-shadow: none;
+          box-shadow: none;
+} 

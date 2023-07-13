@@ -54,12 +54,6 @@ export default function PWAProducts() {
       },
     },
     {
-      field: 'prpw_id',
-      headerName: 'ID',
-      sort: 'asc',
-      maxWidth: 80,
-    },
-    {
       field: 'prpw_descricao',
       headerName: 'Nome',
       flex: 1,
@@ -69,7 +63,7 @@ export default function PWAProducts() {
     },
     {
       field: 'prpw_valor',
-      headerName: 'Valor',
+      headerName: 'Preço',
       maxWidth: 130,
       flex: 1,
       sortable: true,
@@ -78,15 +72,8 @@ export default function PWAProducts() {
       },
     },
     {
-      field: 'cash_descricao',
-      headerName: 'Cashback',
-      maxWidth: 130,
-      flex: 1,
-      sortable: true,
-    },
-    {
       field: 'fopw_descricao',
-      headerName: 'Fornecedor',
+      headerName: 'Fornecedor principal',
       flex: 1,
       width: 120,
       sortable: true,
@@ -94,51 +81,18 @@ export default function PWAProducts() {
     },
     {
       field: 'pcpw_descricao',
-      headerName: 'Categoria',
+      headerName: 'Categoria principal',
       flex: 1,
       width: 120,
       sortable: true,
       filter: true,
     },
     {
-      field: 'prpw_prrv_id',
-      headerName: 'RV Cad.',
-      maxWidth: 80,
+      field: 'cash_descricao',
+      headerName: 'Cashback',
+      maxWidth: 130,
+      flex: 1,
       sortable: true,
-      cellStyle: (params) => {
-        if (params.value) {
-          return { color: '#fff', backgroundColor: '#15803d' }
-        } else {
-          return { color: '#fff', backgroundColor: '#ed3241' }
-        }
-      },
-      cellRenderer: (params: { value: string }) => {
-        if (params.value) {
-          return 'Sim'
-        } else {
-          return 'Não'
-        }
-      },
-    },
-    {
-      field: 'prpw_max_id',
-      headerName: 'Max Cad.',
-      maxWidth: 80,
-      sortable: true,
-      cellStyle: (params) => {
-        if (params.value) {
-          return { color: '#fff', backgroundColor: '#15803d' }
-        } else {
-          return { color: '#fff', backgroundColor: '#ed3241' }
-        }
-      },
-      cellRenderer: (params: { value: string }) => {
-        if (params.value) {
-          return 'Sim'
-        } else {
-          return 'Não'
-        }
-      },
     },
     {
       field: 'prpw_ativo',

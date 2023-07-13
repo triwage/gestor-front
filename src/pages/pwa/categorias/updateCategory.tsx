@@ -1,11 +1,13 @@
-import { ChangeEvent, useEffect, useMemo } from 'react'
+import { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
+import { ButtonText } from '../../../components/Form/ButtonText'
 import { Input } from '../../../components/Form/Input'
 import { Select } from '../../../components/Form/Select'
 import { Switch } from '../../../components/Form/Switch'
+import { FormProviderPWA } from '../../../components/Pages/PWACategories/FormProviderPWA'
 import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
@@ -22,6 +24,7 @@ import {
   usePWACategoriesOfProviders,
 } from '../../../services/pwa/categories'
 import { usePWAProviders } from '../../../services/pwa/providers'
+import { useRVProviders } from '../../../services/rv/providers'
 
 import { PWACategoriesProps } from '../../../@types/pwa/categories'
 import { SelectProps } from '../../../@types/select'
@@ -33,6 +36,7 @@ import {
   CaretLeft,
   FloppyDiskBack,
   Images,
+  PlusSquare,
   UserSquare,
 } from '@phosphor-icons/react'
 import clsx from 'clsx'
@@ -43,6 +47,8 @@ interface Inputs extends PWACategoriesProps {
 }
 
 export default function UpdateCategoryPWA() {
+  const [isOpenForm, setIsOpenForm] = useState(false)
+
   const formCategory = useForm<Inputs>()
   const { handleSubmit, setValue, watch, control } = formCategory
 
@@ -54,6 +60,7 @@ export default function UpdateCategoryPWA() {
     data: ProvidersPWA,
     isLoading: isLoading2,
     isFetching: isFetching2,
+    refetch,
   } = usePWAProviders()
   const {
     data: CategoriesOfProviders,
@@ -61,6 +68,12 @@ export default function UpdateCategoryPWA() {
     isFetching: isFetching3,
     isFetchedAfterMount,
   } = usePWACategoriesOfProviders(location?.state?.pcpw_id)
+
+  const {
+    data: ProvidersRV,
+    isLoading: isLoading4,
+    isFetching: isFetching4,
+  } = useRVProviders()
 
   const { setLoading } = useLoading()
 
@@ -147,6 +160,19 @@ export default function UpdateCategoryPWA() {
     return res
   }, [CashbackPWA])
 
+  const optionsProvidersRV = useMemo(() => {
+    let res = [] as Array<{ value: number; label: string }>
+    if (ProvidersRV) {
+      res = ProvidersRV?.map((item) => {
+        return {
+          value: item.forv_id,
+          label: item.forv_provider,
+        }
+      })
+    }
+    return res
+  }, [ProvidersRV])
+
   useEffect(() => {
     if (location.state) {
       const categoryEdit = Object.keys(location.state)
@@ -177,7 +203,9 @@ export default function UpdateCategoryPWA() {
         isLoading2 ||
         isFetching2 ||
         isLoading3 ||
-        isFetching3) && <Loader />}
+        isFetching3 ||
+        isLoading4 ||
+        isFetching4) && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -207,11 +235,16 @@ export default function UpdateCategoryPWA() {
               />
             </div>
 
-            <div className="grid grid-cols-2 items-center gap-2">
-              <div className="flex flex-col gap-0.5">
-                <TextAction className="text-sm font-medium text-black dark:text-white">
-                  Fornecedores vínculados a essa categoria
-                </TextAction>
+            <div className="grid grid-cols-2 items-start gap-2">
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-3 items-center gap-2">
+                  <TextAction className="col-span-2 text-sm font-medium text-black dark:text-white">
+                    Fornecedores vínculados a essa categoria
+                  </TextAction>
+                  <ButtonText onClick={() => setIsOpenForm(true)} type="button">
+                    Adicionar fornecedor <PlusSquare size={20} weight="fill" />
+                  </ButtonText>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {optionsProviders.map((item) => (
                     <div
@@ -294,6 +327,14 @@ export default function UpdateCategoryPWA() {
           </form>
         </FormProvider>
       </div>
+
+      <FormProviderPWA
+        optionsCashback={optionsCashback}
+        optionsProvidersRV={optionsProvidersRV}
+        open={isOpenForm}
+        closeDialog={() => setIsOpenForm(false)}
+        onSuccess={() => refetch()}
+      />
     </Container>
   )
 }

@@ -2,14 +2,18 @@ import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { FieldOnGrid } from '../../../components/FieldOnGrid'
-import { Button } from '../../../components/Form/Button'
 import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
+import { Loader } from '../../../components/System/Loader'
 import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { addMaxProduct, updateMaxProduct } from '../../../services/max/products'
-import { addPWAProduct, updatePWAProduct } from '../../../services/pwa/products'
+import {
+  addPWAProduct,
+  updatePWAProduct,
+  usePWAProducts,
+} from '../../../services/pwa/products'
 import { updateRVProduct, useRVProducts } from '../../../services/rv/products'
 
 import { MaxProductsProps } from '../../../@types/max/products'
@@ -32,6 +36,7 @@ export default function RVProducts() {
   const [currentSync, setCurrentSync] = useState<null | string>(null)
 
   const { data } = useRVProducts()
+  const { data: ProductsPWA, isLoading, isFetching } = usePWAProducts()
 
   const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
@@ -238,8 +243,7 @@ export default function RVProducts() {
     })
 
     if (check) {
-      let allSuccess = true
-      selectedData.forEach(async (item, index) => {
+      const promise = selectedData.map(async (item, index) => {
         setCurrentSync(`${index}/${selectedData.length}`)
         const productApp = {} as PWAProductsProps
         productApp.prpw_ativo = item.prrv_ativo
@@ -249,25 +253,21 @@ export default function RVProducts() {
         productApp.prpw_prrv_id = item.prrv_id
         productApp.prpw_descricao = item.prrv_nome
         productApp.prpw_id = item.prpw_id
+        productApp.prpw_max_id = item.prrv_max_id
 
-        let res = true
-        if (item.prpw_id) {
-          res = await updatePWAProduct(productApp)
+        if (productApp.prpw_id) {
+          await updatePWAProduct(productApp)
         } else {
-          res = await addPWAProduct(productApp)
-        }
-
-        if (!res) {
-          allSuccess = false
+          await addPWAProduct(productApp)
         }
       })
-      if (allSuccess) {
-        alerta('Sincronização finalizada', 1)
-      }
+
+      await Promise.all(promise)
       setCurrentSync(null)
-      // setTimeout(() => {
-      //   router(0)
-      // }, 400)
+      alerta('Sincronização finalizada', 1)
+      setTimeout(() => {
+        router(0)
+      }, 400)
     }
   }
 
@@ -280,9 +280,17 @@ export default function RVProducts() {
       alerta('Nenhum produto foi selecionado', 4)
       return
     }
-    const sameInApp = selectedData?.some((e) => e.prrv_max_id)
+    const sameInMax = selectedData?.some((e) => e.prrv_max_id)
+    const sameInApp = selectedData?.every((e) => e.prpw_id)
+    if (!sameInApp) {
+      alerta(
+        'É apenas permitido sincronizar na Max nível os produtos que já estiverem no APP',
+      )
+      return
+    }
+
     let message = 'Sincronizar produtos na Max nível'
-    if (sameInApp) {
+    if (sameInMax) {
       message = 'Ao continuar poderá substituir dados já existentes'
     }
 
@@ -292,28 +300,36 @@ export default function RVProducts() {
     })
 
     if (check) {
-      let allSuccess = true
-      selectedData.forEach(async (item, index) => {
+      const promise = selectedData.map(async (item, index) => {
         setCurrentSync(`${index}/${selectedData.length}`)
         const productMax = {} as MaxProductsProps
-        productMax.status = item.prrv_ativo
-        productMax.preco = item.prrv_valor
+        productMax.status = item.prrv_ativo ? '1' : '0'
+        productMax.preco = FormataValorMonetario(
+          item.prrv_valor,
+          false,
+        ).replace(',', '.')
         productMax.nome = item.prrv_nome
-        productMax.id = String(item.prrv_max_id) // id do produto max
-        let res = true
+        productMax.id = item.prrv_max_id ? String(item.prrv_max_id) : null // id do produto max
+
+        let res = null
         if (item.prrv_max_id) {
           res = await updateMaxProduct(productMax)
         } else {
           res = await addMaxProduct(productMax)
         }
-        if (!res) {
-          allSuccess = false
-        }
+
+        const productApp = ProductsPWA?.find(
+          (e) => e.prpw_id === item.prpw_id,
+        ) as PWAProductsProps
+
+        productApp.prpw_max_id = res?.id
+
+        await updatePWAProduct(productApp)
       })
-      if (allSuccess) {
-        alerta('Sincronização finalizada', 1)
-      }
+
+      await Promise.all(promise)
       setCurrentSync(null)
+      alerta('Sincronização finalizada', 1)
       setTimeout(() => {
         router(0)
       }, 400)
@@ -322,6 +338,7 @@ export default function RVProducts() {
 
   return (
     <Container>
+      {(isLoading || isFetching) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Produtos RV</TextHeading>
@@ -348,23 +365,6 @@ export default function RVProducts() {
             </div>
           </div>
         )}
-
-        <div className="my-2 flex w-full items-center gap-2">
-          <Button
-            variant="structure"
-            className="bg-green text-white"
-            onClick={handleSyncDataApp}
-          >
-            Sincronizar com o APP
-          </Button>
-          <Button
-            onClick={handleSyncDataMax}
-            variant="structure"
-            className="bg-purple text-white"
-          >
-            Sincronizar com a Max Nível
-          </Button>
-        </div>
 
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact

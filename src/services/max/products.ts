@@ -91,10 +91,10 @@ export async function updateMaxProduct(data: MaxProductsProps) {
 
     const res = await api.put(`/maxnivel/products/${data.id}`, payload)
 
-    const { success } = res.data
+    const { success, data: resData } = res.data
 
     if (success) {
-      return true
+      return resData
     } else {
       return false
     }

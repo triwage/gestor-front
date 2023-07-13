@@ -3,7 +3,6 @@ import { Controller, FieldValues, RegisterOptions } from 'react-hook-form'
 
 import { TextAction } from '../../Texts/TextAction'
 import { SelectGeneric } from './SelectGeneric'
-import PropTypes from 'prop-types'
 
 export interface OptionsSelectProps {
   value: number | string | boolean
@@ -49,29 +48,11 @@ export function Select({
             label={label}
             {...props}
           />
-          <TextAction size="sm" className="font-semibold text-red">
+          <TextAction size="xs" className="font-semibold text-red">
             {error?.message}
           </TextAction>
         </div>
       )}
     />
   )
-}
-
-Select.propTypes = {
-  className: PropTypes.string,
-  name: PropTypes.string,
-  options: PropTypes.array,
-  // eslint-disable-next-line react/require-default-props
-  control: PropTypes.any,
-  rules: PropTypes.object,
-  defaultValue: PropTypes.any,
-}
-
-Select.defaultProps = {
-  className: '',
-  name: '',
-  options: [],
-  rules: {},
-  defaultValue: false,
 }

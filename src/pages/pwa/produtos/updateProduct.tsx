@@ -59,6 +59,7 @@ const schemaProduct = yup
   .object({
     prpw_descricao: yup.string().required('Informe o nome'),
     prpw_valor: yup.string().required('Informe um valor'),
+    productRv: yup.object().required('Selecione um produto da RV'),
   })
   .required()
 
@@ -268,6 +269,39 @@ export default function UpdateProductPWA() {
     return res
   }, [CategoriesPWA])
 
+  function handleSyncProductWithProductRV(data: SelectProps) {
+    const productRvSelected = data.value
+    if (productRvSelected) {
+      const product = ProductsRV?.find((e) => e.prrv_id === productRvSelected)
+      console.log(product)
+
+      const provider = optionsProviders?.find(
+        (e) => e.value === product?.prrv_forv_id,
+      )
+      const productOnMax = optionsProductsMax?.find(
+        (e) => e.value === product?.prrv_max_id,
+      )
+      if (productOnMax && !watch('productMax')) {
+        setValue('productMax', productOnMax)
+      }
+      if (provider && !watch('provider')) {
+        setValue('provider', provider)
+      }
+      if (!watch('prpw_descricao')) {
+        setValue('prpw_descricao', String(product?.prrv_nome))
+      }
+      if (!watch('prpw_valor')) {
+        setValue(
+          'prpw_valor',
+          FormataValorMonetario(product?.prrv_valor, false),
+        )
+      }
+      if (!watch('prpw_ativo')) {
+        setValue('prpw_ativo', product?.prrv_ativo || false)
+      }
+    }
+  }
+
   useEffect(() => {
     const checkTypeof = {
       prpw_valor: true,
@@ -355,11 +389,7 @@ export default function UpdateProductPWA() {
             <Icon onClick={() => router(-1)}>
               <CaretLeft size={22} className="text-black dark:text-white" />
             </Icon>
-            <TextHeading>
-              {location.state
-                ? 'Produtos PWA / Editar produto'
-                : 'Produtos PWA / Adicionar produto'}
-            </TextHeading>
+            <TextHeading>Produtos PWA / Editar produto</TextHeading>
           </div>
         </div>
 
@@ -369,17 +399,18 @@ export default function UpdateProductPWA() {
             onSubmit={handleSubmit(handleUpdateProductMax)}
           >
             <div className="flex gap-2">
-              <Input name="prpw_descricao" label="Nome" />
-              <InputCurrency name="prpw_valor" label="Preço" />
-            </div>
-
-            <div className="grid grid-cols-2 items-center gap-2">
               <Select
                 control={control}
                 label="Produto RV"
                 name="productRv"
                 options={optionsProductsRV}
+                onChange={(e: any) => handleSyncProductWithProductRV(e)}
               />
+              <Input name="prpw_descricao" label="Nome" />
+            </div>
+
+            <div className="grid grid-cols-2 items-center gap-2">
+              <InputCurrency name="prpw_valor" label="Preço" />
               <div className="flex items-center gap-2">
                 <Select
                   control={control}
@@ -387,21 +418,18 @@ export default function UpdateProductPWA() {
                   name="productMax"
                   options={optionsProductsMax}
                 />
-                {!location?.state ||
-                  (!watch('productMax') && (
-                    <div className="mt-4 w-[80px]">
-                      <Button
-                        type="button"
-                        onClick={handleAddProductInMax}
-                        title="Adicionar novo produto na Max nível"
-                        disable={
-                          !watch('prpw_descricao') || !watch('prpw_valor')
-                        }
-                      >
-                        +
-                      </Button>
-                    </div>
-                  ))}
+                {!watch('productMax') && (
+                  <div className="mt-4 w-[80px]">
+                    <Button
+                      type="button"
+                      onClick={handleAddProductInMax}
+                      title="Adicionar novo produto na Max nível"
+                      disable={!watch('prpw_descricao') || !watch('prpw_valor')}
+                    >
+                      +
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex gap-2">
@@ -509,7 +537,7 @@ export default function UpdateProductPWA() {
                 onClick={() => handleSubmit(handleUpdateProductMax)}
               >
                 <FloppyDiskBack size={18} weight="fill" />
-                {location.state ? 'Atualizar produto' : 'Adicionar produto'}
+                Atualizar produto
               </Button>
             </div>
           </form>

@@ -1,5 +1,5 @@
 export type MaxProductsProps = {
-  id: string
+  id: string | null
   nome: string
   descricao: string
   imagem_padrao_url: string | null

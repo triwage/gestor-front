@@ -42,7 +42,7 @@ export function Dialog({ open, closeDialog, children, size }: DialogProps) {
       </div>
       <div
         className={clsx(
-          'z-50 flex flex-col items-center gap-1 rounded-md bg-white p-1 shadow-sm shadow-white',
+          'shadow-card z-50 flex flex-col items-center gap-1 rounded-md bg-white p-1 shadow-[0px_0px_37px_-3px_#000000] dark:bg-black dark:shadow-[0px_0px_11px_-3px_#f7f7f7]',
           {
             'min-h-[75%] min-w-[75%]': size === 'lg',
           },
