@@ -21,7 +21,7 @@ export function ButtonText({
       className={clsx(
         'flex items-center gap-2',
         'justify-center',
-        'w-full text-sm font-semibold',
+        'w-max text-sm font-semibold',
         'transition-all hover:opacity-90',
         'underline active:translate-y-0.5 active:opacity-90',
         {

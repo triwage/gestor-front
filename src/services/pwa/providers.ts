@@ -82,11 +82,7 @@ export async function addPWAProviders(data: PWAProvidersProps) {
       return resData
     }
   } catch (error) {
-    if (error instanceof AxiosError) {
-      alerta(clearCharacters(error.response?.data?.error))
-    } else {
-      console.error(error)
-    }
+    console.error(error)
   }
 }
 
@@ -111,10 +107,6 @@ export async function updatePWAProviders(data: PWAProvidersProps) {
       return resData
     }
   } catch (error) {
-    if (error instanceof AxiosError) {
-      alerta(clearCharacters(error.response?.data?.error))
-    } else {
-      console.error(error)
-    }
+    console.error(error)
   }
 }

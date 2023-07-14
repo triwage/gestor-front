@@ -130,6 +130,26 @@ export default function MaxProducts() {
         }
       },
     },
+    {
+      field: 'integrado_pwa',
+      headerName: 'APP',
+      maxWidth: 80,
+      sortable: true,
+      cellStyle: (params) => {
+        if (params.value) {
+          return { color: '#fff', backgroundColor: '#15803d' }
+        } else {
+          return { color: '#fff', backgroundColor: '#ed3241' }
+        }
+      },
+      cellRenderer: (params: { value: string }) => {
+        if (params.value) {
+          return 'Ativo'
+        } else {
+          return 'Inativo'
+        }
+      },
+    },
   ])
 
   // const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {

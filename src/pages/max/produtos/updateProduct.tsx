@@ -3,16 +3,16 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
-import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { InputCurrency } from '../../../components/Form/InputCurrency'
+import { Switch } from '../../../components/Form/Switch'
 import { Textarea } from '../../../components/Form/Textarea'
 import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
-import { addMaxProduct, updateMaxProduct } from '../../../services/max/products'
+import { updateMaxProduct } from '../../../services/max/products'
 
 import { MaxProductsProps } from '../../../@types/max/products'
 
@@ -38,6 +38,16 @@ export default function UpdateMaxProduct() {
 
   async function handleUpdateProductMax(data: MaxProductsProps) {
     setLoading(true)
+    const integrado_pwa = watch('integrado_pwa')
+
+    if (integrado_pwa && !data.status) {
+      alerta(
+        'Não é possível alterar os dados, pois esse produto está ligado no APP',
+      )
+      setLoading(false)
+      return
+    }
+
     const imageAnexed = watch('imagem_aux')
     if (imageAnexed) {
       data.imagem_padrao_url = await uploadImages(imageAnexed)
@@ -46,14 +56,11 @@ export default function UpdateMaxProduct() {
     }
 
     if (location.state) {
-      const updateRes = await updateMaxProduct(data)
+      const updateRes = (await updateMaxProduct(data)) as
+        | MaxProductsProps
+        | false
       if (updateRes) {
         alerta('Produto alterado com sucesso', 1)
-      }
-    } else {
-      const res = await addMaxProduct(data)
-      if (res) {
-        alerta('Produto adicionado na Max nível com sucesso', 1)
       }
     }
     setLoading(false)
@@ -103,11 +110,7 @@ export default function UpdateMaxProduct() {
             <Icon onClick={() => router(-1)}>
               <CaretLeft size={22} className="text-black dark:text-white" />
             </Icon>
-            <TextHeading>
-              {location.state
-                ? 'Produtos Max Nível / Editar produto'
-                : 'Produtos Max Nível / Adicionar produto'}
-            </TextHeading>
+            <TextHeading>Produtos Max Nível / Editar produto</TextHeading>
           </div>
         </div>
 
@@ -160,7 +163,7 @@ export default function UpdateMaxProduct() {
                   />
                 </div>
               </div>
-              <Checkbox name="status" label="Produto ativo" />
+              <Switch name="status" label="Produto ativo" />
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button onClick={() => handleSubmit(handleUpdateProductMax)}>

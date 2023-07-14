@@ -6,4 +6,5 @@ export type MaxProductsProps = {
   preco: string
   status: string | boolean
   imagem_aux?: File
+  integrado_pwa: boolean
 }

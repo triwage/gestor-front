@@ -1,5 +1,5 @@
 export interface PWAProductsProps {
-  prpw_id: number
+  prpw_id: number | null
   prpw_prrv_id: number
   prpw_max_id: number
   prpw_cash_id: number

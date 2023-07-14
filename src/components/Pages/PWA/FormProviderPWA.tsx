@@ -18,7 +18,7 @@ import { Textarea } from '../../Form/Textarea'
 import { alerta } from '../../System/Alert'
 import { Dialog } from '../../System/Dialog'
 import { Icon } from '../../System/Icon'
-import { FloppyDiskBack, Images, UserSquare } from '@phosphor-icons/react'
+import { FloppyDiskBack, Images, ImagesSquare } from '@phosphor-icons/react'
 
 interface InputsProvider extends PWAProvidersProps {
   providerRv: SelectProps | null
@@ -128,7 +128,7 @@ export function FormProviderPWA({
             <div className="flex items-end gap-4">
               {!watch('fopw_imagem') && (
                 <Icon>
-                  <UserSquare size={96} weight="fill" />
+                  <ImagesSquare size={96} weight="fill" />
                 </Icon>
               )}
 

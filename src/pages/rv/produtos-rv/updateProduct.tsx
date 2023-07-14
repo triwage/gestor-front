@@ -3,13 +3,23 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
-import { Checkbox } from '../../../components/Form/Checkbox'
 import { Input } from '../../../components/Form/Input'
 import { InputCurrency } from '../../../components/Form/InputCurrency'
 import { Select } from '../../../components/Form/Select'
+import { Switch } from '../../../components/Form/Switch'
+import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
+import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
+import {
+  updateMaxProduct,
+  useMaxProducts,
+} from '../../../services/max/products'
+import {
+  updatePWAProduct,
+  usePWAProducts,
+} from '../../../services/pwa/products'
 import { useRVCategories } from '../../../services/rv/categories'
 import { updateRVProduct } from '../../../services/rv/products'
 import { useRVProviders } from '../../../services/rv/providers'
@@ -27,8 +37,14 @@ export default function UpdateProduct() {
 
   const { setLoading } = useLoading()
 
-  const { data: RVcategories } = useRVCategories()
-  const { data: RVProviders } = useRVProviders()
+  const { data: RVcategories, isLoading, isFetching } = useRVCategories()
+  const {
+    data: RVProviders,
+    isLoading: isLoading2,
+    isFetching: isFetching2,
+  } = useRVProviders()
+  const { data: PWAProducts } = usePWAProducts()
+  const { data: MaxProducts } = useMaxProducts()
 
   const router = useNavigate()
   const location = useLocation()
@@ -38,7 +54,28 @@ export default function UpdateProduct() {
     data.prrv_pcrv_id = data.pcrv_id.value
 
     setLoading(true)
-    await updateRVProduct(data)
+    const res = (await updateRVProduct(data)) as RVProductsProps
+
+    if (!data.prrv_ativo && res) {
+      const productPWA = PWAProducts?.find((e) => e.prpw_id === res.prpw_id)
+
+      if (productPWA) {
+        await updatePWAProduct(productPWA)
+      }
+
+      const productMax = MaxProducts?.find(
+        (e) => Number(e.id) === Number(res.prrv_max_id),
+      )
+      if (productMax) {
+        await updateMaxProduct(productMax)
+      }
+    }
+
+    if (res) {
+      alerta('Produto alterado com sucesso', 1)
+    } else {
+      alerta('Erro ao atualizar o produto', 1)
+    }
     setLoading(false)
   }
 
@@ -114,6 +151,7 @@ export default function UpdateProduct() {
 
   return (
     <Container>
+      {(isLoading || isFetching || isLoading2 || isFetching2) && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -154,7 +192,7 @@ export default function UpdateProduct() {
               />
             </div>
             <div className="flex gap-2">
-              <Checkbox name="prrv_ativo" label="Produto ativo" />
+              <Switch name="prrv_ativo" label="Produto ativo" />
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button onClick={() => handleSubmit(handleUpdateProduct)}>

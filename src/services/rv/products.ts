@@ -52,16 +52,13 @@ export async function updateRVProduct(data: RVProductsProps) {
 
     const res = await api.put('/rv/products', payload)
 
-    const { success } = res.data
+    const { success, data: resData } = res.data
 
-    if (success) {
-      alerta('Produto alterado com sucesso', 1)
+    if (success && haveData(resData)) {
+      return haveData(resData)
     }
   } catch (error) {
-    if (error instanceof AxiosError) {
-      alerta(clearCharacters(error.response?.data?.error))
-    } else {
-      console.error(error)
-    }
+    console.error(error)
+    return false
   }
 }

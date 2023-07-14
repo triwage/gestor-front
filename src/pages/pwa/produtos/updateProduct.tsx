@@ -1,12 +1,14 @@
-import { ChangeEvent, useEffect, useMemo } from 'react'
+import { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
+import { ButtonText } from '../../../components/Form/ButtonText'
 import { Input } from '../../../components/Form/Input'
 import { InputCurrency } from '../../../components/Form/InputCurrency'
 import { Select } from '../../../components/Form/Select'
 import { Switch } from '../../../components/Form/Switch'
+import { FormCategoryPWA } from '../../../components/Pages/PWA/FormCategoryPWA'
 import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
@@ -42,6 +44,7 @@ import {
   FloppyDiskBack,
   Images,
   Package,
+  PlusSquare,
 } from '@phosphor-icons/react'
 import clsx from 'clsx'
 import * as yup from 'yup'
@@ -60,10 +63,12 @@ const schemaProduct = yup
     prpw_descricao: yup.string().required('Informe o nome'),
     prpw_valor: yup.string().required('Informe um valor'),
     productRv: yup.object().required('Selecione um produto da RV'),
+    productMax: yup.object().required('Selecione um produto da MAX'),
   })
   .required()
 
 export default function UpdateProductPWA() {
+  const [isOpenForm, setIsOpenForm] = useState(false)
   const formProduct = useForm<Inputs>({
     // @ts-expect-error
     resolver: yupResolver(schemaProduct),
@@ -86,6 +91,7 @@ export default function UpdateProductPWA() {
     data: CategoriesPWA,
     isLoading: isLoading3,
     isFetching: isFetching3,
+    refetch: refetchCategories,
   } = usePWACategories()
   const {
     data: ProvidersPWA,
@@ -269,8 +275,8 @@ export default function UpdateProductPWA() {
     return res
   }, [CategoriesPWA])
 
-  function handleSyncProductWithProductRV(data: SelectProps) {
-    const productRvSelected = data.value
+  useEffect(() => {
+    const productRvSelected = watch('productRv')?.value
     if (productRvSelected) {
       const product = ProductsRV?.find((e) => e.prrv_id === productRvSelected)
       console.log(product)
@@ -281,26 +287,17 @@ export default function UpdateProductPWA() {
       const productOnMax = optionsProductsMax?.find(
         (e) => e.value === product?.prrv_max_id,
       )
-      if (productOnMax && !watch('productMax')) {
+      if (productOnMax) {
         setValue('productMax', productOnMax)
       }
-      if (provider && !watch('provider')) {
+      if (provider) {
         setValue('provider', provider)
       }
-      if (!watch('prpw_descricao')) {
-        setValue('prpw_descricao', String(product?.prrv_nome))
-      }
-      if (!watch('prpw_valor')) {
-        setValue(
-          'prpw_valor',
-          FormataValorMonetario(product?.prrv_valor, false),
-        )
-      }
-      if (!watch('prpw_ativo')) {
-        setValue('prpw_ativo', product?.prrv_ativo || false)
-      }
+      setValue('prpw_descricao', String(product?.prrv_nome))
+      setValue('prpw_valor', FormataValorMonetario(product?.prrv_valor, false))
+      setValue('prpw_ativo', product?.prrv_ativo || false)
     }
-  }
+  }, [watch('productRv')])
 
   useEffect(() => {
     const checkTypeof = {
@@ -404,7 +401,6 @@ export default function UpdateProductPWA() {
                 label="Produto RV"
                 name="productRv"
                 options={optionsProductsRV}
-                onChange={(e: any) => handleSyncProductWithProductRV(e)}
               />
               <Input name="prpw_descricao" label="Nome" />
             </div>
@@ -435,7 +431,7 @@ export default function UpdateProductPWA() {
             <div className="flex gap-2">
               <Select
                 control={control}
-                label="Fornecedor"
+                label="Fornecedor principal"
                 name="provider"
                 options={optionsProviders}
               />
@@ -449,16 +445,21 @@ export default function UpdateProductPWA() {
             <div className="grid grid-cols-2 items-center gap-2">
               <Select
                 control={control}
-                label="Categoria"
+                label="Categoria principal"
                 name="category"
                 options={optionsCategories}
               />
               <Switch name="prpw_ativo" label="Produto ativo" />
             </div>
-            <div className="flex flex-col gap-0.5">
-              <TextAction className="text-sm font-medium text-black dark:text-white">
-                Outras categorias
-              </TextAction>
+            <div className="flex flex-col gap-2">
+              <div className="flex w-1/2 items-center justify-between gap-2">
+                <TextAction className="text-sm font-medium text-black dark:text-white">
+                  Outras categorias
+                </TextAction>
+                <ButtonText onClick={() => setIsOpenForm(true)} type="button">
+                  Adicionar categoria <PlusSquare size={20} weight="fill" />
+                </ButtonText>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {optionsCategories.map(
                   (item) =>
@@ -543,6 +544,12 @@ export default function UpdateProductPWA() {
           </form>
         </FormProvider>
       </div>
+      <FormCategoryPWA
+        open={isOpenForm}
+        closeDialog={() => setIsOpenForm(false)}
+        optionsCashback={optionsCashback}
+        onSuccess={() => refetchCategories()}
+      />
     </Container>
   )
 }

@@ -1,6 +1,6 @@
 export type RVProductsProps = {
   prrv_id: number
-  prpw_id: number
+  prpw_id: number | null
   prrv_max_id: number
   prrv_rv_id: string
   prrv_pcrv_id: number

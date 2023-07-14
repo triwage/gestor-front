@@ -69,11 +69,7 @@ export async function addMaxProduct(data: MaxProductsProps) {
       return null
     }
   } catch (error) {
-    if (error instanceof AxiosError) {
-      alerta(clearCharacters(error.response?.data?.error))
-    } else {
-      console.error(error)
-    }
+    console.error(error)
     return null
   }
 }
@@ -99,11 +95,7 @@ export async function updateMaxProduct(data: MaxProductsProps) {
       return false
     }
   } catch (error) {
-    if (error instanceof AxiosError) {
-      alerta(clearCharacters(error.response?.data?.error))
-    } else {
-      console.error(error)
-    }
+    console.error(error)
     return false
   }
 }

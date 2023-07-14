@@ -8,8 +8,8 @@ import { Input } from '../../../components/Form/Input'
 import { Select } from '../../../components/Form/Select'
 import { Switch } from '../../../components/Form/Switch'
 import { Textarea } from '../../../components/Form/Textarea'
+import { FormCategoryPWA } from '../../../components/Pages/PWA/FormCategoryPWA'
 import { alerta } from '../../../components/System/Alert'
-import { Dialog } from '../../../components/System/Dialog'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextAction } from '../../../components/Texts/TextAction'
@@ -32,7 +32,6 @@ import { useRVProviders } from '../../../services/rv/providers'
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
 import { SelectProps } from '../../../@types/select'
 
-import useConfirm from '../../../contexts/ConfirmContext'
 import useLoading from '../../../contexts/LoadingContext'
 import { getBase64, handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
@@ -59,7 +58,6 @@ export default function UpdateProviderPWA() {
   const router = useNavigate()
   const location = useLocation()
   const { setLoading } = useLoading()
-  const { Confirm } = useConfirm()
 
   const { data: ProvidersRV, isLoading, isFetching } = useRVProviders()
   const {
@@ -71,6 +69,7 @@ export default function UpdateProviderPWA() {
     data: CategoriesPWA,
     isLoading: isLoading3,
     isFetching: isFetching3,
+    refetch,
   } = usePWACategories()
   const {
     data: ProvidersOfCategories,
@@ -356,22 +355,15 @@ export default function UpdateProviderPWA() {
           </form>
         </FormProvider>
       </div>
-
-      <Dialog
+      <FormCategoryPWA
         open={isOpenForm}
-        closeDialog={async () => {
-          const check = await Confirm({
-            title: 'Operação em andamento',
-            message:
-              'Ao sair perderá os dados já informados, tem certeza disso?',
-          })
-          if (check) {
-            setIsOpenForm(false)
-          }
+        closeDialog={() => setIsOpenForm(false)}
+        optionsCashback={optionsCashback}
+        onSuccess={() => {
+          setIsOpenForm(false)
+          refetch()
         }}
-      >
-        <h1>teste</h1>
-      </Dialog>
+      />
     </Container>
   )
 }

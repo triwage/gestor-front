@@ -7,7 +7,7 @@ import { ButtonText } from '../../../components/Form/ButtonText'
 import { Input } from '../../../components/Form/Input'
 import { Select } from '../../../components/Form/Select'
 import { Switch } from '../../../components/Form/Switch'
-import { FormProviderPWA } from '../../../components/Pages/PWACategories/FormProviderPWA'
+import { FormProviderPWA } from '../../../components/Pages/PWA/FormProviderPWA'
 import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
@@ -333,7 +333,10 @@ export default function UpdateCategoryPWA() {
         optionsProvidersRV={optionsProvidersRV}
         open={isOpenForm}
         closeDialog={() => setIsOpenForm(false)}
-        onSuccess={() => refetch()}
+        onSuccess={() => {
+          setIsOpenForm(false)
+          refetch()
+        }}
       />
     </Container>
   )

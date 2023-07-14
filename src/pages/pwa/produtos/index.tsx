@@ -12,7 +12,7 @@ import { PWAProductsProps } from '../../../@types/pwa/products'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { NotePencil, PlusCircle } from '@phosphor-icons/react'
+import { ArrowsDownUp, NotePencil, PlusCircle } from '@phosphor-icons/react'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
@@ -122,10 +122,21 @@ export default function PWAProducts() {
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Produtos PWA</TextHeading>
 
-          <div className="flex items-center">
-            <Button onClick={() => router('updateProduct')}>
-              <PlusCircle size={18} /> Adicionar produto
-            </Button>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center">
+              <Button
+                variant="structure"
+                className="bg-purple text-white"
+                onClick={() => router('addProduct')}
+              >
+                <ArrowsDownUp size={18} /> Sincronizar produto
+              </Button>
+            </div>
+            <div className="flex items-center">
+              <Button onClick={() => router('updateProduct')}>
+                <PlusCircle size={18} /> Adicionar produto
+              </Button>
+            </div>
           </div>
         </div>
 

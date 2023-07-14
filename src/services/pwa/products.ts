@@ -87,11 +87,7 @@ export async function addPWAProduct(data: PWAProductsProps) {
       return haveData(dataRes)
     }
   } catch (error) {
-    if (error instanceof AxiosError) {
-      alerta(clearCharacters(error.response?.data?.error))
-    } else {
-      console.error(error)
-    }
+    console.error(error)
     return null
   }
 }
@@ -121,11 +117,7 @@ export async function updatePWAProduct(data: PWAProductsProps) {
       return haveData(dataRes)
     }
   } catch (error) {
-    if (error instanceof AxiosError) {
-      alerta(clearCharacters(error.response?.data?.error))
-    } else {
-      console.error(error)
-    }
+    console.error(error)
     return null
   }
 }
