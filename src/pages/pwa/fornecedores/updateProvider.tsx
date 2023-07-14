@@ -33,14 +33,18 @@ import { PWAProvidersProps } from '../../../@types/pwa/providers'
 import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
-import { getBase64, handleUploadImage } from '../../../functions/general'
+import {
+  checkIfImage,
+  getBase64,
+  handleUploadImage,
+} from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import {
   CaretLeft,
   FloppyDiskBack,
   Images,
   PlusSquare,
-  UserSquare,
+  Storefront,
 } from '@phosphor-icons/react'
 import clsx from 'clsx'
 
@@ -182,8 +186,18 @@ export default function UpdateProviderPWA() {
       const providerEdit = Object.keys(location.state)
 
       providerEdit?.forEach((providerItem) => {
-        // @ts-expect-error
-        setValue(String(providerItem), location.state[providerItem])
+        if (providerItem === 'fopw_imagem') {
+          const resImage = checkIfImage(location.state[providerItem])
+
+          if (resImage) {
+            setValue('fopw_imagem', location.state[providerItem])
+          } else {
+            setValue('fopw_imagem', null)
+          }
+        } else {
+          // @ts-expect-error
+          setValue(String(providerItem), location.state[providerItem])
+        }
       })
       setValue(
         'providerRv',
@@ -310,13 +324,13 @@ export default function UpdateProviderPWA() {
               <div className="flex items-end gap-4">
                 {!watch('fopw_imagem') && (
                   <Icon>
-                    <UserSquare size={96} weight="fill" />
+                    <Storefront size={96} />
                   </Icon>
                 )}
 
                 {watch('fopw_imagem') && (
                   <img
-                    src={watch('fopw_imagem')}
+                    src={watch('fopw_imagem') ?? ''}
                     alt="Logo"
                     className="h-full max-h-48"
                   />

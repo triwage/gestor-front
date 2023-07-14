@@ -3,7 +3,7 @@ export interface PWACategoriesProps {
   pcpw_cash_id: number | null
   cash_descricao: string
   pcpw_descricao: string
-  pcpw_imagem: string
+  pcpw_imagem: string | null
   pcpw_ativo: boolean
 }
 

@@ -9,6 +9,7 @@ import { usePWAProviders } from '../../../services/pwa/providers'
 
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
 
+import { checkIfImage } from '../../../functions/general'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
 import { NotePencil, PlusCircle } from '@phosphor-icons/react'
@@ -91,7 +92,8 @@ export default function PWAProviders() {
         justifyContent: 'center',
       },
       cellRenderer: (params: { value: string | undefined }) => {
-        if (params.value !== 'não nula') {
+        const resImage = checkIfImage(params.value)
+        if (resImage) {
           return <img src={params.value} alt="Imagem" width={24} height={24} />
         }
         return '-'

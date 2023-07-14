@@ -6,6 +6,6 @@ export interface PWAProvidersProps {
   fopw_descricao: string
   fopw_termos_condicoes: string
   fopw_instrucoes: string
-  fopw_imagem: string
+  fopw_imagem: string | null
   fopw_ativo: boolean
 }

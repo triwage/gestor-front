@@ -48,3 +48,15 @@ export function haveData(value: any) {
   }
   return value
 }
+
+export function checkIfImage(imgOrigin: any) {
+  const img = document.createElement('img')
+  img.src = imgOrigin
+
+  let res = false
+
+  img.onload = function () {
+    res = true
+  }
+  return res
+}

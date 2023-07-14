@@ -17,13 +17,14 @@ import { Switch } from '../../Form/Switch'
 import { alerta } from '../../System/Alert'
 import { Dialog } from '../../System/Dialog'
 import { Icon } from '../../System/Icon'
+import { TextAction } from '../../Texts/TextAction'
 import { FloppyDiskBack, Images, ImagesSquare } from '@phosphor-icons/react'
 
 interface FormCategoryPWAProps {
   open: boolean
   closeDialog: () => void
   optionsCashback: SelectProps[]
-  onSuccess: () => void
+  onSuccess: (res?: PWACategoriesProps | null) => void
 }
 
 interface Inputs extends PWACategoriesProps {
@@ -68,11 +69,11 @@ export function FormCategoryPWA({
 
     data.pcpw_cash_id = Number(data.cash?.value)
 
-    await addPWACategories(data)
+    const res = await addPWACategories(data)
 
     alerta('Categoria criada com sucesso', 1)
     setLoading(false)
-    onSuccess()
+    onSuccess(res)
   }
 
   return (
@@ -90,10 +91,13 @@ export function FormCategoryPWA({
     >
       <FormProvider {...formCategory}>
         <form
-          className="my-2 space-y-2 p-4"
+          className="mb-2 flex w-full flex-col items-center gap-2 p-4"
           onSubmit={handleSubmit(handleUpdateProductMax)}
         >
-          <div className="flex gap-2">
+          <TextAction className="mb-6 font-semibold">
+            Cadastrar nova categoria
+          </TextAction>
+          <div className="flex w-full gap-2">
             <Input name="pcpw_descricao" label="Nome" />
             <Select
               control={control}
@@ -103,7 +107,7 @@ export function FormCategoryPWA({
             />
           </div>
 
-          <div className="grid grid-cols-2 items-start gap-2">
+          <div className="grid w-full grid-cols-2 items-start gap-2">
             <div className="flex items-end gap-4">
               {!watch('pcpw_imagem') && (
                 <Icon>

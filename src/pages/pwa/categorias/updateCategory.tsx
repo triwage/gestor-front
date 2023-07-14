@@ -24,20 +24,23 @@ import {
   usePWACategoriesOfProviders,
 } from '../../../services/pwa/categories'
 import { usePWAProviders } from '../../../services/pwa/providers'
-import { useRVProviders } from '../../../services/rv/providers'
 
 import { PWACategoriesProps } from '../../../@types/pwa/categories'
 import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
-import { getBase64, handleUploadImage } from '../../../functions/general'
+import {
+  checkIfImage,
+  getBase64,
+  handleUploadImage,
+} from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import {
   CaretLeft,
   FloppyDiskBack,
+  ImageSquare,
   Images,
   PlusSquare,
-  UserSquare,
 } from '@phosphor-icons/react'
 import clsx from 'clsx'
 
@@ -68,12 +71,6 @@ export default function UpdateCategoryPWA() {
     isFetching: isFetching3,
     isFetchedAfterMount,
   } = usePWACategoriesOfProviders(location?.state?.pcpw_id)
-
-  const {
-    data: ProvidersRV,
-    isLoading: isLoading4,
-    isFetching: isFetching4,
-  } = useRVProviders()
 
   const { setLoading } = useLoading()
 
@@ -160,26 +157,23 @@ export default function UpdateCategoryPWA() {
     return res
   }, [CashbackPWA])
 
-  const optionsProvidersRV = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (ProvidersRV) {
-      res = ProvidersRV?.map((item) => {
-        return {
-          value: item.forv_id,
-          label: item.forv_provider,
-        }
-      })
-    }
-    return res
-  }, [ProvidersRV])
-
   useEffect(() => {
     if (location.state) {
       const categoryEdit = Object.keys(location.state)
 
       categoryEdit?.forEach((categoryItem) => {
-        // @ts-expect-error
-        setValue(String(categoryItem), location.state[categoryItem])
+        if (categoryItem === 'pcpw_imagem') {
+          const resImage = checkIfImage(location.state[categoryItem])
+
+          if (resImage) {
+            setValue('pcpw_imagem', location.state[categoryItem])
+          } else {
+            setValue('pcpw_imagem', null)
+          }
+        } else {
+          // @ts-expect-error
+          setValue(String(categoryItem), location.state[categoryItem])
+        }
       })
       setValue(
         'cash',
@@ -203,9 +197,7 @@ export default function UpdateCategoryPWA() {
         isLoading2 ||
         isFetching2 ||
         isLoading3 ||
-        isFetching3 ||
-        isLoading4 ||
-        isFetching4) && <Loader />}
+        isFetching3) && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -284,13 +276,13 @@ export default function UpdateCategoryPWA() {
               <div className="flex items-end gap-4">
                 {!watch('pcpw_imagem') && (
                   <Icon>
-                    <UserSquare size={96} weight="fill" />
+                    <ImageSquare size={96} weight="fill" />
                   </Icon>
                 )}
 
                 {watch('pcpw_imagem') && (
                   <img
-                    src={watch('pcpw_imagem')}
+                    src={watch('pcpw_imagem') ?? ''}
                     alt="Logo"
                     className="h-full max-h-48"
                   />
@@ -330,7 +322,6 @@ export default function UpdateCategoryPWA() {
 
       <FormProviderPWA
         optionsCashback={optionsCashback}
-        optionsProvidersRV={optionsProvidersRV}
         open={isOpenForm}
         closeDialog={() => setIsOpenForm(false)}
         onSuccess={() => {

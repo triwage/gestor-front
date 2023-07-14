@@ -3,12 +3,12 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
-import { ButtonText } from '../../../components/Form/ButtonText'
 import { Input } from '../../../components/Form/Input'
 import { InputCurrency } from '../../../components/Form/InputCurrency'
 import { Select } from '../../../components/Form/Select'
 import { Switch } from '../../../components/Form/Switch'
 import { FormCategoryPWA } from '../../../components/Pages/PWA/FormCategoryPWA'
+import { FormProviderPWA } from '../../../components/Pages/PWA/FormProviderPWA'
 import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
@@ -16,7 +16,11 @@ import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
-import { addMaxProduct, useMaxProducts } from '../../../services/max/products'
+import {
+  addMaxProduct,
+  updateMaxProduct,
+  useMaxProducts,
+} from '../../../services/max/products'
 import { usePWACashback } from '../../../services/pwa/cashback'
 import { usePWACategories } from '../../../services/pwa/categories'
 import {
@@ -36,7 +40,11 @@ import { SelectProps } from '../../../@types/select'
 import useConfirm from '../../../contexts/ConfirmContext'
 import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
-import { getBase64, handleUploadImage } from '../../../functions/general'
+import {
+  checkIfImage,
+  getBase64,
+  handleUploadImage,
+} from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
@@ -44,7 +52,7 @@ import {
   FloppyDiskBack,
   Images,
   Package,
-  PlusSquare,
+  PlusCircle,
 } from '@phosphor-icons/react'
 import clsx from 'clsx'
 import * as yup from 'yup'
@@ -55,7 +63,9 @@ interface Inputs extends PWAProductsProps {
   productRv: SelectProps | null
   productMax: SelectProps | null
   category: SelectProps | null
+  categoryAux: any
   provider: SelectProps | null
+  providerAux: any
 }
 
 const schemaProduct = yup
@@ -69,11 +79,19 @@ const schemaProduct = yup
 
 export default function UpdateProductPWA() {
   const [isOpenForm, setIsOpenForm] = useState(false)
+  const [isOpenFormProvider, setIsOpenFormProvider] = useState(false)
   const formProduct = useForm<Inputs>({
     // @ts-expect-error
     resolver: yupResolver(schemaProduct),
   })
-  const { handleSubmit, setValue, watch, control } = formProduct
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    control,
+    getValues,
+    formState: { dirtyFields },
+  } = formProduct
 
   const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
@@ -113,6 +131,24 @@ export default function UpdateProductPWA() {
 
   async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
+
+    const { prpw_descricao, prpw_valor, prpw_ativo } = dirtyFields
+    if (prpw_descricao || prpw_valor || prpw_ativo) {
+      const productMax = ProductsMax?.find(
+        (e) => Number(e.id) === Number(data.productMax?.value),
+      )
+      if (productMax) {
+        productMax.status = prpw_ativo ? data?.prpw_ativo : productMax.status
+        productMax.preco = prpw_valor
+          ? FormataValorMonetario(data?.prpw_valor, false).replace(',', '.')
+          : productMax.preco
+        productMax.nome =
+          prpw_descricao && data?.prpw_descricao
+            ? data?.prpw_descricao
+            : productMax.nome
+        await updateMaxProduct(productMax)
+      }
+    }
 
     const imageAnexed = watch('imagem_aux')
     if (imageAnexed) {
@@ -292,6 +328,27 @@ export default function UpdateProductPWA() {
       }
       if (provider) {
         setValue('provider', provider)
+      } else if (product?.prrv_forv_id) {
+        setValue('provider', {
+          value: 999,
+          label: 'Cadastrar um novo automaticamente',
+        })
+        setValue('providerAux', {
+          fopw_nome: product.forv_provider,
+          fopw_forv_id: product?.prrv_forv_id,
+          fopw_ativo: true,
+        })
+      }
+
+      if (product?.prrv_pcrv_id) {
+        setValue('category', {
+          value: 999,
+          label: 'Cadastrar um novo automaticamente',
+        })
+        setValue('categoryAux', {
+          pcpw_descricao: product.pcrv_kind,
+          pcpw_ativo: true,
+        })
       }
       setValue('prpw_descricao', String(product?.prrv_nome))
       setValue('prpw_valor', FormataValorMonetario(product?.prrv_valor, false))
@@ -303,20 +360,31 @@ export default function UpdateProductPWA() {
     const checkTypeof = {
       prpw_valor: true,
     }
+
     if (location.state) {
       const productEdit = Object.keys(location.state)
 
       productEdit?.forEach((productItem) => {
-        // @ts-expect-error
-        if (checkTypeof[String(productItem)]) {
-          setValue(
-            // @ts-expect-error
-            String(productItem),
-            FormataValorMonetario(location.state[productItem], false),
-          )
+        if (productItem === 'prpw_imagem') {
+          const resImage = checkIfImage(location.state[productItem])
+
+          if (resImage) {
+            setValue('prpw_imagem', location.state[productItem])
+          } else {
+            setValue('prpw_imagem', null)
+          }
         } else {
           // @ts-expect-error
-          setValue(String(productItem), location.state[productItem])
+          if (checkTypeof[String(productItem)]) {
+            setValue(
+              // @ts-expect-error
+              String(productItem),
+              FormataValorMonetario(location.state[productItem], false),
+            )
+          } else {
+            // @ts-expect-error
+            setValue(String(productItem), location.state[productItem])
+          }
         }
       })
       setValue(
@@ -386,7 +454,11 @@ export default function UpdateProductPWA() {
             <Icon onClick={() => router(-1)}>
               <CaretLeft size={22} className="text-black dark:text-white" />
             </Icon>
-            <TextHeading>Produtos PWA / Editar produto</TextHeading>
+            <TextHeading>
+              {location.state
+                ? 'Produtos PWA / Editar produto'
+                : 'Produtos PWA / Adicionar produto'}
+            </TextHeading>
           </div>
         </div>
 
@@ -414,7 +486,7 @@ export default function UpdateProductPWA() {
                   name="productMax"
                   options={optionsProductsMax}
                 />
-                {!watch('productMax') && (
+                {(!location?.state || !watch('productMax')) && (
                   <div className="mt-4 w-[80px]">
                     <Button
                       type="button"
@@ -422,19 +494,30 @@ export default function UpdateProductPWA() {
                       title="Adicionar novo produto na Max nível"
                       disable={!watch('prpw_descricao') || !watch('prpw_valor')}
                     >
-                      +
+                      <PlusCircle size={20} weight="fill" />
                     </Button>
                   </div>
                 )}
               </div>
             </div>
-            <div className="flex gap-2">
-              <Select
-                control={control}
-                label="Fornecedor principal"
-                name="provider"
-                options={optionsProviders}
-              />
+            <div className="grid grid-cols-2 items-center gap-2">
+              <div className="flex items-center gap-2">
+                <Select
+                  control={control}
+                  label="Fornecedor principal"
+                  name="provider"
+                  options={optionsProviders}
+                />
+                <div className="mt-4 w-[80px]">
+                  <Button
+                    onClick={() => setIsOpenFormProvider(true)}
+                    type="button"
+                    title="Adicionar novo fornecedor"
+                  >
+                    <PlusCircle size={20} weight="fill" />
+                  </Button>
+                </div>
+              </div>
               <Select
                 control={control}
                 label="Cashback"
@@ -443,23 +526,29 @@ export default function UpdateProductPWA() {
               />
             </div>
             <div className="grid grid-cols-2 items-center gap-2">
-              <Select
-                control={control}
-                label="Categoria principal"
-                name="category"
-                options={optionsCategories}
-              />
+              <div className="flex items-center gap-2">
+                <Select
+                  control={control}
+                  label="Categoria principal"
+                  name="category"
+                  options={optionsCategories}
+                />
+                <div className="mt-4 w-[80px]">
+                  <Button
+                    onClick={() => setIsOpenForm(true)}
+                    type="button"
+                    title="Adicionar nova categoria"
+                  >
+                    <PlusCircle size={20} weight="fill" />
+                  </Button>
+                </div>
+              </div>
               <Switch name="prpw_ativo" label="Produto ativo" />
             </div>
             <div className="flex flex-col gap-2">
-              <div className="flex w-1/2 items-center justify-between gap-2">
-                <TextAction className="text-sm font-medium text-black dark:text-white">
-                  Outras categorias
-                </TextAction>
-                <ButtonText onClick={() => setIsOpenForm(true)} type="button">
-                  Adicionar categoria <PlusSquare size={20} weight="fill" />
-                </ButtonText>
-              </div>
+              <TextAction className="text-sm font-medium text-black dark:text-white">
+                Outras categorias
+              </TextAction>
               <div className="flex flex-wrap gap-2">
                 {optionsCategories.map(
                   (item) =>
@@ -505,7 +594,7 @@ export default function UpdateProductPWA() {
 
                 {watch('prpw_imagem') && (
                   <img
-                    src={watch('prpw_imagem')}
+                    src={watch('prpw_imagem') ?? ''}
                     alt="Logo"
                     className="h-full max-h-48"
                   />
@@ -538,7 +627,7 @@ export default function UpdateProductPWA() {
                 onClick={() => handleSubmit(handleUpdateProductMax)}
               >
                 <FloppyDiskBack size={18} weight="fill" />
-                Atualizar produto
+                {location.state ? 'Atualizar produto' : 'Adicionar produto'}
               </Button>
             </div>
           </form>
@@ -548,7 +637,18 @@ export default function UpdateProductPWA() {
         open={isOpenForm}
         closeDialog={() => setIsOpenForm(false)}
         optionsCashback={optionsCashback}
-        onSuccess={() => refetchCategories()}
+        onSuccess={() => {
+          setIsOpenForm(false)
+          refetchCategories()
+        }}
+      />
+      <FormProviderPWA
+        optionsCashback={optionsCashback}
+        open={isOpenFormProvider}
+        closeDialog={() => setIsOpenFormProvider(false)}
+        onSuccess={() => {
+          setIsOpenFormProvider(false)
+        }}
       />
     </Container>
   )

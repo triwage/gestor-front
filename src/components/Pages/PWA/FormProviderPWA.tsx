@@ -1,8 +1,9 @@
-import { ChangeEvent } from 'react'
+import { ChangeEvent, useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
 import { uploadImages } from '../../../services/images'
 import { addPWAProviders } from '../../../services/pwa/providers'
+import { useRVProviders } from '../../../services/rv/providers'
 
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
 import { SelectProps } from '../../../@types/select'
@@ -18,6 +19,8 @@ import { Textarea } from '../../Form/Textarea'
 import { alerta } from '../../System/Alert'
 import { Dialog } from '../../System/Dialog'
 import { Icon } from '../../System/Icon'
+import { Loader } from '../../System/Loader'
+import { TextAction } from '../../Texts/TextAction'
 import { FloppyDiskBack, Images, ImagesSquare } from '@phosphor-icons/react'
 
 interface InputsProvider extends PWAProvidersProps {
@@ -29,7 +32,6 @@ interface InputsProvider extends PWAProvidersProps {
 interface FormProviderProps {
   open: boolean
   closeDialog: () => void
-  optionsProvidersRV: OptionsSelectProps[]
   optionsCashback: OptionsSelectProps[]
   onSuccess: () => void
 }
@@ -37,12 +39,27 @@ interface FormProviderProps {
 export function FormProviderPWA({
   open,
   closeDialog,
-  optionsProvidersRV,
   optionsCashback,
   onSuccess,
 }: FormProviderProps) {
   const formProvider = useForm<InputsProvider>()
   const { handleSubmit, watch, control, setValue } = formProvider
+
+  const { data: ProvidersRV, isLoading, isFetching } = useRVProviders()
+
+  const optionsProvidersRV = useMemo(() => {
+    let res = [] as Array<{ value: number; label: string }>
+
+    if (ProvidersRV) {
+      res = ProvidersRV?.map((item) => {
+        return {
+          value: item.forv_id,
+          label: item.forv_provider,
+        }
+      })
+    }
+    return res
+  }, [ProvidersRV])
 
   const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
@@ -92,17 +109,21 @@ export function FormProviderPWA({
         }
       }}
     >
+      {(isLoading || isFetching) && <Loader />}
       <FormProvider {...formProvider}>
         <form
-          className="my-2 space-y-2 p-4"
+          className="mb-2 flex w-full flex-col items-center gap-2 p-4"
           onSubmit={handleSubmit(handleCreateProviderPWA)}
         >
-          <div className="flex gap-2">
+          <TextAction className="mb-6 font-semibold">
+            Cadastrar novo fornecedor
+          </TextAction>
+          <div className="flex w-full gap-2">
             <Input name="fopw_nome" label="Nome" />
             <Input name="fopw_descricao" label="Descrição" />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex w-full gap-2">
             <Select
               control={control}
               label="Fornecedor RV"
@@ -116,7 +137,7 @@ export function FormProviderPWA({
               options={optionsCashback}
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex w-full gap-2">
             <Textarea name="fopw_instrucoes" label="Instruções" rows={8} />
             <Textarea
               name="fopw_termos_condicoes"
