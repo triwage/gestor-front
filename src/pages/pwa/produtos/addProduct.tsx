@@ -293,7 +293,7 @@ export default function AddProduct() {
         await updateRVProduct(item)
       })
 
-      await Promise.all(promise)
+      await Promise.allSettled(promise)
       setCurrentSync(null)
       alerta('Sincronização finalizada', 1)
       setTimeout(() => {

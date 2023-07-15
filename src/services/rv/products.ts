@@ -12,23 +12,25 @@ import { AxiosError } from 'axios'
 export function useRVProducts() {
   return useQuery({
     queryKey: ['RVProducts'],
-    queryFn: async (): Promise<RVProductsProps[] | null> => {
-      try {
-        const res = await api.get('/rv/products')
-
-        const { data } = res.data
-
-        return haveData(data)
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alerta(clearCharacters(error.response?.data?.error))
-        } else {
-          console.error(error)
-        }
-        return null
-      }
-    },
+    queryFn: ListProductsRV,
   })
+}
+
+export async function ListProductsRV(): Promise<RVProductsProps[] | null> {
+  try {
+    const res = await api.get('/rv/products')
+
+    const { data } = res.data
+
+    return haveData(data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
 }
 
 export async function updateRVProduct(data: RVProductsProps) {

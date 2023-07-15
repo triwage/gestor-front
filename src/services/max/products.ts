@@ -4,7 +4,6 @@ import { useMaxProductsStore } from '../../store/useMaxProductsStore'
 
 import { MaxProductsProps } from '../../@types/max/products'
 
-import useLoading from '../../contexts/LoadingContext'
 import { formataMoedaPFloat } from '../../functions/currency'
 import { haveData } from '../../functions/general'
 import { clearCharacters } from '../../functions/stringsAndObjects'
@@ -13,39 +12,39 @@ import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 
 export function useMaxProducts() {
-  const { setLoading } = useLoading()
   const { currentStatus } = useMaxProductsStore()
   return useQuery({
     queryKey: ['MaxProducts', currentStatus],
-    queryFn: async (): Promise<MaxProductsProps[] | null> => {
-      try {
-        setLoading(true)
-        let res = null
-        if (currentStatus === -1) {
-          res = await api.get('/maxnivel/products')
-        } else {
-          res = await api.get('/maxnivel/products', {
-            params: {
-              status: currentStatus,
-            },
-          })
-        }
-
-        const { data } = res.data
-
-        return haveData(data)
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alerta(clearCharacters(error.response?.data?.error))
-        } else {
-          console.error(error)
-        }
-        return null
-      } finally {
-        setLoading(false)
-      }
-    },
+    queryFn: () => ListMaxProducts(currentStatus),
   })
+}
+
+export async function ListMaxProducts(
+  currentStatus: number,
+): Promise<MaxProductsProps[] | null> {
+  try {
+    let res = null
+    if (currentStatus === -1) {
+      res = await api.get('/maxnivel/products')
+    } else {
+      res = await api.get('/maxnivel/products', {
+        params: {
+          status: currentStatus,
+        },
+      })
+    }
+
+    const { data } = res.data
+
+    return haveData(data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
 }
 
 export async function addMaxProduct(data: MaxProductsProps) {

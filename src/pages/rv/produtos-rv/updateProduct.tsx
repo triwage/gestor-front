@@ -59,16 +59,13 @@ export default function UpdateProduct() {
     if (!data.prrv_ativo && res) {
       const productPWA = PWAProducts?.find((e) => e.prpw_id === res.prpw_id)
 
-      if (productPWA) {
-        await updatePWAProduct(productPWA)
-      }
-
       const productMax = MaxProducts?.find(
         (e) => Number(e.id) === Number(res.prrv_max_id),
       )
-      if (productMax) {
-        await updateMaxProduct(productMax)
-      }
+      await Promise.allSettled([
+        productPWA && (await updatePWAProduct(productPWA)),
+        productMax && (await updateMaxProduct(productMax)),
+      ])
     }
 
     if (res) {

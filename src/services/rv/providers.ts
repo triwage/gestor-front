@@ -11,23 +11,25 @@ import { AxiosError } from 'axios'
 export function useRVProviders() {
   return useQuery({
     queryKey: ['RVProviders'],
-    queryFn: async (): Promise<RVProvidersProps[] | null> => {
-      try {
-        const res = await api.get('/rv/providers')
-
-        const { data } = res.data
-
-        return haveData(data)
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alerta(clearCharacters(error.response?.data?.error))
-        } else {
-          console.error(error)
-        }
-        return null
-      }
-    },
+    queryFn: ListProvidersRV,
   })
+}
+
+export async function ListProvidersRV(): Promise<RVProvidersProps[] | null> {
+  try {
+    const res = await api.get('/rv/providers')
+
+    const { data } = res.data
+
+    return haveData(data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
 }
 
 export async function updateRVSupplier(data: RVProvidersProps) {

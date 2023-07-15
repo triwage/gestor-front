@@ -15,22 +15,26 @@ import { AxiosError } from 'axios'
 export function usePWACategories() {
   return useQuery({
     queryKey: ['PWACategories'],
-    queryFn: async (): Promise<PWACategoriesProps[] | null> => {
-      try {
-        const res = await api.get('/pwa/products-categories')
-        const { data } = res.data
-
-        return haveData(data)
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alerta(clearCharacters(error.response?.data?.error))
-        } else {
-          console.error(error)
-        }
-        return null
-      }
-    },
+    queryFn: ListCategoriesPWA,
   })
+}
+
+export async function ListCategoriesPWA(): Promise<
+  PWACategoriesProps[] | null
+> {
+  try {
+    const res = await api.get('/pwa/products-categories')
+    const { data } = res.data
+
+    return haveData(data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
 }
 
 export function usePWACategoriesOfProviders(id: number) {

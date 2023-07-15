@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
@@ -16,18 +16,14 @@ import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
-import { usePWACashback } from '../../../services/pwa/cashback'
 import {
   addCategoriesInProvider,
   removeCategoriesInProvider,
-  usePWACategories,
 } from '../../../services/pwa/categories'
 import {
   addPWAProviders,
   updatePWAProviders,
-  usePWAProvidersOfCategories,
 } from '../../../services/pwa/providers'
-import { useRVProviders } from '../../../services/rv/providers'
 
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
 import { SelectProps } from '../../../@types/select'
@@ -38,6 +34,7 @@ import {
   getBase64,
   handleUploadImage,
 } from '../../../functions/general'
+import { useProviderPWA } from '../../../hooks/useProviderPWA'
 import { Container } from '../../../template/Container'
 import {
   CaretLeft,
@@ -63,24 +60,15 @@ export default function UpdateProviderPWA() {
   const location = useLocation()
   const { setLoading } = useLoading()
 
-  const { data: ProvidersRV, isLoading, isFetching } = useRVProviders()
   const {
-    data: CashbackPWA,
-    isLoading: isLoading2,
-    isFetching: isFetching2,
-  } = usePWACashback()
-  const {
-    data: CategoriesPWA,
-    isLoading: isLoading3,
-    isFetching: isFetching3,
-    refetch,
-  } = usePWACategories()
-  const {
-    data: ProvidersOfCategories,
-    isLoading: isLoading4,
-    isFetching: isFetching4,
-    isFetchedAfterMount,
-  } = usePWAProvidersOfCategories(location?.state?.fopw_id)
+    ProvidersOfCategories,
+    isFetchedAfterMountProvidersOfCategories,
+    loading,
+    optionsCashback,
+    optionsCategories,
+    optionsProvidersRV,
+    refetchCategories,
+  } = useProviderPWA(location?.state?.fopw_id)
 
   async function handleUpdateProviderPWA(data: Inputs) {
     setLoading(true)
@@ -142,45 +130,6 @@ export default function UpdateProviderPWA() {
     }
   }
 
-  const optionsProvidersRV = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (ProvidersRV) {
-      res = ProvidersRV?.map((item) => {
-        return {
-          value: item.forv_id,
-          label: item.forv_provider,
-        }
-      })
-    }
-    return res
-  }, [ProvidersRV])
-
-  const optionsCashback = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (CashbackPWA) {
-      res = CashbackPWA?.map((item) => {
-        return {
-          value: item.cash_id,
-          label: item.cash_descricao,
-        }
-      })
-    }
-    return res
-  }, [CashbackPWA])
-
-  const optionsCategories = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (CategoriesPWA) {
-      res = CategoriesPWA?.map((item) => {
-        return {
-          value: item.pcpw_id,
-          label: item.pcpw_descricao,
-        }
-      })
-    }
-    return res
-  }, [CategoriesPWA])
-
   useEffect(() => {
     if (location.state) {
       const providerEdit = Object.keys(location.state)
@@ -210,7 +159,7 @@ export default function UpdateProviderPWA() {
         optionsCashback?.find((e) => e.value === location.state.fopw_cash_id) ??
           null,
       )
-      if (isFetchedAfterMount) {
+      if (isFetchedAfterMountProvidersOfCategories) {
         ProvidersOfCategories?.forEach((item) => {
           // @ts-expect-error
           setValue(`optionsCategories-${item.fopc_pcpw_id}`, true)
@@ -221,14 +170,7 @@ export default function UpdateProviderPWA() {
 
   return (
     <Container>
-      {(isLoading ||
-        isFetching ||
-        isLoading2 ||
-        isFetching2 ||
-        isLoading3 ||
-        isFetching3 ||
-        isLoading4 ||
-        isFetching4) && <Loader />}
+      {loading() && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -375,7 +317,7 @@ export default function UpdateProviderPWA() {
         optionsCashback={optionsCashback}
         onSuccess={() => {
           setIsOpenForm(false)
-          refetch()
+          refetchCategories()
         }}
       />
     </Container>

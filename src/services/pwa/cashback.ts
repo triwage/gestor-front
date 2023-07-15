@@ -12,22 +12,24 @@ import { AxiosError } from 'axios'
 export function usePWACashback() {
   return useQuery({
     queryKey: ['PWACashback'],
-    queryFn: async (): Promise<PWACashbackProps[] | null> => {
-      try {
-        const res = await api.get('/pwa/cashbacks')
-        const { data } = res.data
-
-        return haveData(data)
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alerta(clearCharacters(error.response?.data?.error))
-        } else {
-          console.error(error)
-        }
-        return null
-      }
-    },
+    queryFn: ListCashback,
   })
+}
+
+export async function ListCashback(): Promise<PWACashbackProps[] | null> {
+  try {
+    const res = await api.get('/pwa/cashbacks')
+    const { data } = res.data
+
+    return haveData(data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
 }
 
 export async function addPWACashback(data: PWACashbackProps) {

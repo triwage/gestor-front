@@ -1,47 +1,40 @@
 import { useMemo } from 'react'
 
-import { useMaxProducts } from '../services/max/products'
-import { usePWACashback } from '../services/pwa/cashback'
-import { usePWACategories } from '../services/pwa/categories'
-import { usePWACategoriesOfProdutos } from '../services/pwa/products'
-import { usePWAProviders } from '../services/pwa/providers'
-import { useRVProducts } from '../services/rv/products'
+import { ListMaxProducts } from '../services/max/products'
+import { ListCashback } from '../services/pwa/cashback'
+import { ListCategoriesPWA } from '../services/pwa/categories'
+import { ListPWACategoriesOfProducts } from '../services/pwa/products'
+import { ListProvidersPWA } from '../services/pwa/providers'
+import { ListProductsRV } from '../services/rv/products'
+
+import { useQueries } from '@tanstack/react-query'
 
 export function useProductsPWA(idProduct: number) {
-  const { data: ProductsRV, isLoading, isFetching } = useRVProducts()
-  const {
-    data: CashbackPWA,
-    isLoading: isLoading2,
-    isFetching: isFetching2,
-  } = usePWACashback()
-  const {
-    data: CategoriesPWA,
-    isLoading: isLoading3,
-    isFetching: isFetching3,
-    refetch: refetchCategories,
-  } = usePWACategories()
-  const {
-    data: ProvidersPWA,
-    isLoading: isLoading4,
-    isFetching: isFetching4,
-  } = usePWAProviders()
-  const {
-    data: ProductsMax,
-    isLoading: isLoading5,
-    isFetching: isFetching5,
-    refetch: refetchProductsMax,
-  } = useMaxProducts()
-  const {
-    data: CategoriesOfProducts,
-    isLoading: isLoading6,
-    isFetching: isFetching6,
-    isFetchedAfterMount: isFetchedAfterMountCategoriesOfProducts,
-  } = usePWACategoriesOfProdutos(idProduct)
+  const [
+    ProductsRV,
+    CashbackPWA,
+    CategoriesPWA,
+    ProvidersPWA,
+    ProductsMax,
+    CategoriesOfProducts,
+  ] = useQueries({
+    queries: [
+      { queryKey: ['RVProducts'], queryFn: ListProductsRV },
+      { queryKey: ['PWACashback'], queryFn: ListCashback },
+      { queryKey: ['PWACategories'], queryFn: ListCategoriesPWA },
+      { queryKey: ['PWAProviders'], queryFn: ListProvidersPWA },
+      { queryKey: ['MaxProducts', -1], queryFn: () => ListMaxProducts(-1) },
+      {
+        queryKey: ['PWACategoriesOfProducts'],
+        queryFn: () => ListPWACategoriesOfProducts(idProduct),
+      },
+    ],
+  })
 
   const optionsProductsRV = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
-    if (ProductsRV) {
-      res = ProductsRV?.map((item) => {
+    if (ProductsRV.data) {
+      res = ProductsRV.data?.map((item) => {
         return {
           value: item.prrv_id,
           label: item.prrv_nome,
@@ -49,12 +42,12 @@ export function useProductsPWA(idProduct: number) {
       })
     }
     return res
-  }, [ProductsRV])
+  }, [ProductsRV.data])
 
   const optionsProductsMax = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
-    if (ProductsMax) {
-      res = ProductsMax?.map((item) => {
+    if (ProductsMax.data) {
+      res = ProductsMax.data?.map((item) => {
         return {
           value: Number(item.id),
           label: item.nome,
@@ -62,12 +55,12 @@ export function useProductsPWA(idProduct: number) {
       })
     }
     return res
-  }, [ProductsMax])
+  }, [ProductsMax.data])
 
   const optionsCashback = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
-    if (CashbackPWA) {
-      res = CashbackPWA?.map((item) => {
+    if (CashbackPWA.data) {
+      res = CashbackPWA.data?.map((item) => {
         return {
           value: item.cash_id,
           label: item.cash_descricao,
@@ -75,13 +68,13 @@ export function useProductsPWA(idProduct: number) {
       })
     }
     return res
-  }, [CashbackPWA])
+  }, [CashbackPWA.data])
 
   const optionsProviders = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
 
-    if (ProvidersPWA) {
-      res = ProvidersPWA?.map((item) => {
+    if (ProvidersPWA.data) {
+      res = ProvidersPWA.data?.map((item) => {
         return {
           value: item.fopw_id,
           label: item.fopw_nome,
@@ -89,12 +82,12 @@ export function useProductsPWA(idProduct: number) {
       })
     }
     return res
-  }, [ProvidersPWA])
+  }, [ProvidersPWA.data])
 
   const optionsCategories = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
-    if (CategoriesPWA) {
-      res = CategoriesPWA?.map((item) => {
+    if (CategoriesPWA.data) {
+      res = CategoriesPWA.data?.map((item) => {
         return {
           value: item.pcpw_id,
           label: item.pcpw_descricao,
@@ -102,22 +95,22 @@ export function useProductsPWA(idProduct: number) {
       })
     }
     return res
-  }, [CategoriesPWA])
+  }, [CategoriesPWA.data])
 
   function Loading() {
     if (
-      isLoading ||
-      isFetching ||
-      isLoading2 ||
-      isFetching2 ||
-      isLoading3 ||
-      isFetching3 ||
-      isLoading4 ||
-      isFetching4 ||
-      isLoading5 ||
-      isFetching5 ||
-      isLoading6 ||
-      isFetching6
+      ProductsRV.isLoading ||
+      ProductsRV.isFetching ||
+      CashbackPWA.isLoading ||
+      CashbackPWA.isFetching ||
+      CategoriesPWA.isLoading ||
+      CategoriesPWA.isFetching ||
+      ProvidersPWA.isLoading ||
+      ProvidersPWA.isFetching ||
+      ProductsMax.isLoading ||
+      ProductsMax.isFetching ||
+      CategoriesOfProducts.isLoading ||
+      CategoriesOfProducts.isFetching
     ) {
       return true
     } else {
@@ -126,15 +119,16 @@ export function useProductsPWA(idProduct: number) {
   }
 
   return {
-    ProductsRV,
-    CashbackPWA,
-    CategoriesPWA,
-    refetchCategories,
-    ProvidersPWA,
-    ProductsMax,
-    refetchProductsMax,
-    CategoriesOfProducts,
-    isFetchedAfterMountCategoriesOfProducts,
+    ProductsRV: ProductsRV.data,
+    CashbackPWA: CashbackPWA.data,
+    CategoriesPWA: CategoriesPWA.data,
+    refetchCategories: CategoriesPWA.refetch,
+    ProvidersPWA: ProvidersPWA.data,
+    ProductsMax: ProductsMax.data,
+    refetchProductsMax: ProductsMax.refetch,
+    CategoriesOfProducts: CategoriesOfProducts.data,
+    isFetchedAfterMountCategoriesOfProducts:
+      CategoriesOfProducts.isFetchedAfterMount,
     optionsProductsRV,
     optionsProductsMax,
     optionsCashback,

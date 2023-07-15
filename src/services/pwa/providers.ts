@@ -12,53 +12,57 @@ import { AxiosError } from 'axios'
 export function usePWAProviders() {
   return useQuery({
     queryKey: ['PWAProviders'],
-    queryFn: async (): Promise<PWAProvidersProps[] | null> => {
-      try {
-        const res = await api.get('/pwa/providers')
-        const { data } = res.data
-
-        return haveData(data)
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alerta(clearCharacters(error.response?.data?.error))
-        } else {
-          console.error(error)
-        }
-        return null
-      }
-    },
+    queryFn: ListProvidersPWA,
   })
+}
+
+export async function ListProvidersPWA(): Promise<PWAProvidersProps[] | null> {
+  try {
+    const res = await api.get('/pwa/providers')
+    const { data } = res.data
+
+    return haveData(data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
 }
 
 export function usePWAProvidersOfCategories(id: number) {
   return useQuery({
     queryKey: ['PWAProvidersOfCategories'],
-    queryFn: async (): Promise<Category[] | null> => {
-      try {
-        if (!id) {
-          return null
-        }
-        const res = await api.get(
-          `/pwa/providers-prod-categories/provider/${id}`,
-        )
-
-        const { success, data } = res.data
-
-        if (success && haveData(data)) {
-          return data[0].categorias
-        }
-        return null
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alerta(clearCharacters(error.response?.data?.error))
-        } else {
-          console.error(error)
-        }
-        return null
-      }
-    },
+    queryFn: () => ListPWAProvidersOfCategories(id),
     cacheTime: Infinity,
   })
+}
+
+export async function ListPWAProvidersOfCategories(
+  id: number,
+): Promise<Category[] | null> {
+  try {
+    if (!id) {
+      return null
+    }
+    const res = await api.get(`/pwa/providers-prod-categories/provider/${id}`)
+
+    const { success, data } = res.data
+
+    if (success && haveData(data)) {
+      return data[0].categorias
+    }
+    return null
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
 }
 
 export async function addPWAProviders(data: PWAProvidersProps) {

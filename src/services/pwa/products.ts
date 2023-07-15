@@ -1,7 +1,6 @@
 import { alerta } from '../../components/System/Alert'
 
 import {
-  Categoryes,
   PWAProductsCategoriesProps,
   PWAProductsProps,
 } from '../../@types/pwa/products'
@@ -37,29 +36,31 @@ export function usePWAProducts() {
 export function usePWACategoriesOfProdutos(id: number) {
   return useQuery({
     queryKey: ['PWACategoriesOfProducts'],
-    queryFn: async (): Promise<Categoryes[] | null> => {
-      try {
-        if (!id) {
-          return null
-        }
-        const res = await api.get(`/pwa/products-prod-categories/product/${id}`)
-        const { data } = res.data
-
-        if (haveData(data)) {
-          return data[0].categorias
-        }
-        return null
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alerta(clearCharacters(error.response?.data?.error))
-        } else {
-          console.error(error)
-        }
-        return null
-      }
-    },
+    queryFn: () => ListPWACategoriesOfProducts(id),
     cacheTime: Infinity,
   })
+}
+
+export async function ListPWACategoriesOfProducts(id: number) {
+  try {
+    if (!id) {
+      return null
+    }
+    const res = await api.get(`/pwa/products-prod-categories/product/${id}`)
+    const { data } = res.data
+
+    if (haveData(data)) {
+      return data[0].categorias
+    }
+    return null
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
 }
 
 export async function addPWAProduct(data: PWAProductsProps) {
