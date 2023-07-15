@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
@@ -16,22 +16,14 @@ import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
-import {
-  addMaxProduct,
-  updateMaxProduct,
-  useMaxProducts,
-} from '../../../services/max/products'
-import { usePWACashback } from '../../../services/pwa/cashback'
-import { usePWACategories } from '../../../services/pwa/categories'
+import { addMaxProduct, updateMaxProduct } from '../../../services/max/products'
 import {
   addCategoriesInProduct,
   addPWAProduct,
   removeCategoriesInProduct,
   updatePWAProduct,
-  usePWACategoriesOfProdutos,
 } from '../../../services/pwa/products'
-import { usePWAProviders } from '../../../services/pwa/providers'
-import { useRVProducts } from '../../../services/rv/products'
+import { addPWAProviders } from '../../../services/pwa/providers'
 
 import { MaxProductsProps } from '../../../@types/max/products'
 import { PWAProductsProps } from '../../../@types/pwa/products'
@@ -45,6 +37,7 @@ import {
   getBase64,
   handleUploadImage,
 } from '../../../functions/general'
+import { useProductsPWA } from '../../../hooks/useProductsPWA'
 import { Container } from '../../../template/Container'
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
@@ -99,35 +92,20 @@ export default function UpdateProductPWA() {
   const router = useNavigate()
   const location = useLocation()
 
-  const { data: ProductsRV, isLoading, isFetching } = useRVProducts()
   const {
-    data: CashbackPWA,
-    isLoading: isLoading2,
-    isFetching: isFetching2,
-  } = usePWACashback()
-  const {
-    data: CategoriesPWA,
-    isLoading: isLoading3,
-    isFetching: isFetching3,
-    refetch: refetchCategories,
-  } = usePWACategories()
-  const {
-    data: ProvidersPWA,
-    isLoading: isLoading4,
-    isFetching: isFetching4,
-  } = usePWAProviders()
-  const {
-    data: ProductsMax,
-    isLoading: isLoading5,
-    isFetching: isFetching5,
-    refetch,
-  } = useMaxProducts()
-  const {
-    data: CategoriesOfProducts,
-    isLoading: isLoading6,
-    isFetching: isFetching6,
-    isFetchedAfterMount,
-  } = usePWACategoriesOfProdutos(location?.state?.prpw_id)
+    ProductsMax,
+    ProductsRV,
+    CategoriesOfProducts,
+    isFetchedAfterMountCategoriesOfProducts,
+    loading,
+    optionsCashback,
+    optionsCategories,
+    optionsProductsMax,
+    optionsProductsRV,
+    optionsProviders,
+    refetchCategories,
+    refetchProductsMax,
+  } = useProductsPWA(location?.state?.prpw_id)
 
   async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
@@ -155,6 +133,12 @@ export default function UpdateProductPWA() {
       data.prpw_imagem = await uploadImages(imageAnexed)
     } else {
       data.prpw_imagem = watch('prpw_imagem')
+    }
+
+    if (data.provider && Number(data.provider?.value) === 99999) {
+      const newProvider = getValues('providerAux')
+      const resNewProvider = await addPWAProviders(newProvider)
+      data.provider.value = resNewProvider.fopw_id
     }
 
     data.prpw_cash_id = Number(data.cash?.value)
@@ -219,7 +203,7 @@ export default function UpdateProductPWA() {
         status: '1',
       }
       const res = (await addMaxProduct(data)) as MaxProductsProps
-      refetch()
+      refetchProductsMax()
       if (res) {
         setValue(
           'productMax',
@@ -245,77 +229,10 @@ export default function UpdateProductPWA() {
     setLoading(false)
   }
 
-  const optionsProductsRV = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (ProductsRV) {
-      res = ProductsRV?.map((item) => {
-        return {
-          value: item.prrv_id,
-          label: item.prrv_nome,
-        }
-      })
-    }
-    return res
-  }, [ProductsRV])
-
-  const optionsProductsMax = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (ProductsMax) {
-      res = ProductsMax?.map((item) => {
-        return {
-          value: Number(item.id),
-          label: item.nome,
-        }
-      })
-    }
-    return res
-  }, [ProductsMax])
-
-  const optionsCashback = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (CashbackPWA) {
-      res = CashbackPWA?.map((item) => {
-        return {
-          value: item.cash_id,
-          label: item.cash_descricao,
-        }
-      })
-    }
-    return res
-  }, [CashbackPWA])
-
-  const optionsProviders = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-
-    if (ProvidersPWA) {
-      res = ProvidersPWA?.map((item) => {
-        return {
-          value: item.fopw_id,
-          label: item.fopw_nome,
-        }
-      })
-    }
-    return res
-  }, [ProvidersPWA])
-
-  const optionsCategories = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (CategoriesPWA) {
-      res = CategoriesPWA?.map((item) => {
-        return {
-          value: item.pcpw_id,
-          label: item.pcpw_descricao,
-        }
-      })
-    }
-    return res
-  }, [CategoriesPWA])
-
   useEffect(() => {
     const productRvSelected = watch('productRv')?.value
     if (productRvSelected) {
       const product = ProductsRV?.find((e) => e.prrv_id === productRvSelected)
-      console.log(product)
 
       const provider = optionsProviders?.find(
         (e) => e.value === product?.prrv_forv_id,
@@ -330,7 +247,7 @@ export default function UpdateProductPWA() {
         setValue('provider', provider)
       } else if (product?.prrv_forv_id) {
         setValue('provider', {
-          value: 999,
+          value: 99999,
           label: 'Cadastrar um novo automaticamente',
         })
         setValue('providerAux', {
@@ -342,7 +259,7 @@ export default function UpdateProductPWA() {
 
       if (product?.prrv_pcrv_id) {
         setValue('category', {
-          value: 999,
+          value: 99999,
           label: 'Cadastrar um novo automaticamente',
         })
         setValue('categoryAux', {
@@ -417,7 +334,7 @@ export default function UpdateProductPWA() {
         ) ?? null,
       )
 
-      if (isFetchedAfterMount) {
+      if (isFetchedAfterMountCategoriesOfProducts) {
         CategoriesOfProducts?.forEach((item) => {
           // @ts-expect-error
           setValue(`optionsCategories-${item.prpc_pcpw_id}`, true)
@@ -436,18 +353,7 @@ export default function UpdateProductPWA() {
 
   return (
     <Container>
-      {(isLoading ||
-        isFetching ||
-        isLoading2 ||
-        isFetching2 ||
-        isLoading3 ||
-        isFetching3 ||
-        isLoading4 ||
-        isFetching4 ||
-        isLoading5 ||
-        isFetching5 ||
-        isLoading6 ||
-        isFetching6) && <Loader />}
+      {loading() && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
