@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { FieldOnGrid } from '../../../components/FieldOnGrid'
@@ -23,7 +23,6 @@ export default function RVProducts() {
   const { setLoading } = useLoading()
 
   const router = useNavigate()
-  const gridRef = useRef(null)
 
   async function handleUploadProduct(data: RVProductsProps) {
     setLoading(true)
@@ -34,12 +33,7 @@ export default function RVProducts() {
   const [columnDefs] = useState<ColDef[]>([
     {
       field: '',
-      maxWidth: 70,
-      lockVisible: true,
-      headerCheckboxSelection: true,
-      checkboxSelection: true,
-      showDisabledCheckboxes: true,
-      headerCheckboxSelectionCurrentPageOnly: true,
+      maxWidth: 40,
       cellStyle: {
         textAlign: 'center',
         display: 'flex',
@@ -212,7 +206,6 @@ export default function RVProducts() {
 
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
-            ref={gridRef}
             rowData={data}
             columnDefs={columnDefs}
             animateRows={true}

@@ -52,6 +52,8 @@ export default function UpdateProduct() {
   async function handleUpdateProduct(data: RVProductsProps) {
     // @ts-expect-error
     data.prrv_pcrv_id = data.pcrv_id.value
+    // @ts-expect-error
+    data.prrv_forv_id = data.prrv_forv_id.value
 
     setLoading(true)
     const res = (await updateRVProduct(data)) as RVProductsProps
@@ -62,6 +64,7 @@ export default function UpdateProduct() {
       const productMax = MaxProducts?.find(
         (e) => Number(e.id) === Number(res.prrv_max_id),
       )
+
       await Promise.allSettled([
         productPWA && (await updatePWAProduct(productPWA)),
         productMax && (await updateMaxProduct(productMax)),
@@ -71,7 +74,7 @@ export default function UpdateProduct() {
     if (res) {
       alerta('Produto alterado com sucesso', 1)
     } else {
-      alerta('Erro ao atualizar o produto', 1)
+      alerta('Erro ao atualizar o produto')
     }
     setLoading(false)
   }

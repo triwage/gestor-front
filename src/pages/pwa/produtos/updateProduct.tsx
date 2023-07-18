@@ -17,6 +17,7 @@ import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
 import { addMaxProduct, updateMaxProduct } from '../../../services/max/products'
+import { addPWACategories } from '../../../services/pwa/categories'
 import {
   addCategoriesInProduct,
   addPWAProduct,
@@ -95,6 +96,8 @@ export default function UpdateProductPWA() {
   const {
     ProductsMax,
     ProductsRV,
+    CategoriesPWA,
+    ProvidersPWA,
     CategoriesOfProducts,
     isFetchedAfterMountCategoriesOfProducts,
     loading,
@@ -135,10 +138,16 @@ export default function UpdateProductPWA() {
       data.prpw_imagem = watch('prpw_imagem')
     }
 
-    if (data.provider && Number(data.provider?.value) === 99999) {
+    if (data.provider && Number(data.provider?.value) === -1) {
       const newProvider = getValues('providerAux')
       const resNewProvider = await addPWAProviders(newProvider)
       data.provider.value = resNewProvider.fopw_id
+    }
+
+    if (data.category && Number(data.category?.value) === -1) {
+      const newCategory = getValues('categoryAux')
+      const resNewProvider = await addPWACategories(newCategory)
+      data.category.value = resNewProvider.fopw_id
     }
 
     data.prpw_cash_id = Number(data.cash?.value)
@@ -147,7 +156,9 @@ export default function UpdateProductPWA() {
     data.prpw_pcpw_id = Number(data.category?.value)
     data.prpw_fopw_id = Number(data.provider?.value)
     let res = null as PWAProductsProps | null
+    let message = 'Produto adicionado com sucesso'
     if (location.state) {
+      message = 'Produto atualizado com sucesso'
       res = await updatePWAProduct(data)
     } else {
       res = await addPWAProduct(data)
@@ -173,7 +184,7 @@ export default function UpdateProductPWA() {
         }
       })
 
-      alerta('Produto adicionado com sucesso', 1)
+      alerta(message, 1)
       setTimeout(() => {
         router('/pwa/produtos')
       }, 400)
@@ -229,14 +240,22 @@ export default function UpdateProductPWA() {
     setLoading(false)
   }
 
-  useEffect(() => {
+  function handleChangeProductRV(e: SelectProps) {
+    setValue('productRv', e)
     const productRvSelected = watch('productRv')?.value
     if (productRvSelected) {
       const product = ProductsRV?.find((e) => e.prrv_id === productRvSelected)
 
-      const provider = optionsProviders?.find(
-        (e) => e.value === product?.prrv_forv_id,
-      )
+      let provider = ProvidersPWA?.find(
+        (e) => e.fopw_forv_id === product?.prrv_forv_id,
+      ) as any
+      provider = optionsProviders?.find((e) => e.value === provider?.fopw_id)
+
+      let category = CategoriesPWA?.find(
+        (e) => e.pcpw_rv_id === product?.prrv_pcrv_id,
+      ) as any
+
+      category = optionsCategories?.find((e) => e.value === category?.pcpw_id)
       const productOnMax = optionsProductsMax?.find(
         (e) => e.value === product?.prrv_max_id,
       )
@@ -247,7 +266,7 @@ export default function UpdateProductPWA() {
         setValue('provider', provider)
       } else if (product?.prrv_forv_id) {
         setValue('provider', {
-          value: 99999,
+          value: -1,
           label: 'Cadastrar um novo automaticamente',
         })
         setValue('providerAux', {
@@ -257,9 +276,11 @@ export default function UpdateProductPWA() {
         })
       }
 
-      if (product?.prrv_pcrv_id) {
+      if (category) {
+        setValue('category', category)
+      } else if (product?.prrv_pcrv_id) {
         setValue('category', {
-          value: 99999,
+          value: -1,
           label: 'Cadastrar um novo automaticamente',
         })
         setValue('categoryAux', {
@@ -271,7 +292,7 @@ export default function UpdateProductPWA() {
       setValue('prpw_valor', FormataValorMonetario(product?.prrv_valor, false))
       setValue('prpw_ativo', product?.prrv_ativo || false)
     }
-  }, [watch('productRv')])
+  }
 
   useEffect(() => {
     const checkTypeof = {
@@ -379,6 +400,7 @@ export default function UpdateProductPWA() {
                 label="Produto RV"
                 name="productRv"
                 options={optionsProductsRV}
+                onChange={(e: any) => handleChangeProductRV(e)}
               />
               <Input name="prpw_descricao" label="Nome" />
             </div>

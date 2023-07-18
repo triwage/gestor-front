@@ -11,6 +11,10 @@ import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { addMaxProduct, updateMaxProduct } from '../../../services/max/products'
 import {
+  addPWACategories,
+  usePWACategories,
+} from '../../../services/pwa/categories'
+import {
   addPWAProduct,
   updatePWAProduct,
   usePWAProducts,
@@ -22,6 +26,7 @@ import {
 import { updateRVProduct, useRVProducts } from '../../../services/rv/products'
 
 import { MaxProductsProps } from '../../../@types/max/products'
+import { PWACategoriesProps } from '../../../@types/pwa/categories'
 import { PWAProductsProps } from '../../../@types/pwa/products'
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
 import { RVProductsProps } from '../../../@types/rv/products'
@@ -48,6 +53,11 @@ export default function AddProduct() {
     isLoading: isLoading2,
     isFetching: isFetching2,
   } = usePWAProviders()
+  const {
+    data: CategoriesPWA,
+    isLoading: isLoading3,
+    isFetching: isFetching3,
+  } = usePWACategories()
 
   const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
@@ -233,10 +243,10 @@ export default function AddProduct() {
 
         const productMax = {} as MaxProductsProps
         productMax.status = '1'
-        productMax.preco = FormataValorMonetario(
-          item.prrv_valor,
-          false,
-        ).replace(',', '.')
+        productMax.preco = String(
+          formataMoedaPFloat(FormataValorMonetario(item.prrv_valor, false)),
+        )
+
         productMax.nome = item.prrv_nome
         productMax.id = item.prrv_max_id ? String(item.prrv_max_id) : null // id do produto max
 
@@ -256,6 +266,10 @@ export default function AddProduct() {
           (e) => e.fopw_id === item?.prrv_forv_id,
         )
 
+        const category = CategoriesPWA?.find(
+          (e) => e.pcpw_rv_id === product?.prpw_pcpw_id,
+        )
+
         if (product && provider) {
           if (product?.prpw_fopw_id !== provider?.fopw_id) {
             productApp.prpw_fopw_id = provider?.fopw_id
@@ -269,6 +283,21 @@ export default function AddProduct() {
           const resNewProvider = await addPWAProviders(dataProvider)
 
           productApp.prpw_fopw_id = resNewProvider?.fopw_id
+        }
+
+        if (product && category) {
+          if (product?.prpw_pcpw_id !== category?.pcpw_id) {
+            productApp.prpw_pcpw_id = category?.pcpw_id
+          }
+        } else if (!category) {
+          const dataCategory = {} as PWACategoriesProps
+          dataCategory.pcpw_ativo = true
+          dataCategory.pcpw_prrv_id = item.prrv_id
+          dataCategory.pcpw_descricao = item.pcrv_kind
+
+          const resNewCategory = await addPWACategories(dataCategory)
+
+          productApp.prpw_pcpw_id = resNewCategory?.pcpw_id
         }
 
         productApp.prpw_ativo = true
@@ -287,24 +316,33 @@ export default function AddProduct() {
           resProductApp = await addPWAProduct(productApp)
         }
 
+        item.prrv_valor = String(
+          formataMoedaPFloat(FormataValorMonetario(item.prrv_valor, false)),
+        )
         item.prpw_id = resProductApp?.prpw_id
         item.prrv_max_id = res?.id
         item.prrv_ativo = true
+        console.log(item)
         await updateRVProduct(item)
       })
 
       await Promise.allSettled(promise)
       setCurrentSync(null)
       alerta('Sincronização finalizada', 1)
-      setTimeout(() => {
-        router(0)
-      }, 400)
+      // setTimeout(() => {
+      //   router(0)
+      // }, 400)
     }
   }
 
   return (
     <Container>
-      {(isLoading || isFetching || isLoading2 || isFetching2) && <Loader />}
+      {(isLoading ||
+        isFetching ||
+        isLoading2 ||
+        isFetching2 ||
+        isLoading3 ||
+        isFetching3) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">

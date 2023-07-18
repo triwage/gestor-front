@@ -1,6 +1,7 @@
 import { alerta } from '../../components/System/Alert'
 
 import {
+  Categoryes,
   PWAProductsCategoriesProps,
   PWAProductsProps,
 } from '../../@types/pwa/products'
@@ -41,7 +42,9 @@ export function usePWACategoriesOfProdutos(id: number) {
   })
 }
 
-export async function ListPWACategoriesOfProducts(id: number) {
+export async function ListPWACategoriesOfProducts(
+  id: number,
+): Promise<Categoryes[] | null> {
   try {
     if (!id) {
       return null

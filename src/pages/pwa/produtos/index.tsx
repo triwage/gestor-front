@@ -54,6 +54,14 @@ export default function PWAProducts() {
       },
     },
     {
+      field: 'prrv_nome',
+      headerName: 'Produto RV',
+      flex: 1,
+      width: 120,
+      sortable: true,
+      filter: true,
+    },
+    {
       field: 'prpw_descricao',
       headerName: 'Nome',
       flex: 1,
@@ -114,6 +122,26 @@ export default function PWAProducts() {
         }
       },
     },
+    {
+      field: 'prpw_max_id',
+      headerName: 'Max',
+      maxWidth: 80,
+      sortable: true,
+      cellStyle: (params) => {
+        if (params.value) {
+          return { color: '#fff', backgroundColor: '#15803d' }
+        } else {
+          return { color: '#fff', backgroundColor: '#ed3241' }
+        }
+      },
+      cellRenderer: (params: { value: string }) => {
+        if (params.value) {
+          return 'Ativo'
+        } else {
+          return 'Inativo'
+        }
+      },
+    },
   ])
 
   return (
@@ -129,7 +157,7 @@ export default function PWAProducts() {
                 className="bg-purple text-white"
                 onClick={() => router('addProduct')}
               >
-                <ArrowsDownUp size={18} /> Sincronizar produto
+                <ArrowsDownUp size={18} /> Sincronizar produtos
               </Button>
             </div>
             <div className="flex items-center">
