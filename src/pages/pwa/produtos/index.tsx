@@ -68,6 +68,7 @@ export default function PWAProducts() {
       width: 120,
       sortable: true,
       filter: true,
+      sort: 'asc',
     },
     {
       field: 'prpw_valor',

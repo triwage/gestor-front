@@ -50,6 +50,8 @@ export async function updateRVProduct(data: RVProductsProps) {
         : null,
       prrv_area_codes: data.prrv_area_codes,
       prrv_ativo: data.prrv_ativo,
+      prrv_max_id: data.prrv_max_id,
+      prpw_id: data.prpw_id,
     }
 
     const res = await api.put('/rv/products', payload)

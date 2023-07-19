@@ -78,7 +78,6 @@ export default function AddProduct() {
     {
       field: 'prrv_id',
       headerName: 'ID',
-      sort: 'asc',
       maxWidth: 60,
     },
     {
@@ -88,6 +87,7 @@ export default function AddProduct() {
       width: 120,
       sortable: true,
       filter: true,
+      sort: 'asc',
     },
     {
       field: 'forv_provider',
@@ -243,8 +243,8 @@ export default function AddProduct() {
 
         const productMax = {} as MaxProductsProps
         productMax.status = '1'
-        productMax.preco = String(
-          formataMoedaPFloat(FormataValorMonetario(item.prrv_valor, false)),
+        productMax.preco = formataMoedaPFloat(
+          FormataValorMonetario(item.prrv_valor, false),
         )
 
         productMax.nome = item.prrv_nome
@@ -307,7 +307,7 @@ export default function AddProduct() {
         productApp.prpw_prrv_id = item.prrv_id
         productApp.prpw_descricao = item.prrv_nome
         productApp.prpw_id = product?.prpw_id ?? null
-        productApp.prpw_max_id = res?.id
+        productApp.prpw_max_id = res
 
         let resProductApp = null
         if (productApp.prpw_id) {
@@ -316,22 +316,22 @@ export default function AddProduct() {
           resProductApp = await addPWAProduct(productApp)
         }
 
-        item.prrv_valor = String(
-          formataMoedaPFloat(FormataValorMonetario(item.prrv_valor, false)),
+        item.prrv_valor = formataMoedaPFloat(
+          FormataValorMonetario(item.prrv_valor, false),
         )
         item.prpw_id = resProductApp?.prpw_id
-        item.prrv_max_id = res?.id
+        item.prrv_max_id = res
         item.prrv_ativo = true
-        console.log(item)
+
         await updateRVProduct(item)
       })
 
       await Promise.allSettled(promise)
       setCurrentSync(null)
       alerta('Sincronização finalizada', 1)
-      // setTimeout(() => {
-      //   router(0)
-      // }, 400)
+      setTimeout(() => {
+        router(0)
+      }, 400)
     }
   }
 

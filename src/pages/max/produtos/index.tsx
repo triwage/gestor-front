@@ -68,7 +68,6 @@ export default function MaxProducts() {
     {
       field: 'id',
       headerName: 'ID',
-      sort: 'asc',
       maxWidth: 80,
     },
     {
@@ -78,6 +77,7 @@ export default function MaxProducts() {
       width: 120,
       sortable: true,
       filter: true,
+      sort: 'asc',
     },
     {
       field: 'descricao',

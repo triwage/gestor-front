@@ -50,26 +50,31 @@ export default function UpdateProduct() {
   const location = useLocation()
 
   async function handleUpdateProduct(data: RVProductsProps) {
+    setLoading(true)
     // @ts-expect-error
     data.prrv_pcrv_id = data.pcrv_id.value
     // @ts-expect-error
     data.prrv_forv_id = data.prrv_forv_id.value
-
-    setLoading(true)
-    const res = (await updateRVProduct(data)) as RVProductsProps
-
-    if (!data.prrv_ativo && res) {
-      const productPWA = PWAProducts?.find((e) => e.prpw_id === res.prpw_id)
+    if (!data.prrv_ativo) {
+      const productPWA = PWAProducts?.find((e) => e.prpw_id === data?.prpw_id)
 
       const productMax = MaxProducts?.find(
-        (e) => Number(e.id) === Number(res.prrv_max_id),
+        (e) => Number(e.id) === Number(data?.prrv_max_id),
       )
 
-      await Promise.allSettled([
-        productPWA && (await updatePWAProduct(productPWA)),
-        productMax && (await updateMaxProduct(productMax)),
-      ])
+      if (productPWA) {
+        productPWA.prpw_ativo = false
+        await updatePWAProduct(productPWA)
+      }
+      if (productMax) {
+        productMax.status = '0'
+        await updateMaxProduct(productMax)
+      }
+      data.prrv_max_id = null
+      data.prpw_id = null
     }
+
+    const res = await updateRVProduct(data)
 
     if (res) {
       alerta('Produto alterado com sucesso', 1)

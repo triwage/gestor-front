@@ -32,7 +32,10 @@ import { SelectProps } from '../../../@types/select'
 
 import useConfirm from '../../../contexts/ConfirmContext'
 import useLoading from '../../../contexts/LoadingContext'
-import { FormataValorMonetario } from '../../../functions/currency'
+import {
+  FormataValorMonetario,
+  formataMoedaPFloat,
+} from '../../../functions/currency'
 import {
   checkIfImage,
   getBase64,
@@ -121,7 +124,9 @@ export default function UpdateProductPWA() {
       if (productMax) {
         productMax.status = prpw_ativo ? data?.prpw_ativo : productMax.status
         productMax.preco = prpw_valor
-          ? FormataValorMonetario(data?.prpw_valor, false).replace(',', '.')
+          ? formataMoedaPFloat(
+              FormataValorMonetario(data?.prpw_valor, false).replace(',', '.'),
+            )
           : productMax.preco
         productMax.nome =
           prpw_descricao && data?.prpw_descricao

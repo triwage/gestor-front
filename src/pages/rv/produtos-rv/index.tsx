@@ -64,7 +64,6 @@ export default function RVProducts() {
     {
       field: 'prrv_id',
       headerName: 'ID',
-      sort: 'asc',
       maxWidth: 60,
     },
     {
@@ -74,6 +73,7 @@ export default function RVProducts() {
       width: 120,
       sortable: true,
       filter: true,
+      sort: 'asc',
     },
     {
       field: 'forv_provider',
