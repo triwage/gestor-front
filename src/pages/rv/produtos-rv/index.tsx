@@ -70,7 +70,7 @@ export default function RVProducts() {
       field: 'prrv_nome',
       headerName: 'Nome',
       flex: 1,
-      width: 120,
+      minWidth: 120,
       sortable: true,
       filter: true,
       sort: 'asc',
@@ -79,6 +79,7 @@ export default function RVProducts() {
       field: 'forv_provider',
       headerName: 'Fornecedor',
       flex: 1,
+      minWidth: 120,
       filter: true,
       valueSetter: (params) => {
         const newVal = params.newValue
@@ -92,7 +93,7 @@ export default function RVProducts() {
     {
       field: 'pcrv_kind',
       headerName: 'Tipo',
-      maxWidth: 150,
+      maxWidth: 120,
       sortable: true,
       filter: true,
     },

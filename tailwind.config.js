@@ -98,6 +98,10 @@ export default {
         sans: 'var(--font-inter)',
       },
       screens: {
+        'sm-max': { max: '677px' },
+        // => @media (max-width: 677px) { ... }
+        sm: { min: '678px' },
+        // => @media (min-width: 640px and max-width: 768px) { ... }
         md: { min: '968px' },
         // => @media (min-width: 968px) { ... }
         'md-max': { max: '967px' },

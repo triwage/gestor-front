@@ -33,7 +33,7 @@ export function useProviderPWA(idProvider: number) {
       })
     }
     return res
-  }, [ProvidersRV])
+  }, [ProvidersRV.data])
 
   const optionsCashback = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
@@ -46,7 +46,7 @@ export function useProviderPWA(idProvider: number) {
       })
     }
     return res
-  }, [CashbackPWA])
+  }, [CashbackPWA.data])
 
   const optionsCategories = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
@@ -59,7 +59,7 @@ export function useProviderPWA(idProvider: number) {
       })
     }
     return res
-  }, [CategoriesPWA])
+  }, [CategoriesPWA.data])
 
   function Loading() {
     if (

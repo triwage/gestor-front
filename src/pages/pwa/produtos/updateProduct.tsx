@@ -113,6 +113,7 @@ export default function UpdateProductPWA() {
     refetchCategories,
     refetchProviders,
     refetchProductsMax,
+    ProvidersRV,
   } = useProductsPWA(location?.state?.prpw_id)
 
   async function handleUpdateProductMax(data: Inputs) {
@@ -130,7 +131,7 @@ export default function UpdateProductPWA() {
       if (productMax) {
         productMax.status = prpw_ativo ? data?.prpw_ativo : productMax.status
         productMax.preco = prpw_valor
-          ? formataMoedaPFloat(FormataValorMonetario(data?.prpw_valor, false))
+          ? formataMoedaPFloat(data?.prpw_valor)
           : formataMoedaPFloat(FormataValorMonetario(productMax.preco, false))
         productMax.nome =
           prpw_descricao && data?.prpw_descricao
@@ -249,7 +250,9 @@ export default function UpdateProductPWA() {
       setValue('prpw_imagem', imageFinal)
       setValue('imagem_aux', res)
     }
-    const inputElem = document.getElementById('newFile') as HTMLInputElement
+    const inputElem = document.getElementById(
+      'imageProductFile',
+    ) as HTMLInputElement
     if (inputElem) {
       inputElem.value = ''
     }
@@ -272,9 +275,11 @@ export default function UpdateProductPWA() {
       ) as any
 
       category = optionsCategories?.find((e) => e.value === category?.pcpw_id)
+
       const productOnMax = optionsProductsMax?.find(
         (e) => e.value === product?.prrv_max_id,
       )
+
       if (productOnMax) {
         setValue('productMax', productOnMax)
       } else if (product?.prrv_max_id) {
@@ -298,9 +303,17 @@ export default function UpdateProductPWA() {
           value: -1,
           label: 'Cadastrar um novo automaticamente',
         })
+        const dataNewProvider = ProvidersRV?.find(
+          (e) => e.forv_id === product?.prrv_forv_id,
+        )
+
         setValue('providerAux', {
-          fopw_nome: product.forv_provider,
-          fopw_forv_id: product?.prrv_forv_id,
+          fopw_nome: dataNewProvider?.forv_provider,
+          fopw_forv_id: dataNewProvider?.forv_id,
+          fopw_descricao: dataNewProvider?.forv_descricao,
+          fopw_termos_condicoes: dataNewProvider?.forv_termos_condicoes,
+          fopw_instrucoes: dataNewProvider?.forv_instrucoes,
+          fopw_imagem: dataNewProvider?.forv_logo,
           fopw_ativo: true,
         })
       }
@@ -314,6 +327,7 @@ export default function UpdateProductPWA() {
         })
         setValue('categoryAux', {
           pcpw_descricao: product.pcrv_kind,
+          pcpw_rv_id: product.prrv_pcrv_id,
           pcpw_ativo: true,
         })
       }
@@ -360,6 +374,7 @@ export default function UpdateProductPWA() {
           (e) => e.value === location.state.prpw_prrv_id,
         ) ?? null,
       )
+
       setValue(
         'productMax',
         optionsProductsMax?.find(
@@ -558,7 +573,7 @@ export default function UpdateProductPWA() {
                 )}
                 <div>
                   <label
-                    htmlFor="newFile"
+                    htmlFor="imageProductFile"
                     className="flex w-max cursor-pointer flex-col"
                   >
                     <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
@@ -570,7 +585,7 @@ export default function UpdateProductPWA() {
                   </label>
                   <input
                     className="hidden"
-                    id="newFile"
+                    id="imageProductFile"
                     type="file"
                     accept="image/*"
                     onChange={getImage}
@@ -594,18 +609,30 @@ export default function UpdateProductPWA() {
         open={isOpenForm}
         closeDialog={() => setIsOpenForm(false)}
         optionsCashback={optionsCashback}
-        onSuccess={() => {
+        onSuccess={(res) => {
           setIsOpenForm(false)
           refetchCategories()
+          if (res) {
+            setValue('category', {
+              value: res?.pcpw_id,
+              label: res?.pcpw_descricao,
+            })
+          }
         }}
       />
       <FormProviderPWA
         optionsCashback={optionsCashback}
         open={isOpenFormProvider}
         closeDialog={() => setIsOpenFormProvider(false)}
-        onSuccess={() => {
+        onSuccess={(res) => {
           setIsOpenFormProvider(false)
           refetchProviders()
+          if (res) {
+            setValue('provider', {
+              value: res?.fopw_id,
+              label: res?.fopw_nome,
+            })
+          }
         }}
       />
     </Container>

@@ -25,16 +25,16 @@ export async function ListMaxProducts(
   try {
     let res = null
 
-    if (currentStatus === 0) {
+    if (currentStatus === 1) {
       res = await api.get('/maxnivel/products', {
         params: {
-          status: currentStatus,
+          status: 1,
         },
       })
     } else {
       res = await api.get('/maxnivel/products', {
         params: {
-          status: 1,
+          status: 0,
         },
       })
     }
@@ -94,7 +94,11 @@ export async function updateMaxProduct(data: MaxProductsProps) {
     const { success, data: resData } = res.data
 
     if (success) {
-      return resData
+      if (haveData(resData)) {
+        return resData
+      } else {
+        return true
+      }
     } else {
       return false
     }

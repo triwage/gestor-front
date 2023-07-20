@@ -6,6 +6,7 @@ import { ListCategoriesPWA } from '../services/pwa/categories'
 import { ListPWACategoriesOfProducts } from '../services/pwa/products'
 import { ListProvidersPWA } from '../services/pwa/providers'
 import { ListProductsRV } from '../services/rv/products'
+import { ListProvidersRV } from '../services/rv/providers'
 
 import { useQueries } from '@tanstack/react-query'
 
@@ -17,17 +18,19 @@ export function useProductsPWA(idProduct: number) {
     ProvidersPWA,
     ProductsMax,
     CategoriesOfProducts,
+    ProvidersRV,
   ] = useQueries({
     queries: [
       { queryKey: ['RVProducts'], queryFn: ListProductsRV },
       { queryKey: ['PWACashback'], queryFn: ListCashback },
       { queryKey: ['PWACategories'], queryFn: ListCategoriesPWA },
       { queryKey: ['PWAProviders'], queryFn: ListProvidersPWA },
-      { queryKey: ['MaxProducts', -1], queryFn: () => ListMaxProducts(-1) },
+      { queryKey: ['MaxProducts', 1], queryFn: () => ListMaxProducts(1) },
       {
         queryKey: ['PWACategoriesOfProducts'],
         queryFn: () => ListPWACategoriesOfProducts(idProduct),
       },
+      { queryKey: ['RVProviders'], queryFn: ListProvidersRV },
     ],
   })
 
@@ -110,7 +113,9 @@ export function useProductsPWA(idProduct: number) {
       ProductsMax.isLoading ||
       ProductsMax.isFetching ||
       CategoriesOfProducts.isLoading ||
-      CategoriesOfProducts.isFetching
+      CategoriesOfProducts.isFetching ||
+      ProvidersRV.isLoading ||
+      ProvidersRV.isFetching
     ) {
       return true
     } else {
@@ -125,6 +130,7 @@ export function useProductsPWA(idProduct: number) {
     refetchCategories: CategoriesPWA.refetch,
     refetchProviders: ProvidersPWA.refetch,
     ProvidersPWA: ProvidersPWA.data,
+    ProvidersRV: ProvidersRV.data,
     ProductsMax: ProductsMax.data,
     refetchProductsMax: ProductsMax.refetch,
     CategoriesOfProducts: CategoriesOfProducts.data,

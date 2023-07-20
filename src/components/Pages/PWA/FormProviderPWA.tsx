@@ -33,7 +33,7 @@ interface FormProviderProps {
   open: boolean
   closeDialog: () => void
   optionsCashback: OptionsSelectProps[]
-  onSuccess: () => void
+  onSuccess: (res?: PWAProvidersProps | null) => void
 }
 
 export function FormProviderPWA({
@@ -76,11 +76,11 @@ export function FormProviderPWA({
     data.fopw_forv_id = Number(data.providerRv?.value)
     data.fopw_cash_id = Number(data.cash?.value)
 
-    await addPWAProviders(data)
+    const res = await addPWAProviders(data)
 
     alerta('Fornecedor adicionado com sucesso', 1)
     setLoading(false)
-    onSuccess()
+    onSuccess(res)
   }
 
   async function getImageProvider(event: ChangeEvent<HTMLInputElement>) {
@@ -90,7 +90,9 @@ export function FormProviderPWA({
       setValue('fopw_imagem', imageFinal)
       setValue('imagem_aux', res)
     }
-    const inputElem = document.getElementById('newFile') as HTMLInputElement
+    const inputElem = document.getElementById(
+      'newFileProviderModal',
+    ) as HTMLInputElement
     if (inputElem) {
       inputElem.value = ''
     }
@@ -162,7 +164,7 @@ export function FormProviderPWA({
               )}
               <div>
                 <label
-                  htmlFor="newFile"
+                  htmlFor="newFileProviderModal"
                   className="flex w-max cursor-pointer flex-col"
                 >
                   <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
@@ -172,7 +174,7 @@ export function FormProviderPWA({
                 </label>
                 <input
                   className="hidden"
-                  id="newFile"
+                  id="newFileProviderModal"
                   type="file"
                   accept="image/*"
                   onChange={getImageProvider}

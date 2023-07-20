@@ -24,6 +24,7 @@ import {
   usePWACategoriesOfProviders,
 } from '../../../services/pwa/categories'
 import { usePWAProviders } from '../../../services/pwa/providers'
+import { useRVCategories } from '../../../services/rv/categories'
 
 import { PWACategoriesProps } from '../../../@types/pwa/categories'
 import { SelectProps } from '../../../@types/select'
@@ -46,6 +47,7 @@ import clsx from 'clsx'
 
 interface Inputs extends PWACategoriesProps {
   cash: SelectProps | null
+  categoryRv: SelectProps | null
   imagem_aux: File
 }
 
@@ -71,6 +73,11 @@ export default function UpdateCategoryPWA() {
     isFetching: isFetching3,
     isFetchedAfterMount,
   } = usePWACategoriesOfProviders(location?.state?.pcpw_id)
+  const {
+    data: CategoriesRV,
+    isLoading: isLoading4,
+    isFetching: isFetching4,
+  } = useRVCategories()
 
   const { setLoading } = useLoading()
 
@@ -84,6 +91,7 @@ export default function UpdateCategoryPWA() {
     }
 
     data.pcpw_cash_id = Number(data.cash?.value)
+    data.pcpw_rv_id = Number(data.categoryRv?.value)
     let message = 'Categoria criada com sucesso'
     let res = null as PWACategoriesProps | null
     if (location.state) {
@@ -144,6 +152,20 @@ export default function UpdateCategoryPWA() {
     return res
   }, [ProvidersPWA])
 
+  const optionsCategoriesRV = useMemo(() => {
+    let res = [] as Array<{ value: number; label: string }>
+
+    if (CategoriesRV) {
+      res = CategoriesRV?.map((item) => {
+        return {
+          value: item.pcrv_id,
+          label: item.pcrv_kind,
+        }
+      })
+    }
+    return res
+  }, [CategoriesRV])
+
   const optionsCashback = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
     if (CashbackPWA) {
@@ -197,7 +219,9 @@ export default function UpdateCategoryPWA() {
         isLoading2 ||
         isFetching2 ||
         isLoading3 ||
-        isFetching3) && <Loader />}
+        isFetching3 ||
+        isLoading4 ||
+        isFetching4) && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -221,20 +245,33 @@ export default function UpdateCategoryPWA() {
               <Input name="pcpw_descricao" label="Nome" />
               <Select
                 control={control}
+                label="Categoria da RV"
+                name="categoryRv"
+                options={optionsCategoriesRV}
+              />
+            </div>
+            <div className="grid grid-cols-2 items-center gap-2">
+              <Select
+                control={control}
                 label="Cashback"
                 name="cash"
                 options={optionsCashback}
               />
+
+              <Switch name="pcpw_ativo" label="Ativo" />
             </div>
 
             <div className="grid grid-cols-2 items-start gap-2">
               <div className="flex flex-col gap-2">
-                <div className="grid grid-cols-3 items-center gap-2">
+                <div className="flex justify-between gap-2">
                   <TextAction className="col-span-2 text-sm font-medium text-black dark:text-white">
                     Fornecedores vínculados a essa categoria
                   </TextAction>
                   <ButtonText onClick={() => setIsOpenForm(true)} type="button">
-                    Adicionar fornecedor <PlusSquare size={20} weight="fill" />
+                    Adicionar fornecedor{' '}
+                    <Icon>
+                      <PlusSquare size={20} weight="fill" />
+                    </Icon>
                   </ButtonText>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -269,8 +306,6 @@ export default function UpdateCategoryPWA() {
                   ))}
                 </div>
               </div>
-
-              <Switch name="pcpw_ativo" label="Ativo" />
             </div>
             <div className="flex gap-2">
               <div className="flex items-end gap-4">

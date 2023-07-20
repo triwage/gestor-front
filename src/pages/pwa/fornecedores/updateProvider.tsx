@@ -217,14 +217,17 @@ export default function UpdateProviderPWA() {
                 rows={8}
               />
             </div>
-            <div className="grid grid-cols-2 items-center gap-2">
+            <div className="grid grid-cols-2 items-start gap-2">
               <div className="flex flex-col gap-2">
-                <div className="grid grid-cols-3 items-center gap-2">
+                <div className="flex justify-between gap-2">
                   <TextAction className="col-span-2 text-sm font-medium text-black dark:text-white">
                     Categorias vínculadas a esse fornecedor
                   </TextAction>
                   <ButtonText onClick={() => setIsOpenForm(true)} type="button">
-                    Adicionar categoria <PlusSquare size={20} weight="fill" />
+                    Adicionar categoria{' '}
+                    <Icon>
+                      <PlusSquare size={20} weight="fill" />
+                    </Icon>
                   </ButtonText>
                 </div>
                 <div className="flex flex-wrap gap-2">

@@ -24,6 +24,7 @@ import {
   usePWAProviders,
 } from '../../../services/pwa/providers'
 import { updateRVProduct, useRVProducts } from '../../../services/rv/products'
+import { useRVProviders } from '../../../services/rv/providers'
 
 import { MaxProductsProps } from '../../../@types/max/products'
 import { PWACategoriesProps } from '../../../@types/pwa/categories'
@@ -58,6 +59,11 @@ export default function AddProduct() {
     isLoading: isLoading3,
     isFetching: isFetching3,
   } = usePWACategories()
+  const {
+    data: ProvidersRV,
+    isLoading: isLoading4,
+    isFetching: isFetching4,
+  } = useRVProviders()
 
   const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
@@ -84,7 +90,7 @@ export default function AddProduct() {
       field: 'prrv_nome',
       headerName: 'Nome',
       flex: 1,
-      width: 120,
+      minWidth: 120,
       sortable: true,
       filter: true,
       sort: 'asc',
@@ -93,6 +99,7 @@ export default function AddProduct() {
       field: 'forv_provider',
       headerName: 'Fornecedor',
       flex: 1,
+      minWidth: 120,
       filter: true,
       valueSetter: (params) => {
         const newVal = params.newValue
@@ -106,7 +113,7 @@ export default function AddProduct() {
     {
       field: 'pcrv_kind',
       headerName: 'Tipo',
-      maxWidth: 150,
+      maxWidth: 130,
       sortable: true,
       filter: true,
     },
@@ -263,41 +270,57 @@ export default function AddProduct() {
         const productApp = product || ({} as PWAProductsProps)
 
         const provider = ProvidersPWA?.find(
-          (e) => e.fopw_id === item?.prrv_forv_id,
+          (e) => e.fopw_id === product?.prpw_fopw_id,
         )
 
         const category = CategoriesPWA?.find(
           (e) => e.pcpw_rv_id === product?.prpw_pcpw_id,
         )
 
-        if (product && provider) {
-          if (product?.prpw_fopw_id !== provider?.fopw_id) {
-            productApp.prpw_fopw_id = provider?.fopw_id
-          }
-        } else if (!provider) {
+        if (!provider) {
           const dataProvider = {} as PWAProvidersProps
-          dataProvider.fopw_ativo = true
-          dataProvider.fopw_forv_id = item.prrv_forv_id
-          dataProvider.fopw_nome = item.forv_provider
+          const dataNewProvider = ProvidersRV?.find(
+            (e) => e.forv_id === item?.prrv_forv_id,
+          )
+          const checkExistProvider = ProvidersPWA?.find(
+            (e) => e.fopw_forv_id === item?.prrv_forv_id,
+          )
 
-          const resNewProvider = await addPWAProviders(dataProvider)
+          if (dataNewProvider && !checkExistProvider) {
+            dataProvider.fopw_nome = dataNewProvider?.forv_provider
+            dataProvider.fopw_forv_id = dataNewProvider?.forv_id
+            dataProvider.fopw_descricao = dataNewProvider?.forv_descricao
+            dataProvider.fopw_termos_condicoes =
+              dataNewProvider?.forv_termos_condicoes
+            dataProvider.fopw_instrucoes = dataNewProvider?.forv_instrucoes
+            dataProvider.fopw_imagem = dataNewProvider?.forv_logo
+            dataProvider.fopw_ativo = true
 
-          productApp.prpw_fopw_id = resNewProvider?.fopw_id
+            const resNewProvider = await addPWAProviders(dataProvider)
+
+            productApp.prpw_fopw_id = resNewProvider?.fopw_id
+          } else if (checkExistProvider) {
+            productApp.prpw_fopw_id = checkExistProvider?.fopw_id
+          }
         }
 
-        if (product && category) {
-          if (product?.prpw_pcpw_id !== category?.pcpw_id) {
-            productApp.prpw_pcpw_id = category?.pcpw_id
-          }
-        } else if (!category) {
+        if (!category) {
           const dataCategory = {} as PWACategoriesProps
-          dataCategory.pcpw_ativo = true
-          dataCategory.pcpw_prrv_id = item.prrv_id
-          dataCategory.pcpw_descricao = item.pcrv_kind
+          const checkExistCategory = CategoriesPWA?.find(
+            (e) => e.pcpw_rv_id === item?.prrv_pcrv_id,
+          )
 
-          const resNewCategory = await addPWACategories(dataCategory)
+          if (!checkExistCategory) {
+            dataCategory.pcpw_ativo = true
+            dataCategory.pcpw_rv_id = item.prrv_pcrv_id
+            dataCategory.pcpw_descricao = item.pcrv_kind
 
-          productApp.prpw_pcpw_id = resNewCategory?.pcpw_id
+            const resNewCategory = await addPWACategories(dataCategory)
+
+            productApp.prpw_pcpw_id = resNewCategory?.pcpw_id
+          } else {
+            productApp.prpw_pcpw_id = checkExistCategory?.pcpw_id
+          }
         }
 
         productApp.prpw_ativo = true
@@ -342,7 +365,9 @@ export default function AddProduct() {
         isLoading2 ||
         isFetching2 ||
         isLoading3 ||
-        isFetching3) && <Loader />}
+        isFetching3 ||
+        isLoading4 ||
+        isFetching4) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">

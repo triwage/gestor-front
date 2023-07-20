@@ -17,7 +17,10 @@ import { updateMaxProduct } from '../../../services/max/products'
 import { MaxProductsProps } from '../../../@types/max/products'
 
 import useLoading from '../../../contexts/LoadingContext'
-import { FormataValorMonetario } from '../../../functions/currency'
+import {
+  FormataValorMonetario,
+  formataMoedaPFloat,
+} from '../../../functions/currency'
 import { getBase64, handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import {
@@ -54,6 +57,7 @@ export default function UpdateMaxProduct() {
     } else {
       data.imagem_padrao_url = watch('imagem_padrao_url')
     }
+    data.preco = formataMoedaPFloat(data.preco)
 
     if (location.state) {
       const updateRes = (await updateMaxProduct(data)) as
@@ -61,6 +65,11 @@ export default function UpdateMaxProduct() {
         | false
       if (updateRes) {
         alerta('Produto alterado com sucesso', 1)
+        setTimeout(() => {
+          router('/max/produtos')
+        }, 400)
+      } else {
+        alerta('Não foi possível alterar o produto', 1)
       }
     }
     setLoading(false)

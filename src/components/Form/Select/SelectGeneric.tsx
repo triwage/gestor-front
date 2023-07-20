@@ -62,7 +62,7 @@ export function SelectGeneric({
   return (
     <div className="flex w-full flex-col items-start justify-start gap-0.5">
       <label
-        htmlFor={String(label)}
+        htmlFor={props.name}
         className="-mb-0.5 w-full text-sm font-medium text-black dark:text-white"
       >
         {label}
@@ -78,7 +78,7 @@ export function SelectGeneric({
           className,
         )}
         {...props}
-        id={String(label)}
+        id={props.name}
         placeholder={props.placeholder ?? label}
         onChange={onChange}
         options={options}

@@ -1,8 +1,9 @@
-import { ChangeEvent } from 'react'
+import { ChangeEvent, useMemo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 
 import { uploadImages } from '../../../services/images'
 import { addPWACategories } from '../../../services/pwa/categories'
+import { useRVCategories } from '../../../services/rv/categories'
 
 import { PWACategoriesProps } from '../../../@types/pwa/categories'
 import { SelectProps } from '../../../@types/select'
@@ -17,6 +18,7 @@ import { Switch } from '../../Form/Switch'
 import { alerta } from '../../System/Alert'
 import { Dialog } from '../../System/Dialog'
 import { Icon } from '../../System/Icon'
+import { Loader } from '../../System/Loader'
 import { TextAction } from '../../Texts/TextAction'
 import { FloppyDiskBack, Images, ImagesSquare } from '@phosphor-icons/react'
 
@@ -30,6 +32,7 @@ interface FormCategoryPWAProps {
 interface Inputs extends PWACategoriesProps {
   providerRv: SelectProps | null
   cash: SelectProps | null
+  categoryRv: SelectProps | null
   imagem_aux: File
 }
 
@@ -42,17 +45,36 @@ export function FormCategoryPWA({
   const formCategory = useForm<Inputs>()
   const { handleSubmit, setValue, watch, control } = formCategory
 
+  const { data: CategoriesRV, isLoading, isFetching } = useRVCategories()
+
   const { setLoading } = useLoading()
   const { Confirm } = useConfirm()
 
-  async function getImage(event: ChangeEvent<HTMLInputElement>) {
+  const optionsCategoriesRV = useMemo(() => {
+    let res = [] as Array<{ value: number; label: string }>
+
+    if (CategoriesRV) {
+      res = CategoriesRV?.map((item) => {
+        return {
+          value: item.pcrv_id,
+          label: item.pcrv_kind,
+        }
+      })
+    }
+    return res
+  }, [CategoriesRV])
+
+  async function getImageCategory(event: ChangeEvent<HTMLInputElement>) {
     const res = await handleUploadImage(event)
+
     if (res) {
       const imageFinal = (await getBase64(res)) as string
       setValue('pcpw_imagem', imageFinal)
       setValue('imagem_aux', res)
     }
-    const inputElem = document.getElementById('newFile') as HTMLInputElement
+    const inputElem = document.getElementById(
+      'newFileModal',
+    ) as HTMLInputElement
     if (inputElem) {
       inputElem.value = ''
     }
@@ -68,6 +90,7 @@ export function FormCategoryPWA({
     }
 
     data.pcpw_cash_id = Number(data.cash?.value)
+    data.pcpw_rv_id = Number(data.categoryRv?.value)
 
     const res = await addPWACategories(data)
 
@@ -89,9 +112,10 @@ export function FormCategoryPWA({
         }
       }}
     >
+      {(isLoading || isFetching) && <Loader />}
       <FormProvider {...formCategory}>
         <form
-          className="mb-2 flex w-full flex-col items-center gap-2 p-4"
+          className="mb-2 flex w-full flex-col items-center gap-2 p-4 sm:min-w-[678px]"
           onSubmit={handleSubmit(handleUpdateProductMax)}
         >
           <TextAction className="mb-6 font-semibold">
@@ -107,7 +131,18 @@ export function FormCategoryPWA({
             />
           </div>
 
-          <div className="grid w-full grid-cols-2 items-start gap-2">
+          <div className="grid w-full grid-cols-2 items-center gap-2">
+            <Select
+              control={control}
+              label="Categoria da RV"
+              name="categoryRv"
+              options={optionsCategoriesRV}
+            />
+
+            <Switch name="pcpw_ativo" label="Ativo" />
+          </div>
+
+          <div className="w-full">
             <div className="flex items-end gap-4">
               {!watch('pcpw_imagem') && (
                 <Icon>
@@ -124,7 +159,7 @@ export function FormCategoryPWA({
               )}
               <div>
                 <label
-                  htmlFor="newFile"
+                  htmlFor="newFileModal"
                   className="flex w-max cursor-pointer flex-col"
                 >
                   <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
@@ -136,14 +171,13 @@ export function FormCategoryPWA({
                 </label>
                 <input
                   className="hidden"
-                  id="newFile"
+                  id="newFileModal"
                   type="file"
                   accept="image/*"
-                  onChange={getImage}
+                  onChange={getImageCategory}
                 />
               </div>
             </div>
-            <Switch name="pcpw_ativo" label="Ativo" />
           </div>
 
           <div className="w-full border-t border-border pt-1">

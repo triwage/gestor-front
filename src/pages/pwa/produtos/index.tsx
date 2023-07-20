@@ -57,7 +57,7 @@ export default function PWAProducts() {
       field: 'prrv_nome',
       headerName: 'Produto RV',
       flex: 1,
-      width: 120,
+      minWidth: 120,
       sortable: true,
       filter: true,
     },
@@ -65,7 +65,7 @@ export default function PWAProducts() {
       field: 'prpw_descricao',
       headerName: 'Nome',
       flex: 1,
-      width: 120,
+      minWidth: 120,
       sortable: true,
       filter: true,
       sort: 'asc',
@@ -74,6 +74,7 @@ export default function PWAProducts() {
       field: 'prpw_valor',
       headerName: 'Preço',
       maxWidth: 130,
+      minWidth: 90,
       flex: 1,
       sortable: true,
       cellRenderer: (params: { value: boolean }) => {
@@ -156,13 +157,19 @@ export default function PWAProducts() {
               <Button
                 variant="structure"
                 className="bg-purple text-white"
-                onClick={() => router('addProduct')}
+                onClick={() => {
+                  router('addProduct')
+                }}
               >
                 <ArrowsDownUp size={18} /> Sincronizar produtos
               </Button>
             </div>
             <div className="flex items-center">
-              <Button onClick={() => router('updateProduct')}>
+              <Button
+                onClick={() => {
+                  router('updateProduct')
+                }}
+              >
                 <PlusCircle size={18} /> Adicionar produto
               </Button>
             </div>
