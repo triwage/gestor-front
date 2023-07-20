@@ -67,7 +67,7 @@ export default function UpdateProduct() {
         await updatePWAProduct(productPWA)
       }
       if (productMax) {
-        productMax.status = '0'
+        productMax.status = false
         await updateMaxProduct(productMax)
       }
       data.prrv_max_id = null

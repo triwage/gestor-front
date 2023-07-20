@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { Icon } from '../../../components/System/Icon'
@@ -11,7 +11,7 @@ import { RVProvidersProps } from '../../../@types/rv/providers'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
 import { NotePencil } from '@phosphor-icons/react'
-import { ColDef, CellValueChangedEvent } from 'ag-grid-community'
+import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function RVProviders() {
@@ -88,10 +88,6 @@ export default function RVProviders() {
     },
   ])
 
-  const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
-    console.log('Data after change is', event.data)
-  }, [])
-
   return (
     <Container>
       <div className="flex h-full w-full flex-col">
@@ -104,7 +100,6 @@ export default function RVProviders() {
             rowData={data}
             columnDefs={columnDefs}
             animateRows={true}
-            onCellValueChanged={onCellValueChanged}
             pagination={true}
             paginationPageSize={17}
             gridOptions={{ localeText: AgGridTranslation }}

@@ -242,7 +242,7 @@ export default function AddProduct() {
         setCurrentSync(`${index}/${selectedData.length}`)
 
         const productMax = {} as MaxProductsProps
-        productMax.status = '1'
+        productMax.status = true
         productMax.preco = formataMoedaPFloat(
           FormataValorMonetario(item.prrv_valor, false),
         )

@@ -59,6 +59,7 @@ interface Inputs extends PWAProductsProps {
   cash: SelectProps | null
   productRv: SelectProps | null
   productMax: SelectProps | null
+  productMaxAux: any
   category: SelectProps | null
   categoryAux: any
   provider: SelectProps | null
@@ -110,6 +111,7 @@ export default function UpdateProductPWA() {
     optionsProductsRV,
     optionsProviders,
     refetchCategories,
+    refetchProviders,
     refetchProductsMax,
   } = useProductsPWA(location?.state?.prpw_id)
 
@@ -117,21 +119,24 @@ export default function UpdateProductPWA() {
     setLoading(true)
 
     const { prpw_descricao, prpw_valor, prpw_ativo } = dirtyFields
-    if (prpw_descricao || prpw_valor || prpw_ativo) {
+    if (
+      (prpw_descricao || prpw_valor || prpw_ativo) &&
+      data.productMax &&
+      data.productMax?.value !== -1
+    ) {
       const productMax = ProductsMax?.find(
         (e) => Number(e.id) === Number(data.productMax?.value),
       )
       if (productMax) {
         productMax.status = prpw_ativo ? data?.prpw_ativo : productMax.status
         productMax.preco = prpw_valor
-          ? formataMoedaPFloat(
-              FormataValorMonetario(data?.prpw_valor, false).replace(',', '.'),
-            )
-          : productMax.preco
+          ? formataMoedaPFloat(FormataValorMonetario(data?.prpw_valor, false))
+          : formataMoedaPFloat(FormataValorMonetario(productMax.preco, false))
         productMax.nome =
           prpw_descricao && data?.prpw_descricao
             ? data?.prpw_descricao
             : productMax.nome
+
         await updateMaxProduct(productMax)
       }
     }
@@ -141,6 +146,12 @@ export default function UpdateProductPWA() {
       data.prpw_imagem = await uploadImages(imageAnexed)
     } else {
       data.prpw_imagem = watch('prpw_imagem')
+    }
+
+    if (data.productMax && Number(data.productMax?.value) === -1) {
+      const newProductMax = getValues('productMaxAux')
+      const resNewProductMax = await addPWAProviders(newProductMax)
+      data.productMax.value = resNewProductMax.fopw_id
     }
 
     if (data.provider && Number(data.provider?.value) === -1) {
@@ -266,7 +277,20 @@ export default function UpdateProductPWA() {
       )
       if (productOnMax) {
         setValue('productMax', productOnMax)
+      } else if (product?.prrv_max_id) {
+        setValue('productMax', {
+          value: -1,
+          label: 'Cadastrar um novo automaticamente',
+        })
+        setValue('productMaxAux', {
+          nome: product.prrv_nome,
+          preco: formataMoedaPFloat(
+            FormataValorMonetario(product.prrv_valor, false),
+          ),
+          status: true,
+        })
       }
+
       if (provider) {
         setValue('provider', provider)
       } else if (product?.prrv_forv_id) {
@@ -581,6 +605,7 @@ export default function UpdateProductPWA() {
         closeDialog={() => setIsOpenFormProvider(false)}
         onSuccess={() => {
           setIsOpenFormProvider(false)
+          refetchProviders()
         }}
       />
     </Container>

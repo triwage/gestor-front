@@ -99,7 +99,7 @@ export async function updatePWACategory(data: PWACategoriesProps) {
     const payload = {
       pcpw_cash_id: data.pcpw_cash_id,
       pcpw_descricao: data.pcpw_descricao,
-      pcpw_imagem: data.pcpw_imagem,
+      pcpw_imagem: data.pcpw_imagem ?? '-',
       pcpw_ativo: data.pcpw_ativo,
     }
 

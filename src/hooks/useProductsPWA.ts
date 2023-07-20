@@ -123,6 +123,7 @@ export function useProductsPWA(idProduct: number) {
     CashbackPWA: CashbackPWA.data,
     CategoriesPWA: CategoriesPWA.data,
     refetchCategories: CategoriesPWA.refetch,
+    refetchProviders: ProvidersPWA.refetch,
     ProvidersPWA: ProvidersPWA.data,
     ProductsMax: ProductsMax.data,
     refetchProductsMax: ProductsMax.refetch,

@@ -24,12 +24,17 @@ export async function ListMaxProducts(
 ): Promise<MaxProductsProps[] | null> {
   try {
     let res = null
-    if (currentStatus === -1) {
-      res = await api.get('/maxnivel/products')
-    } else {
+
+    if (currentStatus === 0) {
       res = await api.get('/maxnivel/products', {
         params: {
           status: currentStatus,
+        },
+      })
+    } else {
+      res = await api.get('/maxnivel/products', {
+        params: {
+          status: 1,
         },
       })
     }
@@ -81,7 +86,7 @@ export async function updateMaxProduct(data: MaxProductsProps) {
       descricao: data.descricao ?? 'Sem descrição',
       imagem_padrao_url: data.imagem_padrao_url ?? '',
       preco: data.preco,
-      status: data.status,
+      status: data.status ? '1' : '0',
     }
 
     const res = await api.put(`/maxnivel/products/${data.id}`, payload)

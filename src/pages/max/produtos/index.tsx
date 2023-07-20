@@ -152,10 +152,6 @@ export default function MaxProducts() {
     },
   ])
 
-  // const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
-  //   console.log('Data after change is', event.data)
-  // }, [])
-
   return (
     <Container>
       <div className="flex h-full w-full flex-col">
