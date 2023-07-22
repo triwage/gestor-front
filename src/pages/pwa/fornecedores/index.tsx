@@ -3,28 +3,39 @@ import { useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
 import { Icon } from '../../../components/System/Icon'
+import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { usePWAProviders } from '../../../services/pwa/providers'
+import {
+  deletePWAProvider,
+  usePWAProviders,
+} from '../../../services/pwa/providers'
 
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
 
+import useConfirm from '../../../contexts/ConfirmContext'
+import useLoading from '../../../contexts/LoadingContext'
 import { checkIfImage } from '../../../functions/general'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { NotePencil, PlusCircle } from '@phosphor-icons/react'
+import { NotePencil, PlusCircle, TrashSimple } from '@phosphor-icons/react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function PWAProviders() {
+  const queryClient = useQueryClient()
   const router = useNavigate()
 
-  const { data } = usePWAProviders()
+  const { Confirm } = useConfirm()
+  const { setLoading } = useLoading()
+
+  const { data, isLoading, isFetching } = usePWAProviders()
 
   const [columnDefs] = useState<ColDef[]>([
     {
       field: '',
-      maxWidth: 40,
+      maxWidth: 60,
       lockVisible: true,
       cellStyle: {
         textAlign: 'center',
@@ -34,7 +45,7 @@ export default function PWAProviders() {
       },
       cellRenderer: (params: { data: PWAProvidersProps }) => {
         return (
-          <div className="flex h-full w-full items-center justify-center gap-1">
+          <div className="flex h-full w-full items-center justify-center gap-2">
             <Icon
               onClick={() => {
                 router('updateProvider', {
@@ -44,6 +55,16 @@ export default function PWAProviders() {
               className="h-full w-full"
             >
               <NotePencil
+                size={20}
+                weight="fill"
+                className="text-primary dark:text-white"
+              />
+            </Icon>
+            <Icon
+              onClick={() => handleDeleteCategory(params.data.fopw_id)}
+              className="h-full w-full"
+            >
+              <TrashSimple
                 size={20}
                 weight="fill"
                 className="text-primary dark:text-white"
@@ -121,8 +142,29 @@ export default function PWAProviders() {
     },
   ])
 
+  const { mutateAsync: handleDeleteCategory } = useMutation(
+    async (id: number) => {
+      const check = await Confirm({
+        title: 'Excluir fornecedor',
+        message: 'Tem certeza que deseja excluir esse fornecedor?',
+      })
+
+      if (check) {
+        setLoading(true)
+        const res = await deletePWAProvider(id)
+
+        if (res) {
+          const updateData = data?.filter((e) => e.fopw_id !== id)
+          queryClient.setQueryData(['PWAProviders'], updateData)
+        }
+        setLoading(false)
+      }
+    },
+  )
+
   return (
     <Container>
+      {(isLoading || isFetching) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Fornecedores PWA</TextHeading>

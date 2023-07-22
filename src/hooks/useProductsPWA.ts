@@ -25,7 +25,10 @@ export function useProductsPWA(idProduct: number) {
       { queryKey: ['PWACashback'], queryFn: ListCashback },
       { queryKey: ['PWACategories'], queryFn: ListCategoriesPWA },
       { queryKey: ['PWAProviders'], queryFn: ListProvidersPWA },
-      { queryKey: ['MaxProducts', 1], queryFn: () => ListMaxProducts(1) },
+      {
+        queryKey: ['MaxProducts', 1, 0],
+        queryFn: () => ListMaxProducts(1, 0),
+      },
       {
         queryKey: ['PWACategoriesOfProducts'],
         queryFn: () => ListPWACategoriesOfProducts(idProduct),

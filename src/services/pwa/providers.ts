@@ -114,3 +114,26 @@ export async function updatePWAProviders(data: PWAProvidersProps) {
     console.error(error)
   }
 }
+
+export async function deletePWAProvider(id: number) {
+  try {
+    const res = await api.delete(`/pwa/providers/${id}`)
+
+    const { success } = res.data
+
+    if (success) {
+      alerta('Fornecedor removido com sucesso', 1)
+      return true
+    } else {
+      alerta('Não foi possível remover esse fornecedor')
+      return false
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return false
+  }
+}

@@ -232,10 +232,11 @@ export default function UpdateProductPWA() {
       }
       const res = (await addMaxProduct(data)) as MaxProductsProps
       refetchProductsMax()
+
       if (res) {
         setValue(
           'productMax',
-          optionsProductsMax?.find((e) => e.value === Number(res.id)) ?? null,
+          optionsProductsMax?.find((e) => e.value === Number(res)) ?? null,
         )
       }
       setLoading(false)
@@ -342,15 +343,15 @@ export default function UpdateProductPWA() {
       prpw_valor: true,
     }
 
-    if (location.state) {
-      const productEdit = Object.keys(location.state)
+    if (location.state.product) {
+      const productEdit = Object.keys(location.state.product)
 
       productEdit?.forEach((productItem) => {
         if (productItem === 'prpw_imagem') {
-          const resImage = checkIfImage(location.state[productItem])
+          const resImage = checkIfImage(location.state.product[productItem])
 
           if (resImage) {
-            setValue('prpw_imagem', location.state[productItem])
+            setValue('prpw_imagem', location.state.product[productItem])
           } else {
             setValue('prpw_imagem', null)
           }
@@ -360,42 +361,43 @@ export default function UpdateProductPWA() {
             setValue(
               // @ts-expect-error
               String(productItem),
-              FormataValorMonetario(location.state[productItem], false),
+              FormataValorMonetario(location.state.product[productItem], false),
             )
           } else {
             // @ts-expect-error
-            setValue(String(productItem), location.state[productItem])
+            setValue(String(productItem), location.state.product[productItem])
           }
         }
       })
       setValue(
         'productRv',
         optionsProductsRV?.find(
-          (e) => e.value === location.state.prpw_prrv_id,
+          (e) => e.value === location.state.product.prpw_prrv_id,
         ) ?? null,
       )
 
       setValue(
         'productMax',
         optionsProductsMax?.find(
-          (e) => e.value === location.state.prpw_max_id,
+          (e) => Number(e.value) === Number(location.state.productMax.id),
         ) ?? null,
       )
       setValue(
         'provider',
         optionsProviders?.find(
-          (e) => e.value === location.state.prpw_fopw_id,
+          (e) => e.value === location.state.product.prpw_fopw_id,
         ) ?? null,
       )
       setValue(
         'cash',
-        optionsCashback?.find((e) => e.value === location.state.prpw_cash_id) ??
-          null,
+        optionsCashback?.find(
+          (e) => e.value === location.state.product.prpw_cash_id,
+        ) ?? null,
       )
       setValue(
         'category',
         optionsCategories?.find(
-          (e) => e.value === location.state.prpw_pcpw_id,
+          (e) => e.value === location.state.product.prpw_pcpw_id,
         ) ?? null,
       )
 

@@ -123,6 +123,29 @@ export async function updatePWACategory(data: PWACategoriesProps) {
   }
 }
 
+export async function deletePwaCategory(id: number) {
+  try {
+    const res = await api.delete(`/pwa/products-categories/${id}`)
+
+    const { success } = res.data
+
+    if (success) {
+      alerta('Categoria removida com sucesso', 1)
+      return true
+    } else {
+      alerta('Não foi possível remover essa categoria')
+      return false
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return false
+  }
+}
+
 export async function addCategoriesInProvider({
   prpc_pcpw_id: categoryId,
   fopc_fopw_id: providerId,

@@ -2,29 +2,62 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
+import { ModalInfoMaxProduct } from '../../../components/Pages/PWA/ModalInfoMaxProduct'
 import { Icon } from '../../../components/System/Icon'
+import { Loader } from '../../../components/System/Loader'
+import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { usePWAProducts } from '../../../services/pwa/products'
+import { ListAllProductsInMax } from '../../../services/max/products'
+import {
+  deletePWAProduct,
+  usePWAProducts,
+} from '../../../services/pwa/products'
 
+import { MaxProductsProps } from '../../../@types/max/products'
 import { PWAProductsProps } from '../../../@types/pwa/products'
 
+import useConfirm from '../../../contexts/ConfirmContext'
+import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { ArrowsDownUp, NotePencil, PlusCircle } from '@phosphor-icons/react'
+import {
+  ArrowSquareOut,
+  ArrowsDownUp,
+  NotePencil,
+  PlusCircle,
+  TrashSimple,
+} from '@phosphor-icons/react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function PWAProducts() {
+  const [isOpenModalMaxProduct, setIsOpenModalMaxProduct] = useState(false)
+  const [dataOpenModalMax, setDataOpenModalMax] =
+    useState<MaxProductsProps | null>(null)
+  const queryClient = useQueryClient()
   const router = useNavigate()
 
-  const { data } = usePWAProducts()
+  const { Confirm } = useConfirm()
+  const { setLoading } = useLoading()
+
+  const { data, isLoading, isFetching } = usePWAProducts()
+  const {
+    data: ProductsMax,
+    isLoading: isLoading2,
+    isFetching: isFetching2,
+  } = useQuery({
+    queryKey: ['allProductsMax', data],
+    queryFn: () => data && ListAllProductsInMax(data),
+    enabled: !!data,
+  })
 
   const [columnDefs] = useState<ColDef[]>([
     {
       field: '',
-      maxWidth: 40,
+      maxWidth: 60,
       lockVisible: true,
       cellStyle: {
         textAlign: 'center',
@@ -34,16 +67,32 @@ export default function PWAProducts() {
       },
       cellRenderer: (params: { data: PWAProductsProps }) => {
         return (
-          <div className="flex h-full w-full items-center justify-center gap-1">
+          <div className="flex h-full w-full items-center justify-center gap-2">
             <Icon
               onClick={() => {
+                const productMax = ProductsMax?.find(
+                  (e) => Number(e.id) === Number(params.data.prpw_max_id),
+                )
                 router('updateProduct', {
-                  state: params.data,
+                  state: {
+                    product: params.data,
+                    productMax,
+                  },
                 })
               }}
               className="h-full w-full"
             >
               <NotePencil
+                size={20}
+                weight="fill"
+                className="text-primary dark:text-white"
+              />
+            </Icon>
+            <Icon
+              onClick={() => handleDeleteProduct(Number(params.data.prpw_id))}
+              className="h-full w-full"
+            >
+              <TrashSimple
                 size={20}
                 weight="fill"
                 className="text-primary dark:text-white"
@@ -126,28 +175,66 @@ export default function PWAProducts() {
     },
     {
       field: 'prpw_max_id',
-      headerName: 'Max',
-      maxWidth: 80,
+      headerName: 'Max ID',
+      maxWidth: 110,
+      minWidth: 70,
       sortable: true,
-      cellStyle: (params) => {
-        if (params.value) {
-          return { color: '#fff', backgroundColor: '#15803d' }
-        } else {
-          return { color: '#fff', backgroundColor: '#ed3241' }
-        }
+      cellStyle: {
+        display: 'flex',
+        alignItem: 'center',
+        justifyContent: 'center',
       },
-      cellRenderer: (params: { value: string }) => {
-        if (params.value) {
-          return 'Ativo'
-        } else {
-          return 'Inativo'
-        }
+      cellRenderer: (params: { data: PWAProductsProps }) => {
+        return (
+          <div className="flex items-center justify-center gap-2">
+            <TextAction>{params.data.prpw_max_id}</TextAction>
+            <Icon
+              onClick={() => {
+                const product = ProductsMax?.find(
+                  (e) => Number(e.id) === Number(params.data.prpw_max_id),
+                )
+                if (product) {
+                  setIsOpenModalMaxProduct(true)
+                  setDataOpenModalMax(product)
+                }
+              }}
+              className="h-full w-full"
+            >
+              <ArrowSquareOut
+                size={20}
+                weight="fill"
+                className="text-black dark:text-white"
+              />
+            </Icon>
+          </div>
+        )
       },
     },
   ])
 
+  const { mutateAsync: handleDeleteProduct } = useMutation(
+    async (id: number) => {
+      const check = await Confirm({
+        title: 'Excluir produto',
+        message: 'Tem certeza que deseja excluir esse produto?',
+      })
+
+      if (check) {
+        setLoading(true)
+        const res = await deletePWAProduct(id)
+
+        if (res) {
+          const updateData = data?.filter((e) => e.prpw_id !== id)
+          queryClient.setQueryData(['PWAProducts'], updateData)
+        }
+        setLoading(false)
+      }
+    },
+  )
+
   return (
     <Container>
+      {(isLoading || isFetching || isLoading2 || isFetching2) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Produtos PWA</TextHeading>
@@ -178,7 +265,7 @@ export default function PWAProducts() {
 
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
-            rowData={data}
+            rowData={data ?? []}
             columnDefs={columnDefs}
             animateRows={true}
             pagination={true}
@@ -187,6 +274,14 @@ export default function PWAProducts() {
           />
         </div>
       </div>
+
+      {dataOpenModalMax && isOpenModalMaxProduct && (
+        <ModalInfoMaxProduct
+          open={isOpenModalMaxProduct}
+          closeDialog={() => setIsOpenModalMaxProduct(false)}
+          data={dataOpenModalMax}
+        />
+      )}
     </Container>
   )
 }

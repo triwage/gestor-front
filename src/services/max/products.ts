@@ -3,6 +3,7 @@ import { alerta } from '../../components/System/Alert'
 import { useMaxProductsStore } from '../../store/useMaxProductsStore'
 
 import { MaxProductsProps } from '../../@types/max/products'
+import { PWAProductsProps } from '../../@types/pwa/products'
 
 import { formataMoedaPFloat } from '../../functions/currency'
 import { haveData } from '../../functions/general'
@@ -21,6 +22,7 @@ export function useMaxProducts() {
 
 export async function ListMaxProducts(
   currentStatus: number,
+  idMax?: number,
 ): Promise<MaxProductsProps[] | null> {
   try {
     let res = null
@@ -29,15 +31,45 @@ export async function ListMaxProducts(
       res = await api.get('/maxnivel/products', {
         params: {
           status: 1,
+          id: idMax ?? 0,
         },
       })
     } else {
+      const ids = [idMax]
       res = await api.get('/maxnivel/products', {
         params: {
           status: 0,
+          id: JSON.stringify(ids),
         },
       })
     }
+
+    const { data } = res.data
+
+    return haveData(data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
+}
+
+export async function ListAllProductsInMax(
+  dataOrigin: PWAProductsProps[],
+): Promise<MaxProductsProps[] | null> {
+  try {
+    const ids = dataOrigin.map((item) => {
+      return item.prpw_max_id
+    })
+    const res = await api.get('/maxnivel/products', {
+      params: {
+        status: 1,
+        id: JSON.stringify(ids),
+      },
+    })
 
     const { data } = res.data
 
@@ -73,7 +105,11 @@ export async function addMaxProduct(data: MaxProductsProps) {
       return null
     }
   } catch (error) {
-    console.error(error)
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
     return null
   }
 }

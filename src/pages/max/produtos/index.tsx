@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router'
 import { Dialog } from '../../../components/System/Dialog'
 import { Dropdown } from '../../../components/System/Dropdown'
 import { Icon } from '../../../components/System/Icon'
+import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { useMaxProducts } from '../../../services/max/products'
@@ -23,7 +24,7 @@ export default function MaxProducts() {
   const { setCurrentStatus } = useMaxProductsStore()
   const [isOpenModal, setIsOpenModal] = useState(false)
 
-  const { data } = useMaxProducts()
+  const { data, isLoading, isFetching } = useMaxProducts()
 
   const router = useNavigate()
 
@@ -154,6 +155,7 @@ export default function MaxProducts() {
 
   return (
     <Container>
+      {(isLoading || isFetching) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Produtos Max Nível</TextHeading>
@@ -169,7 +171,7 @@ export default function MaxProducts() {
 
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
-            rowData={data}
+            rowData={data ?? []}
             columnDefs={columnDefs}
             animateRows={true}
             pagination={true}

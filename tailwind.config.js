@@ -102,6 +102,8 @@ export default {
         // => @media (max-width: 677px) { ... }
         sm: { min: '678px' },
         // => @media (min-width: 640px and max-width: 768px) { ... }
+        base: { min: '768px' },
+        // => @media (min-width: 640px and max-width: 768px) { ... }
         md: { min: '968px' },
         // => @media (min-width: 968px) { ... }
         'md-max': { max: '967px' },

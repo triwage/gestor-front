@@ -126,6 +126,29 @@ export async function updatePWAProduct(data: PWAProductsProps) {
   }
 }
 
+export async function deletePWAProduct(id: number) {
+  try {
+    const res = await api.delete(`/pwa/products/${id}`)
+
+    const { success } = res.data
+
+    if (success) {
+      alerta('Produto removido com sucesso', 1)
+      return true
+    } else {
+      alerta('Não foi possível remover esse produto')
+      return false
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return false
+  }
+}
+
 export async function addCategoriesInProduct({
   prpc_pcpw_id: categoryId,
   prpc_prpw_id: productId,
