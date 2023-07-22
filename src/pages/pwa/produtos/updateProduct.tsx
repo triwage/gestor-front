@@ -343,7 +343,7 @@ export default function UpdateProductPWA() {
       prpw_valor: true,
     }
 
-    if (location.state.product) {
+    if (location?.state?.product) {
       const productEdit = Object.keys(location.state.product)
 
       productEdit?.forEach((productItem) => {
@@ -375,13 +375,12 @@ export default function UpdateProductPWA() {
           (e) => e.value === location.state.product.prpw_prrv_id,
         ) ?? null,
       )
-
-      setValue(
-        'productMax',
-        optionsProductsMax?.find(
-          (e) => Number(e.value) === Number(location.state.productMax.id),
-        ) ?? null,
-      )
+      if (location?.state?.productMax) {
+        setValue('productMax', {
+          value: Number(location?.state?.productMax?.id),
+          label: location?.state?.productMax?.nome,
+        })
+      }
       setValue(
         'provider',
         optionsProviders?.find(
@@ -460,7 +459,7 @@ export default function UpdateProductPWA() {
                   name="productMax"
                   options={optionsProductsMax}
                 />
-                {(!location?.state || !watch('productMax')) && (
+                {!location?.state && !watch('productMax') && (
                   <div className="mt-4 w-[80px]">
                     <Button
                       type="button"

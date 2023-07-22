@@ -3,28 +3,39 @@ import { useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
 import { Icon } from '../../../components/System/Icon'
+import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { usePWACashback } from '../../../services/pwa/cashback'
+import {
+  deletePWACashback,
+  usePWACashback,
+} from '../../../services/pwa/cashback'
 
 import { PWACashbackProps } from '../../../@types/pwa/cashback'
 
+import useConfirm from '../../../contexts/ConfirmContext'
+import useLoading from '../../../contexts/LoadingContext'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { NotePencil, PlusCircle } from '@phosphor-icons/react'
+import { NotePencil, PlusCircle, TrashSimple } from '@phosphor-icons/react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function PWACashback() {
+  const queryClient = useQueryClient()
   const router = useNavigate()
 
-  const { data } = usePWACashback()
+  const { Confirm } = useConfirm()
+  const { setLoading } = useLoading()
+
+  const { data, isLoading, isFetching } = usePWACashback()
 
   const [columnDefs] = useState<ColDef[]>([
     {
       field: '',
-      maxWidth: 40,
+      maxWidth: 60,
       lockVisible: true,
       cellStyle: {
         textAlign: 'center',
@@ -34,7 +45,7 @@ export default function PWACashback() {
       },
       cellRenderer: (params: { data: PWACashbackProps }) => {
         return (
-          <div className="flex h-full w-full items-center justify-center gap-1">
+          <div className="flex h-full w-full items-center justify-center gap-2">
             <Icon
               onClick={() => {
                 router('updateCashback', {
@@ -44,6 +55,16 @@ export default function PWACashback() {
               className="h-full w-full"
             >
               <NotePencil
+                size={20}
+                weight="fill"
+                className="text-primary dark:text-white"
+              />
+            </Icon>
+            <Icon
+              onClick={() => handleDeleteCashback(params.data.cash_id)}
+              className="h-full w-full"
+            >
+              <TrashSimple
                 size={20}
                 weight="fill"
                 className="text-primary dark:text-white"
@@ -98,8 +119,29 @@ export default function PWACashback() {
     },
   ])
 
+  const { mutateAsync: handleDeleteCashback } = useMutation(
+    async (id: number) => {
+      const check = await Confirm({
+        title: 'Excluir cashback',
+        message: 'Tem certeza que deseja excluir esse cashback?',
+      })
+
+      if (check) {
+        setLoading(true)
+        const res = await deletePWACashback(id)
+
+        if (res) {
+          const updateData = data?.filter((e) => e.cash_id !== id)
+          queryClient.setQueryData(['PWACashback'], updateData)
+        }
+        setLoading(false)
+      }
+    },
+  )
+
   return (
     <Container>
+      {(isLoading || isFetching) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Cashback PWA</TextHeading>
@@ -113,7 +155,7 @@ export default function PWACashback() {
 
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
-            rowData={data}
+            rowData={data ?? []}
             columnDefs={columnDefs}
             animateRows={true}
             pagination={true}

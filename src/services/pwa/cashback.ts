@@ -86,3 +86,26 @@ export async function updatePWACashback(data: PWACashbackProps) {
     }
   }
 }
+
+export async function deletePWACashback(id: number) {
+  try {
+    const res = await api.delete(`/pwa/cashbacks/${id}`)
+
+    const { success } = res.data
+
+    if (success) {
+      alerta('Cashback removido com sucesso', 1)
+      return true
+    } else {
+      alerta('Não foi possível remover essa cashback')
+      return false
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return false
+  }
+}

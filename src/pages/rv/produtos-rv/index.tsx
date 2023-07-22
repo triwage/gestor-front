@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 
 import { FieldOnGrid } from '../../../components/FieldOnGrid'
 import { Icon } from '../../../components/System/Icon'
+import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { updateRVProduct, useRVProducts } from '../../../services/rv/products'
@@ -18,7 +19,7 @@ import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function RVProducts() {
-  const { data } = useRVProducts()
+  const { data, isLoading, isFetching } = useRVProducts()
 
   const { setLoading } = useLoading()
 
@@ -200,6 +201,7 @@ export default function RVProducts() {
 
   return (
     <Container>
+      {(isLoading || isFetching) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Produtos RV</TextHeading>
@@ -207,7 +209,7 @@ export default function RVProducts() {
 
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
-            rowData={data}
+            rowData={data ?? []}
             columnDefs={columnDefs}
             animateRows={true}
             pagination={true}
