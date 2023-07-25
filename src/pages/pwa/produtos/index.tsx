@@ -51,15 +51,12 @@ export default function PWAProducts() {
     fetchStatus,
     data: ProductsMax,
   } = useQuery({
-    queryKey: ['allProductsMax', data],
+    queryKey: ['allProductsMax'],
     queryFn: async () => {
-      if (data) {
-        const res = await ListAllProductsInMax(data)
-        setAllProductMax(res)
-        return res
-      }
+      const res = await ListAllProductsInMax()
+      setAllProductMax(res)
+      return res
     },
-    enabled: !!data,
   })
 
   const [columnDefs] = useState<ColDef[]>([
@@ -190,24 +187,28 @@ export default function PWAProducts() {
         justifyContent: 'center',
       },
       cellRenderer: (params: { data: PWAProductsProps }) => {
-        return (
-          <div className="flex items-center justify-center gap-2">
-            <TextAction>{params.data.prpw_max_id}</TextAction>
-            <Icon
-              onClick={() => {
-                setIdData(params.data.prpw_max_id)
-                setIsOpenModalMaxProduct(true)
-              }}
-              className="h-full w-full"
-            >
-              <ArrowSquareOut
-                size={20}
-                weight="fill"
-                className="text-black dark:text-white"
-              />
-            </Icon>
-          </div>
-        )
+        if (params.data.prpw_max_id) {
+          return (
+            <div className="flex items-center justify-center gap-2">
+              <TextAction>{params.data.prpw_max_id}</TextAction>
+              <Icon
+                onClick={() => {
+                  setIdData(params.data.prpw_max_id)
+                  setIsOpenModalMaxProduct(true)
+                }}
+                className="h-full w-full"
+              >
+                <ArrowSquareOut
+                  size={20}
+                  weight="fill"
+                  className="text-black dark:text-white"
+                />
+              </Icon>
+            </div>
+          )
+        } else {
+          return '-'
+        }
       },
     },
   ])

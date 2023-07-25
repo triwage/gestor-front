@@ -30,11 +30,7 @@ import { PWACategoriesProps } from '../../../@types/pwa/categories'
 import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
-import {
-  checkIfImage,
-  getBase64,
-  handleUploadImage,
-} from '../../../functions/general'
+import { getBase64, handleUploadImage } from '../../../functions/general'
 import { Container } from '../../../template/Container'
 import {
   CaretLeft,
@@ -184,19 +180,20 @@ export default function UpdateCategoryPWA() {
       const categoryEdit = Object.keys(location.state)
 
       categoryEdit?.forEach((categoryItem) => {
-        if (categoryItem === 'pcpw_imagem') {
-          const resImage = checkIfImage(location.state[categoryItem])
-
-          if (resImage) {
-            setValue('pcpw_imagem', location.state[categoryItem])
-          } else {
-            setValue('pcpw_imagem', null)
-          }
-        } else {
+        if (categoryItem !== 'pcpw_imagem') {
           // @ts-expect-error
           setValue(String(categoryItem), location.state[categoryItem])
         }
       })
+      const resImage = new Image()
+      resImage.src = location?.state?.pcpw_imagem
+      resImage.onload = function () {
+        setValue('pcpw_imagem', location?.state?.pcpw_imagem)
+      }
+      resImage.onerror = function () {
+        setValue('pcpw_imagem', null)
+      }
+
       setValue(
         'cash',
         optionsCashback?.find((e) => e.value === location.state.pcpw_cash_id) ??

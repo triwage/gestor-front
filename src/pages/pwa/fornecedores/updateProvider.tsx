@@ -29,11 +29,7 @@ import { PWAProvidersProps } from '../../../@types/pwa/providers'
 import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
-import {
-  checkIfImage,
-  getBase64,
-  handleUploadImage,
-} from '../../../functions/general'
+import { getBase64, handleUploadImage } from '../../../functions/general'
 import { useProviderPWA } from '../../../hooks/useProviderPWA'
 import { Container } from '../../../template/Container'
 import {
@@ -135,19 +131,21 @@ export default function UpdateProviderPWA() {
       const providerEdit = Object.keys(location.state)
 
       providerEdit?.forEach((providerItem) => {
-        if (providerItem === 'fopw_imagem') {
-          const resImage = checkIfImage(location.state[providerItem])
-
-          if (resImage) {
-            setValue('fopw_imagem', location.state[providerItem])
-          } else {
-            setValue('fopw_imagem', null)
-          }
-        } else {
+        if (providerItem !== 'fopw_imagem') {
           // @ts-expect-error
           setValue(String(providerItem), location.state[providerItem])
         }
       })
+
+      const resImage = new Image()
+      resImage.src = location?.state?.fopw_imagem
+      resImage.onload = function () {
+        setValue('fopw_imagem', location?.state?.fopw_imagem)
+      }
+      resImage.onerror = function () {
+        setValue('fopw_imagem', null)
+      }
+
       setValue(
         'providerRv',
         optionsProvidersRV?.find(

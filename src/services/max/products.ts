@@ -3,7 +3,6 @@ import { alerta } from '../../components/System/Alert'
 import { useMaxProductsStore } from '../../store/useMaxProductsStore'
 
 import { MaxProductsProps } from '../../@types/max/products'
-import { PWAProductsProps } from '../../@types/pwa/products'
 
 import { formataMoedaPFloat } from '../../functions/currency'
 import { haveData } from '../../functions/general'
@@ -57,19 +56,11 @@ export async function ListMaxProducts(
   }
 }
 
-export async function ListAllProductsInMax(
-  dataOrigin: PWAProductsProps[],
-): Promise<MaxProductsProps[] | null> {
+export async function ListAllProductsInMax(): Promise<
+  MaxProductsProps[] | null
+> {
   try {
-    const ids = dataOrigin.map((item) => {
-      return item.prpw_max_id
-    })
-    const res = await api.get('/maxnivel/products', {
-      params: {
-        status: 1,
-        id: JSON.stringify(ids),
-      },
-    })
+    const res = await api.get('/pwa/products/select/maxnivel')
 
     const { data } = res.data
 

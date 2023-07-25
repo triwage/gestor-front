@@ -247,6 +247,7 @@ export default function AddProduct() {
     if (check) {
       const newProvidersArray = [] as PWAProvidersProps[] | []
       const newCategoriesArray = [] as PWACategoriesProps[] | []
+
       for (const [index, item] of selectedData.entries()) {
         setCurrentSync(`${index}/${selectedData.length}`)
         const productMax = {} as MaxProductsProps
@@ -258,9 +259,10 @@ export default function AddProduct() {
         productMax.nome = item.prrv_nome
         productMax.id = item.prrv_max_id ? String(item.prrv_max_id) : null // id do produto max
 
-        let res = null
+        let res = {} as any
         if (item.prrv_max_id) {
-          res = await updateMaxProduct(productMax)
+          await updateMaxProduct(productMax)
+          res.id = item.prrv_max_id
         } else {
           res = await addMaxProduct(productMax)
         }
@@ -304,13 +306,16 @@ export default function AddProduct() {
               const resNewProvider = await addPWAProviders(dataProvider)
 
               productApp.prpw_fopw_id = resNewProvider?.fopw_id
+              productApp.fopw_descricao = resNewProvider.fopw_descricao
 
               newProvidersArray.push(resNewProvider)
             } else {
               productApp.prpw_fopw_id = recentlyProvider?.fopw_id
+              productApp.fopw_descricao = recentlyProvider?.fopw_descricao
             }
           } else if (checkExistProvider) {
             productApp.prpw_fopw_id = checkExistProvider?.fopw_id
+            productApp.fopw_descricao = checkExistProvider?.fopw_descricao
           }
         }
 

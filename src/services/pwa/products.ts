@@ -103,6 +103,7 @@ export async function addPWAProduct(data: PWAProductsProps) {
 export async function updatePWAProduct(data: PWAProductsProps) {
   try {
     const payload = {
+      prpw_id: data.prpw_id,
       prpw_prrv_id: data.prpw_prrv_id,
       prpw_max_id: data.prpw_max_id ?? null,
       prpw_cash_id: data.prpw_cash_id ?? null,
@@ -114,7 +115,7 @@ export async function updatePWAProduct(data: PWAProductsProps) {
       prpw_descricao: data.prpw_descricao ?? null,
       prpw_imagem: data.prpw_imagem || 'não nula',
       prpw_valor: data.prpw_valor ? formataMoedaPFloat(data.prpw_valor) : null,
-      prpw_ativo: data.prpw_ativo ?? false,
+      prpw_ativo: !!data.prpw_ativo,
     }
 
     const res = await api.put(`/pwa/products/${data.prpw_id}`, payload)

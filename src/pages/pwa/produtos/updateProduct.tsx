@@ -38,11 +38,7 @@ import {
   FormataValorMonetario,
   formataMoedaPFloat,
 } from '../../../functions/currency'
-import {
-  checkIfImage,
-  getBase64,
-  handleUploadImage,
-} from '../../../functions/general'
+import { getBase64, handleUploadImage } from '../../../functions/general'
 import { useProductsPWA } from '../../../hooks/useProductsPWA'
 import { Container } from '../../../template/Container'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -127,7 +123,8 @@ export default function UpdateProductPWA() {
     if (
       (prpw_descricao || prpw_valor || prpw_ativo) &&
       data.productMax &&
-      data.productMax?.value !== -1
+      data.productMax?.value !== -1 &&
+      location.state
     ) {
       const productMax = ProductsMax?.find(
         (e) => Number(e.id) === Number(data.productMax?.value),
@@ -155,7 +152,7 @@ export default function UpdateProductPWA() {
 
     if (data.productMax && Number(data.productMax?.value) === -1) {
       const newProductMax = getValues('productMaxAux')
-      const resNewProductMax = await addPWAProviders(newProductMax)
+      const resNewProductMax = await addMaxProduct(newProductMax)
       data.productMax.value = resNewProductMax.fopw_id
     }
 
@@ -348,15 +345,7 @@ export default function UpdateProductPWA() {
       const productEdit = Object.keys(location.state.product)
 
       productEdit?.forEach((productItem) => {
-        if (productItem === 'prpw_imagem') {
-          const resImage = checkIfImage(location.state.product[productItem])
-
-          if (resImage) {
-            setValue('prpw_imagem', location.state.product[productItem])
-          } else {
-            setValue('prpw_imagem', null)
-          }
-        } else {
+        if (productItem !== 'prpw_imagem') {
           // @ts-expect-error
           if (checkTypeof[String(productItem)]) {
             setValue(
@@ -370,6 +359,14 @@ export default function UpdateProductPWA() {
           }
         }
       })
+      const resImage = new Image()
+      resImage.src = location.state.product.prpw_imagem
+      resImage.onload = function () {
+        setValue('prpw_imagem', location.state.product.prpw_imagem)
+      }
+      resImage.onerror = function () {
+        setValue('prpw_imagem', null)
+      }
       setValue(
         'productRv',
         optionsProductsRV?.find(

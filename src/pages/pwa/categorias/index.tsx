@@ -15,7 +15,6 @@ import { PWACategoriesProps } from '../../../@types/pwa/categories'
 
 import useConfirm from '../../../contexts/ConfirmContext'
 import useLoading from '../../../contexts/LoadingContext'
-import { checkIfImage } from '../../../functions/general'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
 import { NotePencil, PlusCircle, TrashSimple } from '@phosphor-icons/react'
@@ -105,11 +104,20 @@ export default function PWACategories() {
         justifyContent: 'center',
       },
       cellRenderer: (params: { value: string | undefined }) => {
-        const resImage = checkIfImage(params.value)
-        if (resImage) {
-          return <img src={params.value} alt="Imagem" width={24} height={24} />
+        const resImage = new Image()
+        if (params?.value) {
+          resImage.src = params?.value
+          resImage.onload = function () {
+            return (
+              <img src={params.value} alt="Imagem" width={24} height={24} />
+            )
+          }
+          resImage.onerror = function () {
+            return '-'
+          }
+        } else {
+          return '-'
         }
-        return '-'
       },
     },
     {
