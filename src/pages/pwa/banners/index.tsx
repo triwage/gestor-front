@@ -3,23 +3,31 @@ import { useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
 import { Icon } from '../../../components/System/Icon'
+import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { useBanners } from '../../../services/pwa/banners'
+import { deleteBanner, useBanners } from '../../../services/pwa/banners'
 
 import { BannersProps } from '../../../@types/pwa/banners'
 
+import useConfirm from '../../../contexts/ConfirmContext'
+import useLoading from '../../../contexts/LoadingContext'
 import { formatDateTimeToBr } from '../../../functions/timesAndDates'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { NotePencil, PlusCircle } from '@phosphor-icons/react'
+import { NotePencil, PlusCircle, TrashSimple } from '@phosphor-icons/react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function PWACashback() {
+  const queryClient = useQueryClient()
   const router = useNavigate()
 
-  const { data } = useBanners()
+  const { Confirm } = useConfirm()
+  const { setLoading } = useLoading()
+
+  const { data, isLoading, isFetching } = useBanners()
 
   const [columnDefs] = useState<ColDef[]>([
     {
@@ -44,6 +52,16 @@ export default function PWACashback() {
               className="h-full w-full"
             >
               <NotePencil
+                size={20}
+                weight="fill"
+                className="text-primary dark:text-white"
+              />
+            </Icon>
+            <Icon
+              onClick={() => handleDeleteBanner(Number(params.data.geba_id))}
+              className="h-full w-full"
+            >
+              <TrashSimple
                 size={20}
                 weight="fill"
                 className="text-primary dark:text-white"
@@ -99,8 +117,29 @@ export default function PWACashback() {
     },
   ])
 
+  const { mutateAsync: handleDeleteBanner } = useMutation(
+    async (id: number) => {
+      const check = await Confirm({
+        title: 'Excluir banner',
+        message: 'Tem certeza que deseja excluir esse banner?',
+      })
+
+      if (check) {
+        setLoading(true)
+        const res = await deleteBanner(id)
+
+        if (res) {
+          const updateData = data?.filter((e) => e.geba_id !== id)
+          queryClient.setQueryData(['listBanners'], updateData)
+        }
+        setLoading(false)
+      }
+    },
+  )
+
   return (
     <Container>
+      {(isLoading || isFetching) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Banners</TextHeading>
@@ -114,7 +153,7 @@ export default function PWACashback() {
 
         <div className="ag-theme-alpine dark:ag-theme-alpine-dark h-full">
           <AgGridReact
-            rowData={data}
+            rowData={data || []}
             columnDefs={columnDefs}
             animateRows={true}
             pagination={true}

@@ -56,19 +56,23 @@ export default function UpdateProduct() {
     // @ts-expect-error
     data.prrv_forv_id = data.prrv_forv_id.value
     if (!data.prrv_ativo) {
-      const productPWA = PWAProducts?.find((e) => e.prpw_id === data?.prpw_id)
+      const productPWA = PWAProducts?.filter((e) => e.prpw_id === data?.prpw_id)
 
-      const productMax = MaxProducts?.find(
+      const productMax = MaxProducts?.filter(
         (e) => Number(e.id) === Number(data?.prrv_max_id),
       )
 
       if (productPWA) {
-        productPWA.prpw_ativo = false
-        await updatePWAProduct(productPWA)
+        for (const item of productPWA) {
+          item.prpw_ativo = false
+          await updatePWAProduct(item)
+        }
       }
       if (productMax) {
-        productMax.status = false
-        await updateMaxProduct(productMax)
+        for (const item of productMax) {
+          item.status = false
+          await updateMaxProduct(item)
+        }
       }
       data.prrv_max_id = null
       data.prpw_id = null

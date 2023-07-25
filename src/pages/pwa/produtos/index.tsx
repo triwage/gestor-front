@@ -14,7 +14,8 @@ import {
   usePWAProducts,
 } from '../../../services/pwa/products'
 
-import { MaxProductsProps } from '../../../@types/max/products'
+import { useEditProductPWAStore } from '../../../store/useEditProductPWAStore'
+
 import { PWAProductsProps } from '../../../@types/pwa/products'
 
 import useConfirm from '../../../contexts/ConfirmContext'
@@ -35,22 +36,29 @@ import { AgGridReact } from 'ag-grid-react'
 
 export default function PWAProducts() {
   const [isOpenModalMaxProduct, setIsOpenModalMaxProduct] = useState(false)
-  const [dataOpenModalMax, setDataOpenModalMax] =
-    useState<MaxProductsProps | null>(null)
+  const [idData, setIdData] = useState<number | null>(null)
   const queryClient = useQueryClient()
   const router = useNavigate()
+  const { setAllProductMax } = useEditProductPWAStore()
 
   const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
 
   const { data, isLoading, isFetching } = usePWAProducts()
+
   const {
+    status,
+    fetchStatus,
     data: ProductsMax,
-    isLoading: isLoading2,
-    isFetching: isFetching2,
   } = useQuery({
     queryKey: ['allProductsMax', data],
-    queryFn: () => data && ListAllProductsInMax(data),
+    queryFn: async () => {
+      if (data) {
+        const res = await ListAllProductsInMax(data)
+        setAllProductMax(res)
+        return res
+      }
+    },
     enabled: !!data,
   })
 
@@ -70,13 +78,10 @@ export default function PWAProducts() {
           <div className="flex h-full w-full items-center justify-center gap-2">
             <Icon
               onClick={() => {
-                const productMax = ProductsMax?.find(
-                  (e) => Number(e.id) === Number(params.data.prpw_max_id),
-                )
                 router('updateProduct', {
                   state: {
                     product: params.data,
-                    productMax,
+                    productMax: Number(params.data.prpw_max_id),
                   },
                 })
               }}
@@ -190,13 +195,8 @@ export default function PWAProducts() {
             <TextAction>{params.data.prpw_max_id}</TextAction>
             <Icon
               onClick={() => {
-                const product = ProductsMax?.find(
-                  (e) => Number(e.id) === Number(params.data.prpw_max_id),
-                )
-                if (product) {
-                  setIsOpenModalMaxProduct(true)
-                  setDataOpenModalMax(product)
-                }
+                setIdData(params.data.prpw_max_id)
+                setIsOpenModalMaxProduct(true)
               }}
               className="h-full w-full"
             >
@@ -234,7 +234,10 @@ export default function PWAProducts() {
 
   return (
     <Container>
-      {(isLoading || isFetching || isLoading2 || isFetching2) && <Loader />}
+      {(isLoading ||
+        isFetching ||
+        status !== 'success' ||
+        fetchStatus !== 'idle') && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Produtos PWA</TextHeading>
@@ -275,11 +278,12 @@ export default function PWAProducts() {
         </div>
       </div>
 
-      {dataOpenModalMax && isOpenModalMaxProduct && (
+      {idData && isOpenModalMaxProduct && ProductsMax && (
         <ModalInfoMaxProduct
           open={isOpenModalMaxProduct}
           closeDialog={() => setIsOpenModalMaxProduct(false)}
-          data={dataOpenModalMax}
+          id={idData}
+          productsMax={ProductsMax}
         />
       )}
     </Container>

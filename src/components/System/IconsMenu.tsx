@@ -10,6 +10,7 @@ import {
   NoteBlank,
   Faders,
   Users,
+  HandCoins,
 } from '@phosphor-icons/react'
 
 interface IconsMenuProps {
@@ -28,6 +29,7 @@ interface IconsMenuProps {
     | 'Categorias RV'
     | 'Fornecedores RV'
     | 'Produtos Max Nivel'
+    | 'Cashback'
 }
 
 export function IconsMenu({ name }: IconsMenuProps) {
@@ -60,6 +62,9 @@ export function IconsMenu({ name }: IconsMenuProps) {
       ),
       'Produtos Max Nivel': (
         <Package size={20} className="text-primary dark:text-white" />
+      ),
+      Cashback: (
+        <HandCoins size={20} className="text-primary dark:text-white" />
       ),
     }
 

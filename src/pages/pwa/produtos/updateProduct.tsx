@@ -26,6 +26,8 @@ import {
 } from '../../../services/pwa/products'
 import { addPWAProviders } from '../../../services/pwa/providers'
 
+import { useEditProductPWAStore } from '../../../store/useEditProductPWAStore'
+
 import { MaxProductsProps } from '../../../@types/max/products'
 import { PWAProductsProps } from '../../../@types/pwa/products'
 import { SelectProps } from '../../../@types/select'
@@ -90,6 +92,8 @@ export default function UpdateProductPWA() {
     getValues,
     formState: { dirtyFields },
   } = formProduct
+
+  const { allProductMax } = useEditProductPWAStore()
 
   const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
@@ -234,10 +238,7 @@ export default function UpdateProductPWA() {
       refetchProductsMax()
 
       if (res) {
-        setValue(
-          'productMax',
-          optionsProductsMax?.find((e) => e.value === Number(res)) ?? null,
-        )
+        setValue('productMax', { value: Number(res.id), label: res.nome })
       }
       setLoading(false)
     }
@@ -272,7 +273,7 @@ export default function UpdateProductPWA() {
       provider = optionsProviders?.find((e) => e.value === provider?.fopw_id)
 
       let category = CategoriesPWA?.find(
-        (e) => e.pcpw_rv_id === product?.prrv_pcrv_id,
+        (e) => e.pcpw_descricao === product?.pcrv_kind,
       ) as any
 
       category = optionsCategories?.find((e) => e.value === category?.pcpw_id)
@@ -286,7 +287,7 @@ export default function UpdateProductPWA() {
       } else if (product?.prrv_max_id) {
         setValue('productMax', {
           value: -1,
-          label: 'Cadastrar um novo automaticamente',
+          label: 'Cadastrar automaticamente',
         })
         setValue('productMaxAux', {
           nome: product.prrv_nome,
@@ -302,7 +303,7 @@ export default function UpdateProductPWA() {
       } else if (product?.prrv_forv_id) {
         setValue('provider', {
           value: -1,
-          label: 'Cadastrar um novo automaticamente',
+          label: 'Cadastrar automaticamente',
         })
         const dataNewProvider = ProvidersRV?.find(
           (e) => e.forv_id === product?.prrv_forv_id,
@@ -324,7 +325,7 @@ export default function UpdateProductPWA() {
       } else if (product?.prrv_pcrv_id) {
         setValue('category', {
           value: -1,
-          label: 'Cadastrar um novo automaticamente',
+          label: 'Cadastrar automaticamente',
         })
         setValue('categoryAux', {
           pcpw_descricao: product.pcrv_kind,
@@ -375,10 +376,14 @@ export default function UpdateProductPWA() {
           (e) => e.value === location.state.product.prpw_prrv_id,
         ) ?? null,
       )
-      if (location?.state?.productMax) {
+
+      const currentMax = allProductMax?.find(
+        (e) => Number(e.id) === Number(location?.state?.productMax),
+      )
+      if (location?.state?.productMax && currentMax) {
         setValue('productMax', {
-          value: Number(location?.state?.productMax?.id),
-          label: location?.state?.productMax?.nome,
+          value: Number(currentMax?.id),
+          label: currentMax?.nome,
         })
       }
       setValue(

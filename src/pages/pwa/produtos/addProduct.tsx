@@ -245,9 +245,10 @@ export default function AddProduct() {
     })
 
     if (check) {
-      const promise = selectedData.map(async (item, index) => {
+      const newProvidersArray = [] as PWAProvidersProps[] | []
+      const newCategoriesArray = [] as PWACategoriesProps[] | []
+      for (const [index, item] of selectedData.entries()) {
         setCurrentSync(`${index}/${selectedData.length}`)
-
         const productMax = {} as MaxProductsProps
         productMax.status = true
         productMax.preco = formataMoedaPFloat(
@@ -287,18 +288,27 @@ export default function AddProduct() {
           )
 
           if (dataNewProvider && !checkExistProvider) {
-            dataProvider.fopw_nome = dataNewProvider?.forv_provider
-            dataProvider.fopw_forv_id = dataNewProvider?.forv_id
-            dataProvider.fopw_descricao = dataNewProvider?.forv_descricao
-            dataProvider.fopw_termos_condicoes =
-              dataNewProvider?.forv_termos_condicoes
-            dataProvider.fopw_instrucoes = dataNewProvider?.forv_instrucoes
-            dataProvider.fopw_imagem = dataNewProvider?.forv_logo
-            dataProvider.fopw_ativo = true
+            const recentlyProvider = newProvidersArray?.find(
+              (e) => e.fopw_forv_id === item?.prrv_forv_id,
+            )
+            if (!recentlyProvider) {
+              dataProvider.fopw_nome = dataNewProvider?.forv_provider
+              dataProvider.fopw_forv_id = dataNewProvider?.forv_id
+              dataProvider.fopw_descricao = dataNewProvider?.forv_descricao
+              dataProvider.fopw_termos_condicoes =
+                dataNewProvider?.forv_termos_condicoes
+              dataProvider.fopw_instrucoes = dataNewProvider?.forv_instrucoes
+              dataProvider.fopw_imagem = dataNewProvider?.forv_logo
+              dataProvider.fopw_ativo = true
 
-            const resNewProvider = await addPWAProviders(dataProvider)
+              const resNewProvider = await addPWAProviders(dataProvider)
 
-            productApp.prpw_fopw_id = resNewProvider?.fopw_id
+              productApp.prpw_fopw_id = resNewProvider?.fopw_id
+
+              newProvidersArray.push(resNewProvider)
+            } else {
+              productApp.prpw_fopw_id = recentlyProvider?.fopw_id
+            }
           } else if (checkExistProvider) {
             productApp.prpw_fopw_id = checkExistProvider?.fopw_id
           }
@@ -306,18 +316,29 @@ export default function AddProduct() {
 
         if (!category) {
           const dataCategory = {} as PWACategoriesProps
+
           const checkExistCategory = CategoriesPWA?.find(
-            (e) => e.pcpw_rv_id === item?.prrv_pcrv_id,
+            (e) => e.pcpw_descricao === item?.pcrv_kind,
           )
 
           if (!checkExistCategory) {
-            dataCategory.pcpw_ativo = true
-            dataCategory.pcpw_rv_id = item.prrv_pcrv_id
-            dataCategory.pcpw_descricao = item.pcrv_kind
+            const recently = newCategoriesArray?.find(
+              (e) => e.pcpw_descricao === item?.pcrv_kind,
+            )
 
-            const resNewCategory = await addPWACategories(dataCategory)
+            if (!recently) {
+              dataCategory.pcpw_ativo = true
+              dataCategory.pcpw_rv_id = item.prrv_pcrv_id
+              dataCategory.pcpw_descricao = item.pcrv_kind
 
-            productApp.prpw_pcpw_id = resNewCategory?.pcpw_id
+              const resNewCategory = await addPWACategories(dataCategory)
+
+              productApp.prpw_pcpw_id = resNewCategory?.pcpw_id
+
+              newCategoriesArray.push(resNewCategory)
+            } else {
+              productApp.prpw_pcpw_id = recently?.pcpw_id
+            }
           } else {
             productApp.prpw_pcpw_id = checkExistCategory?.pcpw_id
           }
@@ -330,7 +351,7 @@ export default function AddProduct() {
         productApp.prpw_prrv_id = item.prrv_id
         productApp.prpw_descricao = item.prrv_nome
         productApp.prpw_id = product?.prpw_id ?? null
-        productApp.prpw_max_id = res
+        productApp.prpw_max_id = Number(res?.id)
 
         let resProductApp = null
         if (productApp.prpw_id) {
@@ -343,13 +364,12 @@ export default function AddProduct() {
           FormataValorMonetario(item.prrv_valor, false),
         )
         item.prpw_id = resProductApp?.prpw_id
-        item.prrv_max_id = res
+        item.prrv_max_id = Number(res?.id)
         item.prrv_ativo = true
 
         await updateRVProduct(item)
-      })
+      }
 
-      await Promise.allSettled(promise)
       setCurrentSync(null)
       alerta('Sincronização finalizada', 1)
       setTimeout(() => {

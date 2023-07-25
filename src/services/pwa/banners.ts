@@ -11,7 +11,7 @@ import { AxiosError } from 'axios'
 export function useBanners() {
   return useQuery({
     queryKey: ['listBanners'],
-    queryFn: async () => {
+    queryFn: async (): Promise<BannersProps[] | null> => {
       try {
         const res = await api.get('/banners')
 
@@ -92,15 +92,14 @@ export async function deleteBanner(id: number) {
   try {
     const res = await api.delete(`/banners/${id}`)
 
-    const { success, message, error } = res.data
+    const { success } = res.data
 
     if (success) {
-      alerta(message, 1)
-      setTimeout(() => {
-        location.href = '/pwa/banners'
-      }, 400)
+      alerta('Banner removido com sucesso', 1)
+      return true
     } else {
-      alerta(clearCharacters(error))
+      alerta('Não foi possível remover esse banner')
+      return false
     }
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -108,5 +107,6 @@ export async function deleteBanner(id: number) {
     } else {
       console.error(error)
     }
+    return false
   }
 }

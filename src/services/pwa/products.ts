@@ -16,19 +16,23 @@ import { AxiosError } from 'axios'
 export function usePWAProducts() {
   return useQuery({
     queryKey: ['PWAProducts'],
-    queryFn: async (): Promise<PWAProductsProps[] | null> => {
+    queryFn: async (): Promise<PWAProductsProps[] | []> => {
       try {
         const res = await api.get('/pwa/products')
         const { data } = res.data
 
-        return haveData(data)
+        if (haveData(data)) {
+          return haveData(data)
+        } else {
+          return []
+        }
       } catch (error) {
         if (error instanceof AxiosError) {
           alerta(clearCharacters(error.response?.data?.error))
         } else {
           console.error(error)
         }
-        return null
+        return []
       }
     },
   })
