@@ -27,11 +27,11 @@ export function useProductsPWA(idProduct: number) {
       { queryKey: ['PWAProviders'], queryFn: ListProvidersPWA },
       {
         queryKey: ['MaxProducts', 1, 0],
-        queryFn: () => ListMaxProducts(1, 0),
+        queryFn: async () => await ListMaxProducts(1, 0),
       },
       {
         queryKey: ['PWACategoriesOfProducts'],
-        queryFn: () => ListPWACategoriesOfProducts(idProduct),
+        queryFn: async () => await ListPWACategoriesOfProducts(idProduct),
       },
       { queryKey: ['RVProviders'], queryFn: ListProvidersRV },
     ],

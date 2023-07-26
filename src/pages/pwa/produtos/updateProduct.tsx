@@ -114,7 +114,7 @@ export default function UpdateProductPWA() {
     refetchProviders,
     refetchProductsMax,
     ProvidersRV,
-  } = useProductsPWA(location?.state?.prpw_id)
+  } = useProductsPWA(location?.state?.product?.prpw_id)
 
   async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
@@ -370,7 +370,7 @@ export default function UpdateProductPWA() {
       setValue(
         'productRv',
         optionsProductsRV?.find(
-          (e) => e.value === location.state.product.prpw_prrv_id,
+          (e) => e.value === location?.state?.product?.prpw_prrv_id,
         ) ?? null,
       )
 
@@ -386,19 +386,19 @@ export default function UpdateProductPWA() {
       setValue(
         'provider',
         optionsProviders?.find(
-          (e) => e.value === location.state.product.prpw_fopw_id,
+          (e) => e.value === location?.state?.product?.prpw_fopw_id,
         ) ?? null,
       )
       setValue(
         'cash',
         optionsCashback?.find(
-          (e) => e.value === location.state.product.prpw_cash_id,
+          (e) => e.value === location?.state?.product?.prpw_cash_id,
         ) ?? null,
       )
       setValue(
         'category',
         optionsCategories?.find(
-          (e) => e.value === location.state.product.prpw_pcpw_id,
+          (e) => e.value === location?.state?.product?.prpw_pcpw_id,
         ) ?? null,
       )
 
