@@ -5,6 +5,7 @@ export interface PWACategoriesProps {
   pcpw_rv_id: number | null
   pcpw_descricao: string
   pcpw_imagem: string | null
+  prrv_nome: string | null
   pcpw_ativo: boolean
   pcpw_prrv_id: number
 }

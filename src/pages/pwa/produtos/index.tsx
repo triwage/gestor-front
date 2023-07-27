@@ -47,9 +47,9 @@ export default function PWAProducts() {
   const { data, isLoading, isFetching } = usePWAProducts()
 
   const {
-    status,
-    fetchStatus,
     data: ProductsMax,
+    isLoading: isLoading2,
+    isFetching: isFetching2,
   } = useQuery({
     queryKey: ['allProductsMax'],
     queryFn: async () => {
@@ -105,12 +105,9 @@ export default function PWAProducts() {
       },
     },
     {
-      field: 'prrv_nome',
-      headerName: 'Produto RV',
-      flex: 1,
-      minWidth: 130,
-      sortable: true,
-      filter: true,
+      field: 'prpw_id',
+      headerName: 'ID',
+      maxWidth: 60,
     },
     {
       field: 'prpw_descricao',
@@ -123,7 +120,7 @@ export default function PWAProducts() {
     },
     {
       field: 'prpw_valor',
-      headerName: 'Preço',
+      headerName: 'Valor',
       maxWidth: 130,
       minWidth: 90,
       flex: 1,
@@ -133,27 +130,61 @@ export default function PWAProducts() {
       },
     },
     {
-      field: 'fopw_descricao',
-      headerName: 'Fornecedor principal',
+      field: 'prrv_nome',
+      headerName: 'Produto RV',
       flex: 1,
-      width: 120,
+      minWidth: 130,
       sortable: true,
       filter: true,
+      cellRenderer: (params: { data: PWAProductsProps }) => {
+        if (params?.data) {
+          return `${params?.data?.prpw_prrv_id} - ${params?.data?.prrv_nome}`
+        }
+      },
     },
     {
       field: 'pcpw_descricao',
       headerName: 'Categoria principal',
       flex: 1,
-      width: 120,
+      minWidth: 90,
       sortable: true,
       filter: true,
+      cellRenderer: (params: { data: PWAProductsProps }) => {
+        if (params?.data) {
+          return `${params?.data?.prpw_pcpw_id ?? 'N/A'} - ${
+            params?.data?.pcpw_descricao ?? 'N/A'
+          }`
+        }
+      },
+    },
+    {
+      field: 'fopw_descricao',
+      headerName: 'Fornecedor principal',
+      flex: 1,
+      minWidth: 90,
+      sortable: true,
+      filter: true,
+      cellRenderer: (params: { data: PWAProductsProps }) => {
+        if (params?.data) {
+          return `${params?.data?.prpw_fopw_id ?? 'N/A'} - ${
+            params?.data?.fopw_descricao ?? 'N/A'
+          }`
+        }
+      },
     },
     {
       field: 'cash_descricao',
       headerName: 'Cashback',
-      maxWidth: 130,
+      minWidth: 90,
       flex: 1,
       sortable: true,
+      cellRenderer: (params: { data: PWAProductsProps }) => {
+        if (params?.data) {
+          return `${params?.data?.prpw_cash_id ?? 'N/A'} - ${
+            params?.data?.cash_descricao ?? 'N/A'
+          }`
+        }
+      },
     },
     {
       field: 'prpw_ativo',
@@ -235,10 +266,7 @@ export default function PWAProducts() {
 
   return (
     <Container>
-      {(isLoading ||
-        isFetching ||
-        status !== 'success' ||
-        fetchStatus !== 'idle') && <Loader />}
+      {(isLoading || isFetching || isLoading2 || isFetching2) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Produtos PWA</TextHeading>

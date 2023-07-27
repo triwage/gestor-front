@@ -83,9 +83,23 @@ export default function PWACategories() {
       field: 'pcpw_descricao',
       headerName: 'Nome',
       flex: 1,
-      width: 120,
+      minWidth: 120,
       sortable: true,
       filter: true,
+    },
+    {
+      field: 'pcpw_rv_id',
+      headerName: 'Categoria RV',
+      minWidth: 80,
+      flex: 1,
+      sortable: true,
+      cellRenderer: (params: { data: PWACategoriesProps }) => {
+        if (params?.data) {
+          return `${params?.data?.pcpw_rv_id ?? 'N/A'} - ${
+            params?.data?.prrv_nome ?? 'N/A'
+          }`
+        }
+      },
     },
     {
       field: 'cash_descricao',
@@ -93,11 +107,18 @@ export default function PWACategories() {
       minWidth: 80,
       flex: 1,
       sortable: true,
+      cellRenderer: (params: { data: PWACategoriesProps }) => {
+        if (params?.data) {
+          return `${params?.data?.pcpw_cash_id ?? 'N/A'} - ${
+            params?.data?.cash_descricao ?? 'N/A'
+          }`
+        }
+      },
     },
     {
       field: 'pcpw_imagem',
       headerName: 'Imagem',
-      maxWidth: 85,
+      minWidth: 85,
       cellStyle: {
         display: 'flex',
         alignItems: 'center',

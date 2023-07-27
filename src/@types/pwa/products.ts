@@ -5,6 +5,7 @@ export interface PWAProductsProps {
   prpw_cash_id: number
   cash_descricao: string | null
   prpw_pcpw_id: number
+  prrv_nome: string | null
   pcpw_descricao: string | null
   prpw_fopw_id: number
   fopw_descricao: string | null

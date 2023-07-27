@@ -96,11 +96,18 @@ export default function PWAProviders() {
       filter: true,
     },
     {
-      field: 'fopw_instrucoes',
-      headerName: 'Instruções',
-      minWidth: 90,
+      field: 'forv_provider',
+      headerName: 'Fornecedor RV',
+      minWidth: 80,
       flex: 1,
       sortable: true,
+      cellRenderer: (params: { data: PWAProvidersProps }) => {
+        if (params?.data) {
+          return `${params?.data?.fopw_forv_id ?? 'N/A'} - ${
+            params?.data?.forv_provider ?? 'N/A'
+          }`
+        }
+      },
     },
     {
       field: 'fopw_imagem',
