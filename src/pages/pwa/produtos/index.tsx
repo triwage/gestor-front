@@ -8,13 +8,10 @@ import { Loader } from '../../../components/System/Loader'
 import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import { ListAllProductsInMax } from '../../../services/max/products'
 import {
   deletePWAProduct,
   usePWAProducts,
 } from '../../../services/pwa/products'
-
-import { useEditProductPWAStore } from '../../../store/useEditProductPWAStore'
 
 import { PWAProductsProps } from '../../../@types/pwa/products'
 
@@ -30,7 +27,7 @@ import {
   PlusCircle,
   TrashSimple,
 } from '@phosphor-icons/react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
@@ -39,25 +36,11 @@ export default function PWAProducts() {
   const [idData, setIdData] = useState<number | null>(null)
   const queryClient = useQueryClient()
   const router = useNavigate()
-  const { setAllProductMax } = useEditProductPWAStore()
 
   const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
 
   const { data, isLoading, isFetching } = usePWAProducts()
-
-  const {
-    data: ProductsMax,
-    isLoading: isLoading2,
-    isFetching: isFetching2,
-  } = useQuery({
-    queryKey: ['allProductsMax'],
-    queryFn: async () => {
-      const res = await ListAllProductsInMax()
-      setAllProductMax(res)
-      return res
-    },
-  })
 
   const [columnDefs] = useState<ColDef[]>([
     {
@@ -78,7 +61,7 @@ export default function PWAProducts() {
                 router('updateProduct', {
                   state: {
                     product: params.data,
-                    productMax: Number(params.data.prpw_max_id),
+                    productMax: Number(params.data?.prpw_max_id),
                   },
                 })
               }}
@@ -266,7 +249,7 @@ export default function PWAProducts() {
 
   return (
     <Container>
-      {(isLoading || isFetching || isLoading2 || isFetching2) && <Loader />}
+      {(isLoading || isFetching) && <Loader />}
       <div className="flex h-full w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-gray/30 pb-2">
           <TextHeading>Produtos PWA</TextHeading>
@@ -307,12 +290,11 @@ export default function PWAProducts() {
         </div>
       </div>
 
-      {idData && isOpenModalMaxProduct && ProductsMax && (
+      {idData && isOpenModalMaxProduct && (
         <ModalInfoMaxProduct
           open={isOpenModalMaxProduct}
           closeDialog={() => setIsOpenModalMaxProduct(false)}
           id={idData}
-          productsMax={ProductsMax}
         />
       )}
     </Container>

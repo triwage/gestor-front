@@ -26,8 +26,6 @@ import {
 } from '../../../services/pwa/products'
 import { addPWAProviders } from '../../../services/pwa/providers'
 
-import { useEditProductPWAStore } from '../../../store/useEditProductPWAStore'
-
 import { MaxProductsProps } from '../../../@types/max/products'
 import { PWAProductsProps } from '../../../@types/pwa/products'
 import { SelectProps } from '../../../@types/select'
@@ -88,9 +86,6 @@ export default function UpdateProductPWA() {
     getValues,
     formState: { dirtyFields },
   } = formProduct
-
-  const { allProductMax } = useEditProductPWAStore()
-
   const { Confirm } = useConfirm()
   const { setLoading } = useLoading()
 
@@ -114,7 +109,11 @@ export default function UpdateProductPWA() {
     refetchProviders,
     refetchProductsMax,
     ProvidersRV,
-  } = useProductsPWA(location?.state?.product?.prpw_id)
+    ProductIndividualMax,
+  } = useProductsPWA(
+    location?.state?.product?.prpw_id,
+    location?.state?.productMax,
+  )
 
   async function handleUpdateProductMax(data: Inputs) {
     setLoading(true)
@@ -374,10 +373,8 @@ export default function UpdateProductPWA() {
         ) ?? null,
       )
 
-      const currentMax = allProductMax?.find(
-        (e) => Number(e.id) === Number(location?.state?.productMax),
-      )
-      if (location?.state?.productMax && currentMax) {
+      if (location?.state?.productMax && ProductIndividualMax) {
+        const currentMax = ProductIndividualMax[0]
         setValue('productMax', {
           value: Number(currentMax?.id),
           label: currentMax?.nome,

@@ -28,7 +28,7 @@ export default function Login() {
     const res = await Auth({ login, senha })
     setLoading(false)
     if (res) {
-      router('/')
+      router('/pwa/produtos')
     }
   }
 

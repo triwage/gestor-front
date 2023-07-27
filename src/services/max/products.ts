@@ -15,7 +15,7 @@ export function useMaxProducts() {
   const { currentStatus } = useMaxProductsStore()
   return useQuery({
     queryKey: ['MaxProducts', currentStatus],
-    queryFn: () => ListMaxProducts(currentStatus),
+    queryFn: async () => await ListMaxProducts(currentStatus),
   })
 }
 
@@ -51,6 +51,29 @@ export async function ListMaxProducts(
       alerta(clearCharacters(error.response?.data?.error))
     } else {
       console.error(error)
+    }
+    return null
+  }
+}
+
+export async function ListMaxProduct(
+  idMax?: number,
+): Promise<MaxProductsProps[] | null> {
+  try {
+    const ids = [idMax]
+    const res = await api.get('/maxnivel/products', {
+      params: {
+        status: 1,
+        id: JSON.stringify(ids),
+      },
+    })
+
+    const { data } = res.data
+
+    return haveData(data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
     }
     return null
   }
