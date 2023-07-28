@@ -78,6 +78,8 @@ export default function PWAProviders() {
       headerName: 'ID',
       sort: 'asc',
       maxWidth: 80,
+      sortable: true,
+      filter: true,
     },
     {
       field: 'fopw_nome',

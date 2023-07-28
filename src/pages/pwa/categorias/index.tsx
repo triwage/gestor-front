@@ -78,6 +78,8 @@ export default function PWACategories() {
       headerName: 'ID',
       sort: 'asc',
       maxWidth: 80,
+      sortable: true,
+      filter: true,
     },
     {
       field: 'pcpw_descricao',

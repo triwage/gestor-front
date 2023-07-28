@@ -60,6 +60,8 @@ interface Inputs extends PWAProductsProps {
   categoryAux: any
   provider: SelectProps | null
   providerAux: any
+  prrv_valor_maximo?: string | null
+  prrv_valor_minimo?: string | null
 }
 
 const schemaProduct = yup
@@ -77,6 +79,10 @@ export default function UpdateProductPWA() {
   const formProduct = useForm<Inputs>({
     // @ts-expect-error
     resolver: yupResolver(schemaProduct),
+    defaultValues: {
+      prrv_valor_minimo: '-',
+      prrv_valor_maximo: '-',
+    },
   })
   const {
     handleSubmit,
@@ -109,14 +115,26 @@ export default function UpdateProductPWA() {
     refetchProviders,
     refetchProductsMax,
     ProvidersRV,
-    ProductIndividualMax,
-  } = useProductsPWA(
-    location?.state?.product?.prpw_id,
-    location?.state?.productMax,
-  )
+  } = useProductsPWA(location?.state?.product?.prpw_id)
 
-  async function handleUpdateProductMax(data: Inputs) {
+  async function handleUpdateProductPWA(data: Inputs) {
     setLoading(true)
+
+    const productRvSelected = ProductsRV?.find(
+      (e) => e.prrv_id === Number(data.productRv?.value),
+    )
+    const valueCurrent = formataMoedaPFloat(data.prpw_valor)
+    if (
+      formataMoedaPFloat(productRvSelected?.prrv_valor_maximo) &&
+      formataMoedaPFloat(productRvSelected?.prrv_valor_minimo) &&
+      (valueCurrent >
+        formataMoedaPFloat(productRvSelected?.prrv_valor_maximo) ||
+        valueCurrent < formataMoedaPFloat(productRvSelected?.prrv_valor_minimo))
+    ) {
+      alerta('O preço deve estar entre o valor mínimo e máximo permitido')
+      setLoading(false)
+      return
+    }
 
     const { prpw_descricao, prpw_valor, prpw_ativo } = dirtyFields
     if (
@@ -263,6 +281,19 @@ export default function UpdateProductPWA() {
     if (productRvSelected) {
       const product = ProductsRV?.find((e) => e.prrv_id === productRvSelected)
 
+      setValue(
+        'prrv_valor_minimo',
+        product?.prrv_valor_minimo
+          ? FormataValorMonetario(product?.prrv_valor_minimo)
+          : '-',
+      )
+      setValue(
+        'prrv_valor_maximo',
+        product?.prrv_valor_maximo
+          ? FormataValorMonetario(product?.prrv_valor_maximo)
+          : '-',
+      )
+
       let provider = ProvidersPWA?.find(
         (e) => e.fopw_forv_id === product?.prrv_forv_id,
       ) as any
@@ -366,6 +397,23 @@ export default function UpdateProductPWA() {
       resImage.onerror = function () {
         setValue('prpw_imagem', null)
       }
+      const product = ProductsRV?.find(
+        (e) => e.prrv_id === location?.state?.product?.prpw_prrv_id,
+      )
+
+      setValue(
+        'prrv_valor_minimo',
+        product?.prrv_valor_minimo
+          ? FormataValorMonetario(product?.prrv_valor_minimo)
+          : '-',
+      )
+      setValue(
+        'prrv_valor_maximo',
+        product?.prrv_valor_maximo
+          ? FormataValorMonetario(product?.prrv_valor_maximo)
+          : '-',
+      )
+
       setValue(
         'productRv',
         optionsProductsRV?.find(
@@ -373,13 +421,13 @@ export default function UpdateProductPWA() {
         ) ?? null,
       )
 
-      if (location?.state?.productMax && ProductIndividualMax) {
-        const currentMax = ProductIndividualMax[0]
-        setValue('productMax', {
-          value: Number(currentMax?.id),
-          label: currentMax?.nome,
-        })
-      }
+      setValue(
+        'productMax',
+        optionsProductsMax?.find(
+          (e) => e.value === location?.state?.product?.prpw_max_id,
+        ) ?? null,
+      )
+
       setValue(
         'provider',
         optionsProviders?.find(
@@ -436,7 +484,7 @@ export default function UpdateProductPWA() {
         <FormProvider {...formProduct}>
           <form
             className="my-2 space-y-2"
-            onSubmit={handleSubmit(handleUpdateProductMax)}
+            onSubmit={handleSubmit(handleUpdateProductPWA)}
           >
             <div className="flex gap-2">
               <Select
@@ -445,18 +493,25 @@ export default function UpdateProductPWA() {
                 name="productRv"
                 options={optionsProductsRV}
                 onChange={(e: any) => handleChangeProductRV(e)}
+                isDisabled={location.state}
               />
               <Input name="prpw_descricao" label="Nome" />
             </div>
 
             <div className="grid grid-cols-2 items-center gap-2">
-              <InputCurrency name="prpw_valor" label="Preço" />
+              <InputCurrency
+                name="prpw_valor"
+                label={`Preço - (Mín: ${watch(
+                  'prrv_valor_minimo',
+                )}, Máx: ${watch('prrv_valor_maximo')})`}
+              />
               <div className="flex items-center gap-2">
                 <Select
                   control={control}
                   label="Produto MAX"
                   name="productMax"
                   options={optionsProductsMax}
+                  isDisabled={location.state}
                 />
                 {!location?.state && !watch('productMax') && (
                   <div className="mt-4 w-[80px]">
@@ -596,7 +651,7 @@ export default function UpdateProductPWA() {
             <div className="w-full border-t border-border pt-1">
               <Button
                 type="submit"
-                onClick={() => handleSubmit(handleUpdateProductMax)}
+                onClick={() => handleSubmit(handleUpdateProductPWA)}
               >
                 <FloppyDiskBack size={18} weight="fill" />
                 {location.state ? 'Atualizar produto' : 'Adicionar produto'}

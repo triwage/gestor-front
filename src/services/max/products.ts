@@ -63,7 +63,6 @@ export async function ListMaxProduct(
     const ids = [idMax]
     const res = await api.get('/maxnivel/products', {
       params: {
-        status: 1,
         id: JSON.stringify(ids),
       },
     })

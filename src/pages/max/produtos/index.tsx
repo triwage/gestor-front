@@ -70,6 +70,8 @@ export default function MaxProducts() {
       field: 'id',
       headerName: 'ID',
       maxWidth: 80,
+      sortable: true,
+      filter: true,
     },
     {
       field: 'nome',

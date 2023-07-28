@@ -16,6 +16,7 @@ export interface SelectProps extends InputHTMLAttributes<HTMLInputElement> {
   className?: string
   label?: string | ReactNode
   schema?: RegisterOptions<FieldValues, string> | undefined
+  isDisabled?: boolean
 }
 
 export function Select({

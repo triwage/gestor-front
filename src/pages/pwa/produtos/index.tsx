@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
 import { ModalInfoMaxProduct } from '../../../components/Pages/PWA/ModalInfoMaxProduct'
+import { ModalInfoRVProduct } from '../../../components/Pages/PWA/ModalInfoRVProduct'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextAction } from '../../../components/Texts/TextAction'
@@ -34,6 +35,8 @@ import { AgGridReact } from 'ag-grid-react'
 export default function PWAProducts() {
   const [isOpenModalMaxProduct, setIsOpenModalMaxProduct] = useState(false)
   const [idData, setIdData] = useState<number | null>(null)
+  const [idDataProductRV, setIdDataProductRV] = useState<number | null>(null)
+  const [isOpenModalRV, setIsOpenModalRV] = useState(false)
   const queryClient = useQueryClient()
   const router = useNavigate()
 
@@ -61,7 +64,6 @@ export default function PWAProducts() {
                 router('updateProduct', {
                   state: {
                     product: params.data,
-                    productMax: Number(params.data?.prpw_max_id),
                   },
                 })
               }}
@@ -91,6 +93,8 @@ export default function PWAProducts() {
       field: 'prpw_id',
       headerName: 'ID',
       maxWidth: 60,
+      sortable: true,
+      filter: true,
     },
     {
       field: 'prpw_descricao',
@@ -116,12 +120,36 @@ export default function PWAProducts() {
       field: 'prrv_nome',
       headerName: 'Produto RV',
       flex: 1,
-      minWidth: 130,
+      minWidth: 170,
       sortable: true,
       filter: true,
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+      },
       cellRenderer: (params: { data: PWAProductsProps }) => {
-        if (params?.data) {
-          return `${params?.data?.prpw_prrv_id} - ${params?.data?.prrv_nome}`
+        if (params.data.prpw_max_id) {
+          return (
+            <>
+              <TextAction className="text-[15px] font-medium">{`${params?.data?.prpw_prrv_id} - ${params?.data?.prrv_nome}`}</TextAction>
+              <Icon
+                onClick={() => {
+                  setIdDataProductRV(params.data.prpw_prrv_id)
+                  setIsOpenModalRV(true)
+                }}
+                className="h-4 w-4"
+              >
+                <ArrowSquareOut
+                  size={18}
+                  weight="fill"
+                  className="text-black dark:text-white"
+                />
+              </Icon>
+            </>
+          )
+        } else {
+          return '-'
         }
       },
     },
@@ -192,8 +220,8 @@ export default function PWAProducts() {
     {
       field: 'prpw_max_id',
       headerName: 'Max ID',
-      maxWidth: 110,
-      minWidth: 70,
+      maxWidth: 90,
+      minWidth: 60,
       sortable: true,
       cellStyle: {
         display: 'flex',
@@ -203,14 +231,16 @@ export default function PWAProducts() {
       cellRenderer: (params: { data: PWAProductsProps }) => {
         if (params.data.prpw_max_id) {
           return (
-            <div className="flex items-center justify-center gap-2">
-              <TextAction>{params.data.prpw_max_id}</TextAction>
+            <div className="flex items-center justify-center gap-1">
+              <TextAction className="text-[15px] font-medium">
+                {params.data.prpw_max_id}
+              </TextAction>
               <Icon
                 onClick={() => {
                   setIdData(params.data.prpw_max_id)
                   setIsOpenModalMaxProduct(true)
                 }}
-                className="h-full w-full"
+                className="h-4 w-4"
               >
                 <ArrowSquareOut
                   size={20}
@@ -295,6 +325,14 @@ export default function PWAProducts() {
           open={isOpenModalMaxProduct}
           closeDialog={() => setIsOpenModalMaxProduct(false)}
           id={idData}
+        />
+      )}
+
+      {idDataProductRV && isOpenModalRV && (
+        <ModalInfoRVProduct
+          open={isOpenModalRV}
+          closeDialog={() => setIsOpenModalRV(false)}
+          id={idDataProductRV}
         />
       )}
     </Container>

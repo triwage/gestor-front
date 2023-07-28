@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { ListMaxProduct, ListMaxProducts } from '../services/max/products'
+import { ListAllProductsInMax } from '../services/max/products'
 import { ListCashback } from '../services/pwa/cashback'
 import { ListCategoriesPWA } from '../services/pwa/categories'
 import { ListPWACategoriesOfProducts } from '../services/pwa/products'
@@ -10,7 +10,7 @@ import { ListProvidersRV } from '../services/rv/providers'
 
 import { useQueries } from '@tanstack/react-query'
 
-export function useProductsPWA(idProduct: number, idMax: number) {
+export function useProductsPWA(idProduct: number) {
   const [
     ProductsRV,
     CashbackPWA,
@@ -19,7 +19,6 @@ export function useProductsPWA(idProduct: number, idMax: number) {
     ProductsMax,
     CategoriesOfProducts,
     ProvidersRV,
-    ProductIndividualMax,
   ] = useQueries({
     queries: [
       { queryKey: ['RVProducts'], queryFn: ListProductsRV },
@@ -27,18 +26,14 @@ export function useProductsPWA(idProduct: number, idMax: number) {
       { queryKey: ['PWACategories'], queryFn: ListCategoriesPWA },
       { queryKey: ['PWAProviders'], queryFn: ListProvidersPWA },
       {
-        queryKey: ['MaxProducts', 1, 0],
-        queryFn: async () => await ListMaxProducts(1, 0),
+        queryKey: ['AllMaxProducts'],
+        queryFn: ListAllProductsInMax,
       },
       {
         queryKey: ['PWACategoriesOfProducts'],
         queryFn: async () => await ListPWACategoriesOfProducts(idProduct),
       },
       { queryKey: ['RVProviders'], queryFn: ListProvidersRV },
-      {
-        queryKey: ['MaxProductIndividual', idMax],
-        queryFn: async () => await ListMaxProduct(idMax),
-      },
     ],
   })
 
@@ -132,7 +127,6 @@ export function useProductsPWA(idProduct: number, idMax: number) {
   }
 
   return {
-    ProductIndividualMax: ProductIndividualMax.data,
     ProductsRV: ProductsRV.data,
     CashbackPWA: CashbackPWA.data,
     CategoriesPWA: CategoriesPWA.data,

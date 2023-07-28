@@ -66,6 +66,8 @@ export default function RVProducts() {
       field: 'prrv_id',
       headerName: 'ID',
       maxWidth: 60,
+      sortable: true,
+      filter: true,
     },
     {
       field: 'prrv_nome',

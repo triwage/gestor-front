@@ -66,3 +66,24 @@ export async function updateRVProduct(data: RVProductsProps) {
     return false
   }
 }
+
+export async function ListRVIndividual(
+  id: number,
+): Promise<RVProductsProps[] | null> {
+  try {
+    const res = await api.get('/rv/products', {
+      params: {
+        pesquisa: id,
+      },
+    })
+
+    const { data } = res.data
+
+    return haveData(data)
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    }
+    return null
+  }
+}
