@@ -650,6 +650,7 @@ export default function UpdateProductPWA() {
             </div>
             <div className="w-full border-t border-border pt-1">
               <Button
+                disable={location?.state?.product?.produto_padrao}
                 type="submit"
                 onClick={() => handleSubmit(handleUpdateProductPWA)}
               >
@@ -669,8 +670,8 @@ export default function UpdateProductPWA() {
           refetchCategories()
           if (res) {
             setValue('category', {
-              value: res?.pcpw_id,
-              label: res?.pcpw_descricao,
+              value: Number(res?.pcpw_id),
+              label: `${res?.pcpw_descricao}`,
             })
           }
         }}

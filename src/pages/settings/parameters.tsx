@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router'
 
 import { Button } from '../../components/Form/Button'
 import { Input } from '../../components/Form/Input'
-import { ModalInfoMaxProduct } from '../../components/Pages/PWA/ModalInfoMaxProduct'
+import { ModalInfoPWAProduct } from '../../components/Pages/PWA/ModalInfoPWAProduct'
+import { alerta } from '../../components/System/Alert'
 import { Icon } from '../../components/System/Icon'
 import { Loader } from '../../components/System/Loader'
 import { TextAction } from '../../components/Texts/TextAction'
@@ -16,11 +17,15 @@ import {
   updateParamsDefault,
   useParamsDefault,
 } from '../../services/paramsDefault'
+import {
+  addPWACategories,
+  usePWACategories,
+} from '../../services/pwa/categories'
+import { addPWAProduct, deletePWAProduct } from '../../services/pwa/products'
 
 import { UpdateParamsDefaultProps } from '../../@types/paramsDefault'
 import { SelectProps } from '../../@types/select'
 
-import useConfirm from '../../contexts/ConfirmContext'
 import useLoading from '../../contexts/LoadingContext'
 import { getBase64, handleUploadImage } from '../../functions/general'
 import { Container } from '../../template/Container'
@@ -28,37 +33,37 @@ import {
   CaretLeft,
   FloppyDiskBack,
   FileImage,
-  ArrowSquareOut,
-  ArrowCounterClockwise,
+  Eye,
+  PlusSquare,
+  X,
 } from '@phosphor-icons/react'
 
 interface Inputs extends UpdateParamsDefaultProps {
-  para_prod_pgto_max_id: number | null
+  para_prod_pgto_pwa_id: number | null
   para_imagem_padrao_produto: string | null
-  imagem_aux_produto: File
+  imagem_aux_produto: File | null
   para_imagem_padrao_fornecedor: string | null
-  imagem_aux_fornecedor: File
+  imagem_aux_fornecedor: File | null
   para_imagem_padrao_categoria: string | null
-  imagem_aux_categoria: File
+  imagem_aux_categoria: File | null
   productMax: SelectProps | null
 }
 
 export default function Params() {
-  const [isOpenModalMaxProduct, setIsOpenModalMaxProduct] = useState(false)
+  const [isOpenModalPWAProduct, setIsOpenModalPWAProduct] = useState(false)
   const [idData, setIdData] = useState<number | null>(null)
 
   const formParams = useForm<Inputs>()
   const { handleSubmit, setValue, watch } = formParams
 
+  const { data: ParamsDefault, isLoading, isFetching } = useParamsDefault()
   const {
-    data: ParamsDefault,
-    isLoading,
-    isFetching,
-    refetch,
-  } = useParamsDefault()
+    data: PWACategories,
+    isLoading: isLoading2,
+    isFetching: isFetching2,
+  } = usePWACategories()
   const router = useNavigate()
   const { setLoading } = useLoading()
-  const { Confirm } = useConfirm()
 
   async function getImage(event: ChangeEvent<HTMLInputElement>) {
     const res = await handleUploadImage(event)
@@ -120,12 +125,14 @@ export default function Params() {
     }
 
     if (imageAnexedCategory) {
-      data.para_imagem_padrao_categoria = await uploadImages(imageAnexed)
+      data.para_imagem_padrao_categoria = await uploadImages(
+        imageAnexedCategory,
+      )
     } else {
       data.para_imagem_padrao_categoria = watch('para_imagem_padrao_categoria')
     }
 
-    if (!data.para_prod_pgto_max_id) {
+    if (!data.para_prod_pgto_pwa_id) {
       const res = await addMaxProduct({
         descricao: 'Produto padrão',
         imagem_padrao_url: data.para_imagem_padrao_produto,
@@ -135,32 +142,115 @@ export default function Params() {
         id: null,
       })
 
-      data.para_prod_pgto_max_id = Number(res?.id)
+      if (res) {
+        const defaultCategory = PWACategories?.find((e) => e.categoria_padrao)
+        let prpw_pcpw_id = null
+        if (defaultCategory) {
+          prpw_pcpw_id = defaultCategory?.pcpw_id
+        } else {
+          const newCategorie = await addPWACategories({
+            pcpw_cash_id: null,
+            pcpw_descricao: 'Categoria padrão',
+            pcpw_imagem: 'Sem imagem',
+            pcpw_ativo: true,
+            pcpw_categoria_operacao: 'pagamentos',
+          })
+          prpw_pcpw_id = newCategorie?.pcpw_id
+        }
+
+        const resPwa = await addPWAProduct({
+          prpw_id: null,
+          prrv_nome: null,
+          prpw_prrv_id: null,
+          prpw_max_id: Number(res?.id),
+          prpw_cash_id: null,
+          cash_descricao: null,
+          prpw_pcpw_id,
+          pcpw_descricao: null,
+          prpw_fopw_id: null,
+          fopw_descricao: null,
+          prpw_descricao: 'Produto padrão',
+          prpw_imagem: 'não nula',
+          prpw_valor: 0.01,
+          prpw_ativo: true,
+        })
+
+        data.para_prod_pgto_pwa_id = Number(resPwa?.id)
+      }
     }
     await updateParamsDefault(data)
     setLoading(false)
   }
 
-  async function resetParams() {
-    const check = await Confirm({
-      title: 'Restar parâmetros',
-      message: 'Tem certeza que deseja limpar os parâmetros?',
+  async function addProduct() {
+    setLoading(true)
+
+    const res = await addMaxProduct({
+      descricao: 'Produto padrão',
+      imagem_padrao_url: null,
+      preco: 0.01,
+      status: true,
+      nome: 'Produto padrão',
+      id: null,
     })
 
-    if (check) {
-      setLoading(true)
-      const payload = {
+    if (res) {
+      const defaultCategory = PWACategories?.find((e) => e.categoria_padrao)
+      let prpw_pcpw_id = null
+      if (defaultCategory) {
+        prpw_pcpw_id = defaultCategory?.pcpw_id
+      } else {
+        const newCategorie = await addPWACategories({
+          pcpw_cash_id: null,
+          pcpw_descricao: 'Categoria padrão',
+          pcpw_imagem: 'Sem imagem',
+          pcpw_ativo: true,
+          pcpw_categoria_operacao: 'pagamentos',
+        })
+        prpw_pcpw_id = newCategorie?.pcpw_id
+      }
+
+      const resPwa = await addPWAProduct({
+        prpw_id: null,
+        prrv_nome: null,
+        prpw_prrv_id: null,
+        prpw_max_id: Number(res?.id),
+        prpw_cash_id: null,
+        cash_descricao: null,
+        prpw_pcpw_id,
+        pcpw_descricao: null,
+        prpw_fopw_id: null,
+        fopw_descricao: null,
+        prpw_descricao: 'Produto padrão',
+        prpw_imagem: 'não nula',
+        prpw_valor: 0.01,
+        prpw_ativo: true,
+      })
+      setValue('para_prod_pgto_pwa_id', Number(resPwa?.prpw_id))
+      await updateParamsDefault({
         para_id: 1,
-        para_prod_pgto_max_id: null,
+        para_prod_pgto_pwa_id: Number(resPwa?.prpw_id),
         para_imagem_padrao_produto: null,
         para_imagem_padrao_fornecedor: null,
         para_imagem_padrao_categoria: null,
-      }
-      // @ts-expect-error
-      await updateParamsDefault(payload)
-      refetch()
-      setLoading(false)
+      })
     }
+    setLoading(false)
+  }
+
+  async function removeProduct() {
+    setLoading(true)
+    const id = watch('para_prod_pgto_pwa_id')
+
+    if (id) {
+      const res = await deletePWAProduct(id)
+
+      if (res) {
+        setValue('para_prod_pgto_pwa_id', null)
+        alerta('Produto removido com sucesso', 1)
+      }
+    }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -176,7 +266,7 @@ export default function Params() {
 
   return (
     <Container>
-      {(isLoading || isFetching) && <Loader />}
+      {(isLoading || isFetching || isLoading2 || isFetching2) && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -192,29 +282,46 @@ export default function Params() {
             className="my-2 h-full w-full space-y-2"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <div className="flex w-full items-start gap-2">
-              <div className="flex w-1/2 items-center gap-2">
+            <div className="flex h-full w-full items-start gap-2">
+              <div className="flex min-h-[240px] w-1/2 flex-col justify-between gap-1">
                 <Input
-                  name="para_prod_pgto_max_id"
-                  label="ID Produto MAX"
+                  name="para_prod_pgto_pwa_id"
+                  label="Produto padrão de pagamento"
                   disabled
                 />
-                <Icon
-                  className="h-5 w-5"
-                  title="Ver produto max"
-                  onClick={() => {
-                    setIdData(watch('para_prod_pgto_max_id'))
-                    setIsOpenModalMaxProduct(true)
-                  }}
-                >
-                  <ArrowSquareOut
-                    size={22}
-                    weight="fill"
-                    className="text-black dark:text-white"
-                  />
-                </Icon>
+                <div className="flex w-full flex-col gap-2">
+                  <Button
+                    type="button"
+                    variant="structure"
+                    className="bg-purple text-white"
+                    onClick={() => {
+                      setIdData(watch('para_prod_pgto_pwa_id'))
+                      setIsOpenModalPWAProduct(true)
+                    }}
+                  >
+                    <Eye size={20} />
+                    Ver produto
+                  </Button>
+                  {!watch('para_prod_pgto_pwa_id') ? (
+                    <Button type="button" onClick={addProduct}>
+                      <PlusSquare size={20} />
+                      Adicionar produto
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="structure"
+                      className="bg-red text-white"
+                      onClick={removeProduct}
+                    >
+                      <X size={20} />
+                      Excluir produto
+                    </Button>
+                  )}
+                </div>
               </div>
-              <div className="flex w-1/2 flex-col gap-2 p-1">
+
+              <div className="flex min-h-[240px] w-1/2 flex-col justify-between gap-2 p-1">
                 <TextAction className="text-sm font-medium text-black dark:text-white">
                   Imagem padrão para produto
                 </TextAction>
@@ -237,6 +344,20 @@ export default function Params() {
                       ? 'Adicionar imagem'
                       : 'Alterar imagem'}
                   </div>
+                  {watch('para_imagem_padrao_produto') && (
+                    <Button
+                      onClick={() => {
+                        setValue('para_imagem_padrao_produto', null)
+                        setValue('imagem_aux_produto', null)
+                      }}
+                      type="button"
+                      variant="structure"
+                      className="mt-1 bg-red text-white"
+                    >
+                      <X size={20} />
+                      Remover imagem
+                    </Button>
+                  )}
                   <TextAction className="text-sm text-black dark:text-white">
                     Anexe uma imagem com proporção 1.6, Ex: 197x123
                   </TextAction>
@@ -253,7 +374,7 @@ export default function Params() {
             </div>
 
             <div className="flex h-full w-full gap-2 border-t border-border pt-1">
-              <div className="flex h-full min-h-[240px] w-full flex-col justify-between gap-2 p-1">
+              <div className="flex h-full min-h-[280px] w-full flex-col justify-between gap-2 p-1">
                 <TextAction className="text-sm font-medium text-black dark:text-white">
                   Imagem padrão para fornecedor
                 </TextAction>
@@ -277,6 +398,20 @@ export default function Params() {
                           ? 'Adicionar imagem fornecedor'
                           : 'Alterar imagem fornecedor'}
                       </div>
+                      {watch('para_imagem_padrao_fornecedor') && (
+                        <Button
+                          onClick={() => {
+                            setValue('para_imagem_padrao_fornecedor', null)
+                            setValue('imagem_aux_fornecedor', null)
+                          }}
+                          type="button"
+                          variant="structure"
+                          className="mt-1 bg-red text-white"
+                        >
+                          <X size={20} />
+                          Remover imagem
+                        </Button>
+                      )}
                       <TextAction className="text-sm text-black dark:text-white">
                         Anexe uma imagem com proporção 1.3, Ex: 165x120
                       </TextAction>
@@ -291,7 +426,7 @@ export default function Params() {
                   </div>
                 </div>
               </div>
-              <div className="flex h-full min-h-[240px] w-full flex-col justify-between gap-2 p-1">
+              <div className="flex h-full min-h-[280px] w-full flex-col justify-between gap-2 p-1">
                 <TextAction className="text-sm font-medium text-black dark:text-white">
                   Imagem padrão para categoria
                 </TextAction>
@@ -316,6 +451,21 @@ export default function Params() {
                           ? 'Adicionar imagem categoria'
                           : 'Alterar imagem categoria'}
                       </div>
+                      {watch('para_imagem_padrao_categoria') && (
+                        <Button
+                          onClick={() => {
+                            setValue('para_imagem_padrao_categoria', null)
+                            setValue('imagem_aux_categoria', null)
+                          }}
+                          type="button"
+                          variant="structure"
+                          className="mt-1 bg-red text-white"
+                        >
+                          <X size={20} />
+                          Remover imagem
+                        </Button>
+                      )}
+
                       <TextAction className="text-sm text-black dark:text-white">
                         Anexe uma imagem com proporção 0.75, Ex: 146x195
                       </TextAction>
@@ -333,17 +483,6 @@ export default function Params() {
             </div>
 
             <div className="w-full border-t border-border pt-3">
-              <Button
-                variant="structure"
-                type="button"
-                className="bg-red text-white"
-                onClick={async () => await resetParams()}
-              >
-                <ArrowCounterClockwise size={18} weight="fill" />
-                Resetar parâmetros
-              </Button>
-            </div>
-            <div className="w-full">
               <Button type="submit" onClick={() => handleSubmit(onSubmit)}>
                 <FloppyDiskBack size={18} weight="fill" />
                 Atualizar parâmetro
@@ -353,10 +492,10 @@ export default function Params() {
         </FormProvider>
       </div>
 
-      {idData && isOpenModalMaxProduct && (
-        <ModalInfoMaxProduct
-          open={isOpenModalMaxProduct}
-          closeDialog={() => setIsOpenModalMaxProduct(false)}
+      {idData && isOpenModalPWAProduct && (
+        <ModalInfoPWAProduct
+          open={isOpenModalPWAProduct}
+          closeDialog={() => setIsOpenModalPWAProduct(false)}
           id={idData}
         />
       )}

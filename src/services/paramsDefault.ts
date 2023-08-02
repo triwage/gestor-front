@@ -33,7 +33,7 @@ export async function updateParamsDefault(data: UpdateParamsDefaultProps) {
   try {
     const payload = {
       para_id: 1,
-      para_prod_pgto_max_id: data.para_prod_pgto_max_id,
+      para_prod_pgto_pwa_id: data.para_prod_pgto_pwa_id,
       para_imagem_padrao_produto: data.para_imagem_padrao_produto,
       para_imagem_padrao_fornecedor: data.para_imagem_padrao_fornecedor,
       para_imagem_padrao_categoria: data.para_imagem_padrao_categoria,

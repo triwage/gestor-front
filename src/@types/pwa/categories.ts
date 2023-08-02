@@ -1,13 +1,15 @@
 export interface PWACategoriesProps {
-  pcpw_id: number
+  pcpw_id?: number
   pcpw_cash_id: number | null
-  cash_descricao: string
-  pcpw_rv_id: number | null
-  pcpw_descricao: string
+  cash_descricao?: string
+  pcpw_rv_id?: number | null
+  pcpw_descricao?: string
   pcpw_imagem: string | null
-  prrv_nome: string | null
+  prrv_nome?: string | null
   pcpw_ativo: boolean
-  pcpw_prrv_id: number
+  pcpw_prrv_id?: number
+  pcpw_categoria_operacao: string
+  categoria_padrao?: boolean
 }
 
 export interface Category {
@@ -37,4 +39,9 @@ export interface PWAProvidersInCategoriesProps {
 export interface PWAAddProductsCategoriesProps {
   prpc_pcpw_id: number // categoria id
   fopc_fopw_id: number // provider id
+}
+
+export interface PWADefaultOperationsCategories {
+  debito: string[]
+  credito: string[]
 }

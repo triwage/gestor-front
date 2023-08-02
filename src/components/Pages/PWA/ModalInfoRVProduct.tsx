@@ -3,6 +3,7 @@ import { ListRVIndividual } from '../../../services/rv/products'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { Dialog } from '../../System/Dialog'
 import { Loader } from '../../System/Loader'
+import { TextAction } from '../../Texts/TextAction'
 import { FieldInfo } from './FieldInfo'
 import { useQuery } from '@tanstack/react-query'
 
@@ -60,6 +61,11 @@ export function ModalInfoRVProduct({
             />
           </div>
         </div>
+      )}
+      {!isLoading && !isFetching && !data && (
+        <TextAction className="p-4 font-semibold">
+          Nenhum dado para ser exibido!
+        </TextAction>
       )}
     </Dialog>
   )

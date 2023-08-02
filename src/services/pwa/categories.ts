@@ -3,6 +3,7 @@ import { alerta } from '../../components/System/Alert'
 import {
   PWAAddProductsCategoriesProps,
   PWACategoriesProps,
+  PWADefaultOperationsCategories,
   ProvidesInCategories,
 } from '../../@types/pwa/categories'
 
@@ -37,35 +38,54 @@ export async function ListCategoriesPWA(): Promise<
   }
 }
 
+export async function ListDefaultOperationsCategories(): Promise<PWADefaultOperationsCategories | null> {
+  try {
+    const res = await api.get('/pwa/default-operations')
+
+    const { data } = res.data
+
+    if (haveData(data)) {
+      return haveData(data)
+    }
+    return null
+  } catch (error) {
+    return null
+  }
+}
+
 export function usePWACategoriesOfProviders(id: number) {
   return useQuery({
-    queryKey: ['PWACategiesOfProviders'],
-    queryFn: async (): Promise<ProvidesInCategories[] | null> => {
-      try {
-        if (!id) {
-          return null
-        }
-        const res = await api.get(
-          `pwa/providers-prod-categories/product-category/${id}`,
-        )
-
-        const { success, data } = res.data
-
-        if (success && haveData(data)) {
-          return data[0].fornecedores
-        }
-        return null
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          alerta(clearCharacters(error.response?.data?.error))
-        } else {
-          console.error(error)
-        }
-        return null
-      }
-    },
+    queryKey: ['PWACategiesOfProviders', id],
+    queryFn: () => ListPWACategoriesOfProviders(id),
     cacheTime: Infinity,
   })
+}
+
+export async function ListPWACategoriesOfProviders(
+  id: number,
+): Promise<ProvidesInCategories[] | null> {
+  try {
+    if (!id) {
+      return null
+    }
+    const res = await api.get(
+      `pwa/providers-prod-categories/product-category/${id}`,
+    )
+
+    const { success, data } = res.data
+
+    if (success && haveData(data)) {
+      return data[0].fornecedores
+    }
+    return null
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      alerta(clearCharacters(error.response?.data?.error))
+    } else {
+      console.error(error)
+    }
+    return null
+  }
 }
 
 export async function addPWACategories(data: PWACategoriesProps) {
@@ -75,6 +95,8 @@ export async function addPWACategories(data: PWACategoriesProps) {
       pcpw_descricao: data.pcpw_descricao,
       pcpw_imagem: data.pcpw_imagem ?? 'Sem imagem',
       pcpw_ativo: data.pcpw_ativo,
+      pcpw_rv_id: data.pcpw_rv_id,
+      pcpw_categoria_operacao: data.pcpw_categoria_operacao,
     }
 
     const res = await api.post('/pwa/products-categories', payload)
@@ -101,6 +123,8 @@ export async function updatePWACategory(data: PWACategoriesProps) {
       pcpw_descricao: data.pcpw_descricao,
       pcpw_imagem: data.pcpw_imagem ?? '-',
       pcpw_ativo: data.pcpw_ativo,
+      pcpw_rv_id: data.pcpw_rv_id,
+      pcpw_categoria_operacao: data.pcpw_categoria_operacao,
     }
 
     const res = await api.put(

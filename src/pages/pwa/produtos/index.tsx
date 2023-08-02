@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router'
 import { Button } from '../../../components/Form/Button'
 import { ModalInfoMaxProduct } from '../../../components/Pages/PWA/ModalInfoMaxProduct'
 import { ModalInfoRVProduct } from '../../../components/Pages/PWA/ModalInfoRVProduct'
+import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextAction } from '../../../components/Texts/TextAction'
@@ -76,7 +77,16 @@ export default function PWAProducts() {
               />
             </Icon>
             <Icon
-              onClick={() => handleDeleteProduct(Number(params.data.prpw_id))}
+              onClick={() => {
+                if (!params.data.produto_padrao) {
+                  handleDeleteProduct(Number(params.data.prpw_id))
+                } else {
+                  alerta(
+                    'Essa é o produto padrão, ele não pode ser excluído',
+                    4,
+                  )
+                }
+              }}
               className="h-full w-full"
             >
               <TrashSimple

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
+import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
@@ -60,7 +61,16 @@ export default function PWACategories() {
               />
             </Icon>
             <Icon
-              onClick={() => handleDeleteCategory(params.data.pcpw_id)}
+              onClick={() => {
+                if (!params.data.categoria_padrao) {
+                  handleDeleteCategory(Number(params.data.pcpw_id))
+                } else {
+                  alerta(
+                    'Essa é a categoria padrão, ela não pode ser excluída',
+                    4,
+                  )
+                }
+              }}
               className="h-full w-full"
             >
               <TrashSimple

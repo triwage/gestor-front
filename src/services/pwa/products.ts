@@ -46,6 +46,23 @@ export function usePWACategoriesOfProdutos(id: number) {
   })
 }
 
+export async function ListProductPWAIndividual(
+  id: number,
+): Promise<PWAProductsProps[] | null> {
+  try {
+    const res = await api.get(`/pwa/products/${id}`)
+
+    const { data } = res.data
+
+    if (haveData(data)) {
+      return haveData(data)
+    }
+    return null
+  } catch (error) {
+    return null
+  }
+}
+
 export async function ListPWACategoriesOfProducts(
   id: number,
 ): Promise<Categoryes[] | null> {

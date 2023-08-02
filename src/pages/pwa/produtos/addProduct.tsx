@@ -342,10 +342,10 @@ export default function AddProduct() {
 
               newCategoriesArray.push(resNewCategory)
             } else {
-              productApp.prpw_pcpw_id = recently?.pcpw_id
+              productApp.prpw_pcpw_id = Number(recently?.pcpw_id)
             }
           } else {
-            productApp.prpw_pcpw_id = checkExistCategory?.pcpw_id
+            productApp.prpw_pcpw_id = Number(checkExistCategory?.pcpw_id)
           }
         }
 

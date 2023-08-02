@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router'
 
@@ -15,22 +15,19 @@ import { TextAction } from '../../../components/Texts/TextAction'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
 import { uploadImages } from '../../../services/images'
-import { usePWACashback } from '../../../services/pwa/cashback'
 import {
   addCategoriesInProvider,
   addPWACategories,
   removeCategoriesInProvider,
   updatePWACategory,
-  usePWACategoriesOfProviders,
 } from '../../../services/pwa/categories'
-import { usePWAProviders } from '../../../services/pwa/providers'
-import { useRVCategories } from '../../../services/rv/categories'
 
 import { PWACategoriesProps } from '../../../@types/pwa/categories'
 import { SelectProps } from '../../../@types/select'
 
 import useLoading from '../../../contexts/LoadingContext'
 import { getBase64, handleUploadImage } from '../../../functions/general'
+import { useCategoriesPWA } from '../../../hooks/useCategoriesPWA'
 import { Container } from '../../../template/Container'
 import {
   CaretLeft,
@@ -44,6 +41,7 @@ import clsx from 'clsx'
 interface Inputs extends PWACategoriesProps {
   cash: SelectProps | null
   categoryRv: SelectProps | null
+  categoria_operacao: SelectProps | null
   imagem_aux: File
 }
 
@@ -56,28 +54,21 @@ export default function UpdateCategoryPWA() {
   const router = useNavigate()
   const location = useLocation()
 
-  const { data: CashbackPWA, isLoading, isFetching } = usePWACashback()
   const {
-    data: ProvidersPWA,
-    isLoading: isLoading2,
-    isFetching: isFetching2,
-    refetch,
-  } = usePWAProviders()
-  const {
-    data: CategoriesOfProviders,
-    isLoading: isLoading3,
-    isFetching: isFetching3,
+    CategoriesRV,
+    CategoriesOfProviders,
     isFetchedAfterMount,
-  } = usePWACategoriesOfProviders(location?.state?.pcpw_id)
-  const {
-    data: CategoriesRV,
-    isLoading: isLoading4,
-    isFetching: isFetching4,
-  } = useRVCategories()
+    loading,
+    optionsCashback,
+    optionsCategoriesRV,
+    optionsProviders,
+    optionsDefaultOperationsCategories,
+    refetch,
+  } = useCategoriesPWA(location?.state?.pcpw_id)
 
   const { setLoading } = useLoading()
 
-  async function handleUpdateProductMax(data: Inputs) {
+  async function handleUpdateCategoriePWA(data: Inputs) {
     setLoading(true)
     const imageAnexed = watch('imagem_aux')
     if (imageAnexed) {
@@ -88,6 +79,7 @@ export default function UpdateCategoryPWA() {
 
     data.pcpw_cash_id = Number(data.cash?.value)
     data.pcpw_rv_id = Number(data.categoryRv?.value)
+    data.pcpw_categoria_operacao = String(data.categoria_operacao?.label)
     let message = 'Categoria criada com sucesso'
     let res = null as PWACategoriesProps | null
     if (location.state) {
@@ -134,46 +126,26 @@ export default function UpdateCategoryPWA() {
     }
   }
 
-  const optionsProviders = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
+  async function handleChangeCategorieRV(e: SelectProps) {
+    setValue('categoryRv', e)
+    const categoryRvSelected = watch('categoryRv')?.value
 
-    if (ProvidersPWA) {
-      res = ProvidersPWA?.map((item) => {
-        return {
-          value: item.fopw_id,
-          label: item.fopw_nome,
-        }
-      })
+    if (categoryRvSelected) {
+      const currentCategory = CategoriesRV?.find(
+        (e) => e.pcrv_id === categoryRvSelected,
+      )
+
+      setValue(
+        'categoria_operacao',
+        optionsDefaultOperationsCategories.find(
+          (e) => e.label === currentCategory?.pcrv_categoria_operacao,
+        ) || null,
+      )
+
+      setValue('pcpw_descricao', currentCategory?.pcrv_kind || '')
+      setValue('pcpw_ativo', true)
     }
-    return res
-  }, [ProvidersPWA])
-
-  const optionsCategoriesRV = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-
-    if (CategoriesRV) {
-      res = CategoriesRV?.map((item) => {
-        return {
-          value: item.pcrv_id,
-          label: item.pcrv_kind,
-        }
-      })
-    }
-    return res
-  }, [CategoriesRV])
-
-  const optionsCashback = useMemo(() => {
-    let res = [] as Array<{ value: number; label: string }>
-    if (CashbackPWA) {
-      res = CashbackPWA?.map((item) => {
-        return {
-          value: item.cash_id,
-          label: item.cash_descricao,
-        }
-      })
-    }
-    return res
-  }, [CashbackPWA])
+  }
 
   useEffect(() => {
     if (location.state) {
@@ -200,6 +172,20 @@ export default function UpdateCategoryPWA() {
           null,
       )
 
+      setValue(
+        'categoryRv',
+        optionsCategoriesRV?.find(
+          (e) => e.value === location.state.pcpw_rv_id,
+        ) ?? null,
+      )
+
+      setValue(
+        'categoria_operacao',
+        optionsDefaultOperationsCategories?.find(
+          (e) => e.label === location.state.pcpw_categoria_operacao,
+        ) ?? null,
+      )
+
       if (isFetchedAfterMount) {
         CategoriesOfProviders?.forEach((item) => {
           // @ts-expect-error
@@ -207,18 +193,16 @@ export default function UpdateCategoryPWA() {
         })
       }
     }
-  }, [location, optionsCashback, CategoriesOfProviders])
+  }, [
+    location,
+    optionsCashback,
+    CategoriesOfProviders,
+    optionsDefaultOperationsCategories,
+  ])
 
   return (
     <Container>
-      {(isLoading ||
-        isFetching ||
-        isLoading2 ||
-        isFetching2 ||
-        isLoading3 ||
-        isFetching3 ||
-        isLoading4 ||
-        isFetching4) && <Loader />}
+      {loading() && <Loader />}
       <div className="flex w-full flex-col">
         <div className="flex w-full items-center justify-between gap-2 border-b border-border pb-2">
           <div className="flex items-center gap-2">
@@ -236,16 +220,17 @@ export default function UpdateCategoryPWA() {
         <FormProvider {...formCategory}>
           <form
             className="my-2 space-y-2"
-            onSubmit={handleSubmit(handleUpdateProductMax)}
+            onSubmit={handleSubmit(handleUpdateCategoriePWA)}
           >
             <div className="flex gap-2">
-              <Input name="pcpw_descricao" label="Nome" />
               <Select
                 control={control}
                 label="Categoria da RV"
                 name="categoryRv"
                 options={optionsCategoriesRV}
+                onChange={(e: any) => handleChangeCategorieRV(e)}
               />
+              <Input name="pcpw_descricao" label="Nome" />
             </div>
             <div className="grid grid-cols-2 items-center gap-2">
               <Select
@@ -253,6 +238,12 @@ export default function UpdateCategoryPWA() {
                 label="Cashback"
                 name="cash"
                 options={optionsCashback}
+              />
+              <Select
+                control={control}
+                label="Categoria padrão"
+                name="categoria_operacao"
+                options={optionsDefaultOperationsCategories}
               />
 
               <Switch name="pcpw_ativo" label="Ativo" />
@@ -343,7 +334,10 @@ export default function UpdateCategoryPWA() {
             </div>
 
             <div className="w-full border-t border-border pt-1">
-              <Button onClick={() => handleSubmit(handleUpdateProductMax)}>
+              <Button
+                disable={location?.state?.categoria_padrao}
+                onClick={() => handleSubmit(handleUpdateCategoriePWA)}
+              >
                 <FloppyDiskBack size={18} weight="fill" />
                 {location.state ? 'Atualizar categoria' : 'Adicionar categoria'}
               </Button>
