@@ -39,6 +39,7 @@ import {
 } from '@phosphor-icons/react'
 
 interface Inputs extends UpdateParamsDefaultProps {
+  label: string
   para_prod_pgto_pwa_id: number | null
   para_imagem: string | null
   imagem_aux_produto: File | null
@@ -178,6 +179,7 @@ export default function Params() {
         data.para_prod_pgto_pwa_id = Number(resPwa?.id)
       }
     }
+    data.prpw_descricao = 'Produto de pagamento padrão'
     await updateParamsDefault(data)
     setLoading(false)
   }
@@ -229,6 +231,7 @@ export default function Params() {
       setValue('para_prod_pgto_pwa_id', Number(resPwa?.prpw_id))
       await updateParamsDefault({
         para_id: 1,
+        prpw_descricao: 'Produto de pagamento padrão',
         para_prod_pgto_pwa_id: Number(resPwa?.prpw_id),
         para_imagem: null,
         para_imagem_padrao_fornecedor: null,
@@ -261,6 +264,11 @@ export default function Params() {
         // @ts-expect-error
         setValue(String(param), ParamsDefault[param])
       })
+
+      setValue(
+        'label',
+        `${ParamsDefault.para_id} - ${ParamsDefault.prpw_descricao}`,
+      )
     }
   }, [ParamsDefault])
 
@@ -285,7 +293,7 @@ export default function Params() {
             <div className="flex h-full w-full items-start gap-2">
               <div className="flex min-h-[240px] w-1/2 flex-col justify-between gap-1">
                 <Input
-                  name="para_prod_pgto_pwa_id"
+                  name="label"
                   label="Produto de pagamento padrão"
                   disabled
                 />

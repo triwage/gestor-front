@@ -42,8 +42,6 @@ export function ModalInfoPWAProduct({
     }
   }, [data])
 
-  console.log(imagem)
-
   return (
     <Dialog open={open} closeDialog={closeDialog}>
       {(isLoading || isFetching) && <Loader />}

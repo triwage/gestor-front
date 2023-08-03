@@ -108,7 +108,7 @@ export default function PWACategories() {
       cellRenderer: (params: { data: PWACategoriesProps }) => {
         if (params?.data) {
           return `${params?.data?.pcpw_rv_id ?? 'N/A'} - ${
-            params?.data?.prrv_nome ?? 'N/A'
+            params?.data?.pcrv_kind ?? 'N/A'
           }`
         }
       },

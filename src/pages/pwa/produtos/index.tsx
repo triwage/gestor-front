@@ -142,7 +142,9 @@ export default function PWAProducts() {
         if (params.data.prpw_max_id) {
           return (
             <>
-              <TextAction className="text-[15px] font-medium">{`${params?.data?.prpw_prrv_id} - ${params?.data?.prrv_nome}`}</TextAction>
+              <TextAction className="text-[15px] font-medium">{`${
+                params?.data?.prpw_prrv_id ?? 'N/A'
+              } - ${params?.data?.prrv_nome ?? 'N/A'}`}</TextAction>
               <Icon
                 onClick={() => {
                   setIdDataProductRV(params.data.prpw_prrv_id)
@@ -188,7 +190,7 @@ export default function PWAProducts() {
       cellRenderer: (params: { data: PWAProductsProps }) => {
         if (params?.data) {
           return `${params?.data?.prpw_fopw_id ?? 'N/A'} - ${
-            params?.data?.fopw_descricao ?? 'N/A'
+            params?.data?.fopw_nome ?? 'N/A'
           }`
         }
       },
