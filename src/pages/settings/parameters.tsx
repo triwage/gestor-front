@@ -40,7 +40,7 @@ import {
 
 interface Inputs extends UpdateParamsDefaultProps {
   para_prod_pgto_pwa_id: number | null
-  para_imagem_padrao_produto: string | null
+  para_imagem: string | null
   imagem_aux_produto: File | null
   para_imagem_padrao_fornecedor: string | null
   imagem_aux_fornecedor: File | null
@@ -69,7 +69,7 @@ export default function Params() {
     const res = await handleUploadImage(event)
     if (res) {
       const imageFinal = (await getBase64(res)) as string
-      setValue('para_imagem_padrao_produto', imageFinal)
+      setValue('para_imagem', imageFinal)
       setValue('imagem_aux_produto', res)
     }
     const inputElem = document.getElementById('newFile') as HTMLInputElement
@@ -110,9 +110,9 @@ export default function Params() {
     const imageAnexedCategory = watch('imagem_aux_categoria')
 
     if (imageAnexed) {
-      data.para_imagem_padrao_produto = await uploadImages(imageAnexed)
+      data.para_imagem = await uploadImages(imageAnexed)
     } else {
-      data.para_imagem_padrao_produto = watch('para_imagem_padrao_produto')
+      data.para_imagem = watch('para_imagem')
     }
     if (imageAnexedProvider) {
       data.para_imagem_padrao_fornecedor = await uploadImages(
@@ -134,11 +134,11 @@ export default function Params() {
 
     if (!data.para_prod_pgto_pwa_id) {
       const res = await addMaxProduct({
-        descricao: 'Produto padrão',
-        imagem_padrao_url: data.para_imagem_padrao_produto,
+        descricao: 'Produto de pagamento padrão',
+        imagem_padrao_url: data.para_imagem,
         preco: 0.01,
         status: true,
-        nome: 'Produto padrão',
+        nome: 'Produto de pagamento padrão',
         id: null,
       })
 
@@ -150,7 +150,7 @@ export default function Params() {
         } else {
           const newCategorie = await addPWACategories({
             pcpw_cash_id: null,
-            pcpw_descricao: 'Categoria padrão',
+            pcpw_descricao: 'Categoria padrão pagamento',
             pcpw_imagem: 'Sem imagem',
             pcpw_ativo: true,
             pcpw_categoria_operacao: 'pagamentos',
@@ -169,7 +169,7 @@ export default function Params() {
           pcpw_descricao: null,
           prpw_fopw_id: null,
           fopw_descricao: null,
-          prpw_descricao: 'Produto padrão',
+          prpw_descricao: 'Produto de pagamento padrão',
           prpw_imagem: 'não nula',
           prpw_valor: 0.01,
           prpw_ativo: true,
@@ -186,11 +186,11 @@ export default function Params() {
     setLoading(true)
 
     const res = await addMaxProduct({
-      descricao: 'Produto padrão',
+      descricao: 'Produto de pagamento padrão',
       imagem_padrao_url: null,
       preco: 0.01,
       status: true,
-      nome: 'Produto padrão',
+      nome: 'Produto de pagamento padrão',
       id: null,
     })
 
@@ -202,7 +202,7 @@ export default function Params() {
       } else {
         const newCategorie = await addPWACategories({
           pcpw_cash_id: null,
-          pcpw_descricao: 'Categoria padrão',
+          pcpw_descricao: 'Categoria padrão de pagamento',
           pcpw_imagem: 'Sem imagem',
           pcpw_ativo: true,
           pcpw_categoria_operacao: 'pagamentos',
@@ -221,7 +221,7 @@ export default function Params() {
         pcpw_descricao: null,
         prpw_fopw_id: null,
         fopw_descricao: null,
-        prpw_descricao: 'Produto padrão',
+        prpw_descricao: 'Produto de pagamento padrão',
         prpw_imagem: 'não nula',
         prpw_valor: 0.01,
         prpw_ativo: true,
@@ -230,7 +230,7 @@ export default function Params() {
       await updateParamsDefault({
         para_id: 1,
         para_prod_pgto_pwa_id: Number(resPwa?.prpw_id),
-        para_imagem_padrao_produto: null,
+        para_imagem: null,
         para_imagem_padrao_fornecedor: null,
         para_imagem_padrao_categoria: null,
       })
@@ -286,7 +286,7 @@ export default function Params() {
               <div className="flex min-h-[240px] w-1/2 flex-col justify-between gap-1">
                 <Input
                   name="para_prod_pgto_pwa_id"
-                  label="Produto padrão de pagamento"
+                  label="Produto de pagamento padrão"
                   disabled
                 />
                 <div className="flex w-full flex-col gap-2">
@@ -325,12 +325,9 @@ export default function Params() {
                 <TextAction className="text-sm font-medium text-black dark:text-white">
                   Imagem padrão para produto
                 </TextAction>
-                {watch('para_imagem_padrao_produto') && (
+                {watch('para_imagem') && (
                   <div className="max-h-[197px] w-[123px] rounded-md">
-                    <img
-                      src={watch('para_imagem_padrao_produto') ?? ''}
-                      alt="Produto"
-                    />
+                    <img src={watch('para_imagem') ?? ''} alt="Produto" />
                   </div>
                 )}
 
@@ -340,14 +337,14 @@ export default function Params() {
                 >
                   <div className="flex select-none items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-white">
                     <FileImage size={20} weight="fill" />
-                    {!watch('para_imagem_padrao_produto')
+                    {!watch('para_imagem')
                       ? 'Adicionar imagem'
                       : 'Alterar imagem'}
                   </div>
-                  {watch('para_imagem_padrao_produto') && (
+                  {watch('para_imagem') && (
                     <Button
                       onClick={() => {
-                        setValue('para_imagem_padrao_produto', null)
+                        setValue('para_imagem', null)
                         setValue('imagem_aux_produto', null)
                       }}
                       type="button"

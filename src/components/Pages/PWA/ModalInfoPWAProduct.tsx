@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react'
+
 import { ListProductPWAIndividual } from '../../../services/pwa/products'
 
+import Logo from '../../../assets/logo.png'
 import { FormataValorMonetario } from '../../../functions/currency'
 import { Dialog } from '../../System/Dialog'
 import { Loader } from '../../System/Loader'
@@ -18,10 +21,28 @@ export function ModalInfoPWAProduct({
   closeDialog,
   id,
 }: FormProviderProps) {
+  const [imagem, setImagem] = useState<any>(null)
+
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['PWAProductIndividual', id],
     queryFn: async () => await ListProductPWAIndividual(id),
   })
+
+  useEffect(() => {
+    const resImage = new Image()
+    if (data && data[0]?.prpw_imagem) {
+      resImage.src = data[0]?.prpw_imagem
+
+      resImage.onload = function () {
+        setImagem(data[0]?.prpw_imagem)
+      }
+      resImage.onerror = function () {
+        setImagem(null)
+      }
+    }
+  }, [data])
+
+  console.log(imagem)
 
   return (
     <Dialog open={open} closeDialog={closeDialog}>
@@ -64,13 +85,12 @@ export function ModalInfoPWAProduct({
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {data[0]?.prpw_imagem && (
-              <img
-                src={data[0]?.prpw_imagem ?? ''}
-                alt="Image"
-                className="h-full max-h-20"
-              />
+            {imagem ? (
+              <img src={imagem} alt="Image" className="h-full max-h-20" />
+            ) : (
+              <img src={Logo} alt="Image" className="h-full max-h-20" />
             )}
+
             <FieldInfo
               title="Produto ativo"
               description={data[0]?.prpw_ativo ? 'Sim' : 'Não'}
