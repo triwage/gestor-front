@@ -2,40 +2,35 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { Button } from '../../../components/Form/Button'
-import { alerta } from '../../../components/System/Alert'
+// import { alerta } from '../../../components/System/Alert'
 import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import {
-  deletePwaCategory,
-  usePWACategories,
-} from '../../../services/pwa/categories'
+import { usePWACategories } from '../../../services/pwa/categories'
 
 import { PWACategoriesProps } from '../../../@types/pwa/categories'
 
-import useConfirm from '../../../contexts/ConfirmContext'
-import useLoading from '../../../contexts/LoadingContext'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { NotePencil, PlusCircle, TrashSimple } from '@phosphor-icons/react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { NotePencil, PlusCircle } from '@phosphor-icons/react'
+// import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function PWACategories() {
-  const queryClient = useQueryClient()
   const router = useNavigate()
 
-  const { Confirm } = useConfirm()
-  const { setLoading } = useLoading()
+  // const queryClient = useQueryClient()
+  // const { Confirm } = useConfirm()
+  // const { setLoading } = useLoading()
 
   const { data, isLoading, isFetching } = usePWACategories()
 
   const [columnDefs] = useState<ColDef[]>([
     {
       field: '',
-      maxWidth: 60,
+      maxWidth: 40,
       lockVisible: true,
       cellStyle: {
         textAlign: 'center',
@@ -55,25 +50,6 @@ export default function PWACategories() {
               className="h-full w-full"
             >
               <NotePencil
-                size={20}
-                weight="fill"
-                className="text-primary dark:text-white"
-              />
-            </Icon>
-            <Icon
-              onClick={() => {
-                if (!params.data.categoria_padrao) {
-                  handleDeleteCategory(Number(params.data.pcpw_id))
-                } else {
-                  alerta(
-                    'Essa é a categoria padrão, ela não pode ser excluída',
-                    4,
-                  )
-                }
-              }}
-              className="h-full w-full"
-            >
-              <TrashSimple
                 size={20}
                 weight="fill"
                 className="text-primary dark:text-white"
@@ -175,25 +151,25 @@ export default function PWACategories() {
     },
   ])
 
-  const { mutateAsync: handleDeleteCategory } = useMutation(
-    async (id: number) => {
-      const check = await Confirm({
-        title: 'Excluir categoria',
-        message: 'Tem certeza que deseja excluir essa categoria?',
-      })
+  // const { mutateAsync: handleDeleteCategory } = useMutation(
+  //   async (id: number) => {
+  //     const check = await Confirm({
+  //       title: 'Excluir categoria',
+  //       message: 'Tem certeza que deseja excluir essa categoria?',
+  //     })
 
-      if (check) {
-        setLoading(true)
-        const res = await deletePwaCategory(id)
+  //     if (check) {
+  //       setLoading(true)
+  //       const res = await deletePwaCategory(id)
 
-        if (res) {
-          const updateData = data?.filter((e) => e.pcpw_id !== id)
-          queryClient.setQueryData(['PWACategories'], updateData)
-        }
-        setLoading(false)
-      }
-    },
-  )
+  //       if (res) {
+  //         const updateData = data?.filter((e) => e.pcpw_id !== id)
+  //         queryClient.setQueryData(['PWACategories'], updateData)
+  //       }
+  //       setLoading(false)
+  //     }
+  //   },
+  // )
 
   return (
     <Container>

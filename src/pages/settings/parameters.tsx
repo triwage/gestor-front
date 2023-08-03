@@ -267,7 +267,7 @@ export default function Params() {
 
       setValue(
         'label',
-        `${ParamsDefault.para_id} - ${ParamsDefault.prpw_descricao}`,
+        `${ParamsDefault.para_prod_pgto_pwa_id} - ${ParamsDefault.prpw_descricao}`,
       )
     }
   }, [ParamsDefault])

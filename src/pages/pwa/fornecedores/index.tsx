@@ -6,35 +6,32 @@ import { Icon } from '../../../components/System/Icon'
 import { Loader } from '../../../components/System/Loader'
 import { TextHeading } from '../../../components/Texts/TextHeading'
 
-import {
-  deletePWAProvider,
-  usePWAProviders,
-} from '../../../services/pwa/providers'
+import { usePWAProviders } from '../../../services/pwa/providers'
 
 import { PWAProvidersProps } from '../../../@types/pwa/providers'
 
-import useConfirm from '../../../contexts/ConfirmContext'
-import useLoading from '../../../contexts/LoadingContext'
+// import useConfirm from '../../../contexts/ConfirmContext'
+// import useLoading from '../../../contexts/LoadingContext'
 import { AgGridTranslation } from '../../../libs/apiGridTranslation'
 import { Container } from '../../../template/Container'
-import { NotePencil, PlusCircle, TrashSimple } from '@phosphor-icons/react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { NotePencil, PlusCircle } from '@phosphor-icons/react'
+// import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 
 export default function PWAProviders() {
-  const queryClient = useQueryClient()
   const router = useNavigate()
 
-  const { Confirm } = useConfirm()
-  const { setLoading } = useLoading()
+  // const queryClient = useQueryClient()
+  // const { Confirm } = useConfirm()
+  // const { setLoading } = useLoading()
 
   const { data, isLoading, isFetching } = usePWAProviders()
 
   const [columnDefs] = useState<ColDef[]>([
     {
       field: '',
-      maxWidth: 60,
+      maxWidth: 40,
       lockVisible: true,
       cellStyle: {
         textAlign: 'center',
@@ -54,16 +51,6 @@ export default function PWAProviders() {
               className="h-full w-full"
             >
               <NotePencil
-                size={20}
-                weight="fill"
-                className="text-primary dark:text-white"
-              />
-            </Icon>
-            <Icon
-              onClick={() => handleDeleteCategory(params.data.fopw_id)}
-              className="h-full w-full"
-            >
-              <TrashSimple
                 size={20}
                 weight="fill"
                 className="text-primary dark:text-white"
@@ -159,25 +146,25 @@ export default function PWAProviders() {
     },
   ])
 
-  const { mutateAsync: handleDeleteCategory } = useMutation(
-    async (id: number) => {
-      const check = await Confirm({
-        title: 'Excluir fornecedor',
-        message: 'Tem certeza que deseja excluir esse fornecedor?',
-      })
+  // const { mutateAsync: handleDeleteCategory } = useMutation(
+  //   async (id: number) => {
+  //     const check = await Confirm({
+  //       title: 'Excluir fornecedor',
+  //       message: 'Tem certeza que deseja excluir esse fornecedor?',
+  //     })
 
-      if (check) {
-        setLoading(true)
-        const res = await deletePWAProvider(id)
+  //     if (check) {
+  //       setLoading(true)
+  //       const res = await deletePWAProvider(id)
 
-        if (res) {
-          const updateData = data?.filter((e) => e.fopw_id !== id)
-          queryClient.setQueryData(['PWAProviders'], updateData)
-        }
-        setLoading(false)
-      }
-    },
-  )
+  //       if (res) {
+  //         const updateData = data?.filter((e) => e.fopw_id !== id)
+  //         queryClient.setQueryData(['PWAProviders'], updateData)
+  //       }
+  //       setLoading(false)
+  //     }
+  //   },
+  // )
 
   return (
     <Container>
