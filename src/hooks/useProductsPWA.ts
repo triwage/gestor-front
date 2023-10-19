@@ -93,6 +93,7 @@ export function useProductsPWA(idProduct: number) {
   const optionsCategories = useMemo(() => {
     let res = [] as Array<{ value: number; label: string }>
     if (CategoriesPWA.data) {
+      // @ts-expect-error
       res = CategoriesPWA.data?.map((item) => {
         return {
           value: item.pcpw_id,

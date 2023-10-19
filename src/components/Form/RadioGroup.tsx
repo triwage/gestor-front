@@ -1,8 +1,7 @@
 import { InputHTMLAttributes } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-import { getParseMessageError } from '~/functions/stringsAndObjects'
-
+import { getParseMessageError } from '../../functions/stringsAndObjects'
 import { TextAction } from '../Texts/TextAction'
 import { RadioButton } from './RadioButton'
 

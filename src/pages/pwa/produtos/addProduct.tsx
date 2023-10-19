@@ -245,8 +245,8 @@ export default function AddProduct() {
     })
 
     if (check) {
-      const newProvidersArray = [] as PWAProvidersProps[] | []
-      const newCategoriesArray = [] as PWACategoriesProps[] | []
+      const newProvidersArray = [] as any
+      const newCategoriesArray = [] as any
 
       for (const [index, item] of selectedData.entries()) {
         setCurrentSync(`${index}/${selectedData.length}`)
@@ -291,7 +291,7 @@ export default function AddProduct() {
 
           if (dataNewProvider && !checkExistProvider) {
             const recentlyProvider = newProvidersArray?.find(
-              (e) => e.fopw_forv_id === item?.prrv_forv_id,
+              (e: any) => e.fopw_forv_id === item?.prrv_forv_id,
             )
             if (!recentlyProvider) {
               dataProvider.fopw_nome = dataNewProvider?.forv_provider
@@ -328,7 +328,7 @@ export default function AddProduct() {
 
           if (!checkExistCategory) {
             const recently = newCategoriesArray?.find(
-              (e) => e.pcpw_descricao === item?.pcrv_kind,
+              (e: any) => e.pcpw_descricao === item?.pcrv_kind,
             )
 
             if (!recently) {
